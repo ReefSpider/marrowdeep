@@ -27,19 +27,14 @@ let peerLib=null;
 function loadPeer(){ if(window.Peer) return Promise.resolve(); if(peerLib) return peerLib;
   peerLib=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'; sc.onload=()=>res(); sc.onerror=()=>{ peerLib=null; rej(new Error('lib')); }; document.head.appendChild(sc); }); return peerLib; }
 /* Where two machines find a route to each other. STUN finds a direct path; when a network won't allow one
-   (mobile data, carrier-grade NAT, office firewalls) the TURN relays carry the game instead.
+   (mobile data, carrier-grade NAT, office firewalls) a TURN relay has to carry the game instead.
    METERED_TURN: paste a Metered TURN credentials URL here (free account, 20 GB a month) for a dedicated relay:
    'https://YOURAPP.metered.live/api/v1/turn/credentials?apiKey=YOURKEY' */
 const METERED_TURN='';
 let ICE=null, iceAt=0;
 async function iceConfig(){ if(ICE&&Date.now()-iceAt<6*3600e3) return ICE;
-  const sv=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']},
-    {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'}];
-  /* Open Relay (Metered's free public TURN), with short-lived credentials made the standard way from its public secret */
-  try{ const user=(Math.floor(Date.now()/1000)+24*3600)+':marrowdeep', enc=new TextEncoder();
-    const key=await crypto.subtle.importKey('raw',enc.encode('openrelayprojectsecret'),{name:'HMAC',hash:'SHA-1'},false,['sign']);
-    const sig=new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(user))); const cred=btoa(String.fromCharCode(...sig));
-    sv.push({urls:['turn:staticauth.openrelay.metered.ca:80','turn:staticauth.openrelay.metered.ca:443?transport=tcp','turns:staticauth.openrelay.metered.ca:443?transport=tcp'],username:user,credential:cred}); }catch(e){}
+  /* PeerJS's own relays and Metered's old anonymous Open Relay no longer answer (checked 2026-11-04), so the only relay is the one in METERED_TURN */
+  const sv=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
   if(METERED_TURN) try{ const r=await fetch(METERED_TURN); if(r.ok){ const a=await r.json(); if(Array.isArray(a)) sv.push(...a); } }catch(e){}
   ICE={iceServers:sv}; iceAt=Date.now(); return ICE; }
 /* watch a connection's route-finding, so a failure can say what went wrong */
@@ -48,7 +43,7 @@ function watchIce(c,on){ const t0=Date.now(); const poll=setInterval(()=>{ const
     pc.addEventListener('icecandidate',ev=>{ const cd=ev.candidate&&ev.candidate.candidate||''; if(/ typ relay/.test(cd)) info.relay=true; else if(/ typ srflx/.test(cd)) info.srflx=true; else if(/ typ host/.test(cd)) info.host=true; });
     pc.addEventListener('iceconnectionstatechange',()=>{ info.state=pc.iceConnectionState; if(on) on(info.state,info); }); },50); }
 function iceWhy(info){ if(!info) return 'No answer from the host\'s machine.';
-  if(info.state==='failed'||info.state==='disconnected') return info.relay?'Found the host, but no route between your networks worked, not even through the relay. One of you is on a network that blocks games like this (some work, school or mobile networks).':'Found the host, but your networks couldn\'t reach each other and the relay servers didn\'t answer.';
+  if(info.state==='failed'||info.state==='disconnected') return info.relay?'Found the host, but no route between your networks worked, not even through the relay. One of you is on a network that blocks games like this (some work, school or mobile networks).':METERED_TURN?'Found the host, but your networks couldn\'t reach each other and the relay server didn\'t answer.':'Found the host, but your networks can\'t reach each other directly, and no relay server is set up to carry the game.';
   if(!info.srflx&&!info.relay) return 'Found the host, but your browser didn\'t share any network route. A privacy setting or extension may be blocking WebRTC (Brave shields, uBlock\'s "prevent WebRTC leak", a VPN).';
   return 'Found the host, but the connection never finished opening. A strict network on one side, most likely.'; }
 class PeerTr{ constructor(h){ this.h=h; this.conns=new Map(); }
