@@ -30,7 +30,7 @@ function loadPeer(){ if(window.Peer) return Promise.resolve(); if(peerLib) retur
    (mobile data, carrier-grade NAT, office firewalls) a TURN relay has to carry the game instead.
    METERED_TURN: paste a Metered TURN credentials URL here (free account, 20 GB a month) for a dedicated relay:
    'https://YOURAPP.metered.live/api/v1/turn/credentials?apiKey=YOURKEY' */
-const METERED_TURN='';
+const METERED_TURN='https://marrowdeep.metered.live/api/v1/turn/credentials?apiKey=850a46ee178694db2a2aa562fefab7aab1e1';
 let ICE=null, iceAt=0;
 async function iceConfig(){ if(ICE&&Date.now()-iceAt<6*3600e3) return ICE;
   /* PeerJS's own relays and Metered's old anonymous Open Relay no longer answer (checked 2026-11-04), so the only relay is the one in METERED_TURN */
