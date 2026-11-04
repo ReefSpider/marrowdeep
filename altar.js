@@ -12,7 +12,7 @@
 #altarScr .mh{font-size:calc(var(--u)*3.2);margin-bottom:calc(var(--u)*.4)}
 #altarScr .sub{font-family:var(--fs);font-size:max(10px,calc(var(--u)*1.2));color:#9a8a7a;letter-spacing:.08em;margin-bottom:calc(var(--u)*1)}
 #altarScr .pane{gap:calc(var(--u)*1.6)}
-#altarScr .bag{grid-template-columns:repeat(6,calc(var(--u)*4.4));grid-auto-rows:calc(var(--u)*4.4)}
+#altarScr .bag{grid-template-columns:repeat(9,calc(var(--u)*3.9));grid-auto-rows:calc(var(--u)*3.9)}
 #altarScr .bag.worn{grid-template-columns:repeat(6,calc(var(--u)*4.4))}
 .alc{min-width:calc(var(--u)*34);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.7)}
 .alc h3{margin:0!important;font-size:calc(var(--u)*2.1)!important}
@@ -104,7 +104,7 @@ const altarScr=document.createElement('div'); altarScr.className='screen'; altar
 function ownedList(){ const out=[]; for(const k of ['weapon','off','helm','armor','amulet','ring']) if(P.equip[k]) out.push({it:P.equip[k],where:'equip',k}); P.bag.forEach((it,i)=>out.push({it,where:'bag',i})); return out; }
 function locOf(it){ for(const k in P.equip) if(P.equip[k]===it) return {where:'equip',k}; const i=P.bag.indexOf(it); return i>=0?{where:'bag',i}:null; }
 function takeOut(it){ const l=locOf(it); if(!l) return; if(l.where==='equip') P.equip[l.k]=null; else P.bag.splice(l.i,1); }
-function putIn(old,nit){ const l=locOf(old); if(!l){ if(P.bag.length<24) P.bag.push(nit); else dropItem(nit,P.x,P.y-10,true); return; } if(l.where==='equip') P.equip[l.k]=nit; else P.bag[l.i]=nit; }
+function putIn(old,nit){ const l=locOf(old); if(!l){ if(!bagAdd(nit)) dropItem(nit,P.x,P.y-10,true); return; } if(l.where==='equip') P.equip[l.k]=nit; else { nit.bx=old.bx; nit.by=old.by; P.bag[l.i]=nit; bagEnsure(); } }
 function altarOdds(){ const it=ALTAR.prim; if(!it) return null; const r=it.rarity;
   const base=32+[0,0,-3,-6,-8,-12][r]; let tr=0; for(const t of ALTAR.trib) tr+=[4,6,9,14,18,30][t.rarity]; tr=Math.min(45,tr);
   const K=120*(1+(it.ilvl||1)/6); const gb=ALTAR.gold>0?32*ALTAR.gold/(ALTAR.gold+K):0;
@@ -127,7 +127,7 @@ function renderAltar(){ const o=altarOdds(), it=ALTAR.prim, plain=it&&it.rarity=
     <div class="row"><button class="btn" id="alGo"${it?'':' disabled'}>Offer it up <kbd>E</kbd></button><button class="btn ghost" id="alClose">Leave <kbd>Esc</kbd></button></div></div></div>`;
   const mk=(e)=>{ const d=slotEl(e.it,()=>altarPick(e.it)); if(e.it===ALTAR.prim) d.classList.add('sel'); if(ALTAR.trib.includes(e.it)) d.classList.add('trib'); return d; };
   const all=ownedList(); const bag=$('#alBag'), worn=$('#alWorn');
-  for(let i=0;i<24;i++){ const e=all.find(x=>x.where==='bag'&&x.i===i); bag.appendChild(e?mk(e):slotEl(null)); }
+  for(let i=0;i<Math.max(27,Math.ceil(P.bag.length/9)*9);i++){ const e=all.find(x=>x.where==='bag'&&x.i===i); bag.appendChild(e?mk(e):slotEl(null)); }
   for(const e of all.filter(x=>x.where==='equip')) worn.appendChild(mk(e)); for(let i=all.filter(x=>x.where==='equip').length;i<6;i++) worn.appendChild(slotEl(null));
   const pr=$('#alPrim'); if(it){ pr.appendChild(iconEl(it)); bindTip(pr,it); pr.onclick=()=>altarPick(it); }
   const tb=$('#alTrib'); for(let i=0;i<4;i++){ const t=ALTAR.trib[i]; tb.appendChild(slotEl(t||null,t?()=>altarPick(t):null)); }

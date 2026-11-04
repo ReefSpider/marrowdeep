@@ -71,11 +71,12 @@ const stashScr=document.createElement('div'); stashScr.className='screen'; stash
 function slotEl(it,onclick){ const d=document.createElement('div'); d.className='slot'; if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); bindTip(d,it); d.onclick=onclick; } return d; }
 function openStash(){ mode='inv'; hud.hidden=true; stashScr.hidden=false; renderStash(); }
 function closeStash(){ stashScr.hidden=true; hideTip(); mode='play'; hud.hidden=false; saveGame(); }
-function renderStash(){ stashScr.innerHTML=`<h2 class="mh">The stash 蔵</h2><div class="pane"><div class="panel"><h3>Satchel</h3><div class="bag" id="sbBag"></div><div class="hint">Click to put it in the stash</div></div>
+function renderStash(){ stashScr.innerHTML=`<h2 class="mh">The stash 蔵</h2><div class="pane"><div class="panel"><h3>Satchel</h3><div class="bag" id="sbBag"></div><div class="hint">Click or drag onto the stash to store · drag to rearrange</div></div>
   <div class="panel"><h3>Stash · ${STASH.length}/${STASH_N}</h3><div class="bag stash" id="sbStash"></div><div class="hint">Shared by every character · click to take</div></div></div><div class="row"><button class="btn" id="sbClose">Close <kbd>Esc</kbd></button></div>`;
   const b=$('#sbBag'), s=$('#sbStash');
-  for(let i=0;i<24;i++){ const it=P.bag[i]; b.appendChild(slotEl(it,()=>{ if(STASH.length>=STASH_N){ toast('The stash is full.'); return; } STASH.push(P.bag.splice(i,1)[0]); saveStash(); hideTip(); AU.coin(); renderStash(); })); }
-  for(let i=0;i<STASH_N;i++){ const it=STASH[i]; s.appendChild(slotEl(it,()=>{ if(P.bag.length>=24){ toast('Your satchel is full.'); return; } P.bag.push(STASH.splice(i,1)[0]); saveStash(); hideTip(); AU.coin(); renderStash(); })); }
+  const toStash=i=>{ if(STASH.length>=STASH_N){ toast('The stash is full.'); return false; } const it=P.bag.splice(i,1)[0]; it.bx=it.by=null; STASH.push(it); saveStash(); hideTip(); AU.coin(); renderStash(); return true; };
+  renderBagGrid(b,{cell:'calc(var(--u)*2.45)',click:(it,i)=>toStash(i),drops:{'#sbStash':(it,i)=>toStash(i)},after:renderStash});
+  for(let i=0;i<STASH_N;i++){ const it=STASH[i]; s.appendChild(slotEl(it,()=>{ if(!bagAdd(STASH[i])){ toast('No room in your satchel for that.'); return; } STASH.splice(i,1); saveStash(); hideTip(); AU.coin(); renderStash(); })); }
   $('#sbClose').onclick=closeStash; }
 
 /* ---------- loadouts: three saved sets of gear on the rack ---------- */
@@ -85,7 +86,7 @@ function saveLoadout(n){ META.loadouts[n]={equip:Object.fromEntries(Object.entri
 function wearLoadout(n){ const lo=META.loadouts[n]; if(!lo) return; let missing=0;
   for(const k in lo.equip){ const f=lo.equip[k]; if(!f){ continue; } if(fp(P.equip[k])===f) continue; const at=findItem(f); if(!at){ missing++; continue; }
     let it; if(at.where==='bag') it=P.bag.splice(at.i,1)[0]; else if(at.where==='stash') it=STASH.splice(at.i,1)[0]; else { it=P.equip[at.k]; P.equip[at.k]=null; }
-    const old=P.equip[k]; P.equip[k]=it; if(old){ if(P.bag.length<24) P.bag.push(old); else STASH.push(old); } }
+    const old=P.equip[k]; P.equip[k]=it; if(old){ if(!bagAdd(old)) STASH.push(old); } }
   saveStash(); calcStats(); P.life=P.stats.life; saveGame(); AU.pickup(); toast(missing?`Loadout ${n+1} worn · ${missing} piece${missing>1?'s':''} no longer owned`:`Loadout ${n+1} worn.`); }
 function loadoutCard(){ const row=n=>{ const lo=META.loadouts[n]; return lo?Object.values(lo.names).join(' · '):'Empty'; };
   showCard({title:'The weapon rack',jp:'武具掛け',body:'Three pegs, three ways to go down. Wear a set and anything it needs comes off the rack, out of the satchel or out of the stash.\n\n'+[0,1,2].map(n=>`${n+1}. ${row(n)}`).join('\n'),
@@ -177,7 +178,7 @@ function showMap(from,to,onGo){ const prev=mode; mode='map'; hud.hidden=true; ma
   const step=now=>{ const k=moving?clamp((now-t0)/1600,0,1):1; drawMap(from,to,1-Math.pow(1-k,3)); mapAnim=requestAnimationFrame(step); }; mapAnim=requestAnimationFrame(step); if(moving) AU.tone('sine',220,330,1.2,.06,.6); $('#mapGo').focus({preventScroll:true}); }
 (function(){ const o=nextLevel; nextLevel=function(){ const ni=lvlIdx+1; if(ni<CABIN_IDX&&LEVELS[lvlIdx].kind!=='cabin'){ showMap(lvlIdx,ni,()=>o()); } else o(); }; })();
 addEventListener('keydown',ev=>{ const k=ev.key.length===1?ev.key.toLowerCase():ev.key;
-  if(mode==='map'&&(k==='e'||k==='Enter'||k==='Escape'||k==='m'||k===' ')){ ev.preventDefault(); mapScr._close&&mapScr._close(); return; }
+  if(mode==='map'&&(k==='e'||k==='Enter'||k==='Escape'||k==='m'||k===' ')){ ev.preventDefault(); ev.stopImmediatePropagation(); if(ev.repeat) return; mapScr._close&&mapScr._close(); return; }
   if(mode==='play'&&k==='m'&&L&&L.def.kind!=='cabin'){ ev.preventDefault(); showMap(lvlIdx,lvlIdx); }
   if(mode==='inv'&&!stashScr.hidden&&['Escape','e','i','t','c','Tab'].includes(k)){ ev.preventDefault(); ev.stopImmediatePropagation(); if(k==='Escape'||k==='e') closeStash(); } },true);
 { const pb=document.createElement('button'); pb.className='btn ghost'; pb.id='pMap'; pb.innerHTML='Map <kbd>M</kbd>'; $('#pCodex').after(pb); pb.onclick=()=>{ $('#pause').hidden=true; mode='play'; if(L&&L.def.kind!=='cabin') showMap(lvlIdx,lvlIdx); else { hud.hidden=false; } }; }

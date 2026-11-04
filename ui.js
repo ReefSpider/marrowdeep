@@ -46,7 +46,7 @@ function findInteract(){
   if(L.relic&&!L.relic.taken&&Math.abs(L.relic.x+12-P.x)<22&&Math.abs(L.relic.y-P.y)<20) consider(L.relic,0,'<kbd>E</kbd> Pull the blade from the dead man',takeRelic);
   const ex=L.exit.x*T+8, ey=L.exit.y*T; if(!L.locked&&!L.noExit&&Math.abs(P.x-ex)<26&&Math.abs(P.y-ey)<22) consider(L.exit,Math.abs(P.x-ex),L.def.id==='count'?'<kbd>E</kbd> Walk into the dawn':'<kbd>E</kbd> Climb on',()=>finishLevel());
   return best; }
-function takeDrop(d){ if(P.bag.length>=24){ bark('meh'); return; } P.bag.push(d.item); d.gone=true; drops=drops.filter(x=>!x.gone); AU.coin(); noteBest(d.item); if(d.item.rarity>=4) bark('unique',true); }
+function takeDrop(d){ if(!bagAdd(d.item)){ bark('meh'); toast('No room in the satchel. Open it (I) and make space.'); return; } d.gone=true; drops=drops.filter(x=>!x.gone); AU.coin(); noteBest(d.item); if(d.item.rarity>=4) bark('unique',true); }
 function noteBest(it){ if(!P.best||it.rarity>P.best.rarity) P.best=it; }
 function takeRelic(){ const r=L.relic; r.taken=true; P.equip.weapon=mkBase('Rusted Falchion'); calcStats(); AU.pickup(); impactT=.08; shake(3); freeze=.08; sparks(r.x+12,r.y-12,14); P.face=1; P.attack=null; P.swordA=-1.2; bark('relic',true); }
 
@@ -123,7 +123,7 @@ function statReel(it,box,done,opt){ opt=opt||{}; const fast=!!opt.fast;
   if(!fast) reveal={finish:end}; raf=requestAnimationFrame(step); }
 function closeCase(take){ const cs=caseState; if(!cs||!cs.ready) return; caseState=null;
   if(take==='equip'&&typeof equipItem==='function'&&equipItem(cs.win)){}
-  else if(take&&P.bag.length<24){ P.bag.push(cs.win); AU.coin(); } else dropItem(cs.win,P.x+P.face*10,P.y-10,true);
+  else if(take&&bagAdd(cs.win)){ AU.coin(); } else dropItem(cs.win,P.x+P.face*10,P.y-10,true);
   $('#case').hidden=true; if(cs.onClose) cs.onClose(); else { hud.hidden=false; mode='play'; } }
 
 /* ---------- chest cinematic: a close-up before the reel ---------- */
@@ -158,23 +158,19 @@ function bindTip(el,it){ el.addEventListener('pointerenter',()=>showTip(it,el));
 function invMsg(t){ const h=$('#invMsg'); h.textContent=t; h.classList.remove('on'); void h.offsetWidth; h.classList.add('on'); }
 function equipFromBag(i,wantOff){ const it=P.bag[i]; let slot=it.slot;
   if(slot==='weapon'){ const b=it.base; if(b.h===0||wantOff){ if(!has('off')){ invMsg('Learn Second Hand (Steel) to use your off hand.'); return; } if(b.h===2){ invMsg('Two-handed. It needs both hands.'); return; } slot='off'; } }
-  const old=P.equip[slot]; P.equip[slot]=it; P.bag.splice(i,1); if(old) P.bag.push(old);
+  const old=P.equip[slot]; P.equip[slot]=it; bagSwapOut(i,old);
   if(slot==='weapon'&&it.base.h===2&&P.equip.off) invMsg('Two-handed weapon: your off hand rests.');
   calcStats(); AU.tone('triangle',420,300,.08,.12,.1); hideTip(); renderInv(); }
 function renderInv(){
   const eq=$('#equip'); eq.innerHTML='';
   [['weapon','Main hand','1 / 1 / 3 / 2'],['helm','Helm','1 / 2 / 2 / 3'],['armor','Armour','2 / 2 / 3 / 3'],['off','Off hand','1 / 3 / 3 / 4'],['amulet','Amulet','1 / 4 / 2 / 5'],['ring','Ring','2 / 4 / 3 / 5']].forEach(([s,lab,area])=>{
-    const d=document.createElement('div'); d.className='slot'; d.style.gridArea=area; const it=P.equip[s];
+    const d=document.createElement('div'); d.className='slot'; d.dataset.slot=s; d.style.gridArea=area; const it=P.equip[s];
     if(s==='off'&&!has('off')){ d.classList.add('lockd'); d.innerHTML='<span class="kj">双</span><span class="lab">Second Hand</span>'; d.onpointerenter=()=>showTipHTML('<div class="w">Off hand</div><div class="g">Learn Second Hand in the Steel brand.</div>',d); d.onpointerleave=hideTip; eq.appendChild(d); return; }
-    if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); if(s==='off'&&!offActive()) d.classList.add('idle'); bindTip(d,it); d.onclick=()=>{ if(P.bag.length<24){ P.bag.push(it); P.equip[s]=null; calcStats(); hideTip(); renderInv(); } }; }
+    if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); if(s==='off'&&!offActive()) d.classList.add('idle'); bindTip(d,it); d.onclick=()=>{ if(bagAdd(it)){ P.equip[s]=null; calcStats(); hideTip(); renderInv(); } else invMsg('No room in the satchel for that.'); }; }
     else { const l=document.createElement('span'); l.className='lab'; l.textContent=lab; d.appendChild(l); }
     eq.appendChild(d); });
-  const bag=$('#bag'); bag.innerHTML='';
-  for(let i=0;i<24;i++){ const d=document.createElement('div'); d.className='slot'; const it=P.bag[i];
-    if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); bindTip(d,it);
-      d.onclick=e=>{ if(e.shiftKey){ dropFromBag(i); return; } equipFromBag(i,false); };
-      d.oncontextmenu=e=>{ e.preventDefault(); equipFromBag(i,it.slot==='weapon'&&has('off')); }; }
-    bag.appendChild(d); }
+  renderBagGrid($('#bag'),{click:(it,i,e)=>{ if(e.shiftKey){ dropFromBag(i); return; } equipFromBag(i,false); },
+    context:(it,i)=>equipFromBag(i,it.slot==='weapon'&&has('off'))});
   const s=P.stats; const rate=s.spd*(1+s.as/100);
   $('#stats').innerHTML=[['Level',`${P.lvl} (${P.xp} / ${xpNext(P.lvl)})`],['Damage',`${s.min}–${s.max} ${elemSummary(s)}`],offActive()&&s.omax?['Off hand',`${s.omin}–${s.omax}`]:null,['Defense',s.def],['Life',`${Math.ceil(P.life)} / ${s.life}`],['Attack rate',rate.toFixed(2)+'×'],['Critical strike',s.crit+'%'],['Life stolen',s.ls+'%'],['Magic find',s.mf+'%'],['Gold',P.gold]].filter(Boolean).map(([a,b])=>`<span>${a}</span><b>${b}</b>`).join('');
   renderTree(); }
@@ -227,8 +223,8 @@ function endCut(){ bars(false); caption(''); const f=cut.onEnd; cut=null; fadeTa
 function saveGame(){ store.set(SAVEKEY,{v:2,lvlIdx,ngp,codex:[...CODEX_OPEN],vows:VOWS_TAKEN,seen:seenIntro,P:{lvl:P.lvl,xp:P.xp,sp:P.sp,skills:[...P.skills],gold:P.gold,potions:P.potions,equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])),bag:P.bag.map(serItem)}}); }
 function loadSave(){ const s=store.get(SAVEKEY); if(!s||s.v!==2) return null; return s; }
 function restorePlayer(sv){ P=newPlayer(); Object.assign(P,{lvl:sv.lvl,xp:sv.xp,sp:sv.sp,gold:sv.gold,potions:sv.potions}); P.skills=new Set(sv.skills); for(const k in sv.equip) P.equip[k]=deItem(sv.equip[k]); P.bag=(sv.bag||[]).map(deItem).filter(Boolean); calcStats(); P.life=P.stats.life; }
-function loadLevel(idx,opt){ opt=opt||{}; lvlIdx=idx; const def=LEVELS[idx]; const seed=(idx+1)*7919+ngp*104729+(opt.seed||0);
-  L=genLevel(def,seed); pal=PALS[def.pal]; LV=withSeed(seed+1,()=>bakeLevel(L,pal)); LVc=LV.getContext('2d'); BG=withSeed(seed+2,()=>bakeBG(pal));
+function loadLevel(idx,opt){ opt=opt||{}; lvlIdx=idx; interact=null; promptTxt=''; const def=LEVELS[idx]; const seed=(idx+1)*7919+ngp*104729+(opt.seed||0);
+  L=genLevel(def,seed); L.bornAt=performance.now(); pal=PALS[def.pal]; LV=withSeed(seed+1,()=>bakeLevel(L,pal)); LVc=LV.getContext('2d'); BG=withSeed(seed+2,()=>bakeBG(pal));
   enemies=L.spawns.map(mkEnemy); chests=L.chests.map(c=>({x:c.x*T,y:c.y*T,tier:c.tier,open:false,t:0,secret:c.secret})); drops=[]; parts=[]; ghosts=[]; projs=[]; fx=[]; bgev=[]; bgT=1.5;
   L.relic=(idx===0&&!P.equip.weapon)?{x:L.spawn.x+5*T,y:L.spawn.y,taken:false}:null;
   if(def.kind==='boss'){ const b=spawnBoss(def.boss); enemies.push(b); L.locked=false; L.noExit=true; if(def.id==='count') L.wound=.35; }
@@ -243,7 +239,9 @@ function nextLevel(){ const ni=lvlIdx+1; if(ni>=LEVELS.length){ ngp++; goLevel(1
 function goLevel(i){ if(cut){ cut=null; bars(false); caption(''); fadeTarget=1; } const prevAct=LEVELS[lvlIdx]&&LEVELS[lvlIdx].act; loadLevel(i); const act=LEVELS[i].act; mode='play'; hud.hidden=false;
   const begin=()=>{ mode='play'; hud.hidden=false; bark('start',true); setTimeout(()=>epigraph(LEVELS[i].id),400); if(typeof MUS!=='undefined') MUS.setMood(moodFor(LEVELS[i])); };
   if(act!==prevAct||ngp&&i===1) { mode='card'; actCard(act,begin); } else begin(); }
-function finishLevel(){ AU.door(); const def=LEVELS[lvlIdx];
+function finishLevel(){ /* v21: never leave a level in the same breath it opened, or while its exit is barred */
+  if(L&&L.def.kind!=='cabin'&&(performance.now()-(L.bornAt||0)<800||L.locked||L.noExit)) return;
+  AU.door(); const def=LEVELS[lvlIdx];
   if(def.id==='count'){ playEnding(); return; }
   mode='card'; merchantCard(()=>nextLevel()); }
 function respawn(){ if(typeof MUS!=='undefined') MUS.setMood(moodFor(LEVELS[lvlIdx])); const stain=P.gold>0?{x:P.x,y:Math.min(P.y,L.h*T-T),n:P.gold}:null; P.gold=0; P.life=P.stats.life; P.grit=100; P.rage=0;

@@ -337,10 +337,10 @@ function dropsIn(a){ const have=new Set(drops.map(d=>d.nid)); for(const o of a){
     if(d.item&&mode==='play'&&typeof dropRoll==='function') dropRoll(d.item,d.x,d.y); } }
 (function(){ const o=dropItem; dropItem=function(it,x,y,quiet){ if(COOP&&!NET.host){ if(NET.applying) return; toHost({t:'pdrop',it:serItem(it),x,y}); return; } return o(it,x,y,quiet); }; })();
 (function(){ const o=dropGold; dropGold=function(x,y,n){ if(COOP&&!NET.host) return; return o(x,y,n); }; })();
-(function(){ const o=takeDrop; takeDrop=function(d){ if(!COOP||!d.nid) return o(d); if(P.bag.length>=24){ bark('meh'); return; }
+(function(){ const o=takeDrop; takeDrop=function(d){ if(!COOP||!d.nid) return o(d); if(!bagRoom(d.item)){ bark('meh'); toast('No room in the satchel.'); return; }
   if(NET.host){ o(d); bcast({t:'gone',n:d.nid,by:0}); return; } if(d._pend&&time-d._pend<1.2) return; d._pend=time; toHost({t:'take',n:d.nid}); }; })();
 function takeIn(s,n){ const d=drops.find(x=>x.nid===n&&!x.gone); if(!d) return; d.gone=true; drops=drops.filter(x=>!x.gone); bcast({t:'gone',n,by:s}); }
-function goneIn(m){ const d=drops.find(x=>x.nid===m.n); if(!d) return; drops=drops.filter(x=>x!==d); if(m.by===NET.me&&!NET.host&&d.item){ if(P.bag.length<24){ P.bag.push(d.item); AU.coin(); noteBest(d.item); if(d.item.rarity>=4) bark('unique',true); } else dropItem(d.item,P.x,P.y-10,true); } }
+function goneIn(m){ const d=drops.find(x=>x.nid===m.n); if(!d) return; drops=drops.filter(x=>x!==d); if(m.by===NET.me&&!NET.host&&d.item){ if(bagAdd(d.item)){ AU.coin(); noteBest(d.item); if(d.item.rarity>=4) bark('unique',true); } else dropItem(d.item,P.x,P.y-10,true); } }
 function projIn(a){ for(const [type,x,y,vx,vy,g,r,life] of a) projs.push({type,from:'v',x,y,vx,vy,g,r,life,hits:new Set()}); }
 
 /* ---------- trading: give an item straight to someone ---------- */
@@ -349,7 +349,7 @@ function projIn(a){ for(const [type,x,y,vx,vy,g,r,life] of a) projs.push({type,f
   bar.querySelectorAll('.btn').forEach(b=>b.onclick=()=>{ const s=+b.dataset.s; NET.giveTo=NET.giveTo===s?null:s; renderInv(); }); }; })();
 (function(){ const o=equipFromBag; equipFromBag=function(i,wantOff){ if(COOP&&NET.giveTo!=null&&seatOf(NET.giveTo)){ const it=P.bag.splice(i,1)[0]; if(!it) return; const m={t:'give',to:NET.giveTo,from:NET.me,it:serItem(it)};
     if(NET.host){ if(m.to===0) giftIn(m); else sendSeat(m.to,m); } else toHost(m); hideTip(); AU.coin(); invMsg(`Given to ${nameOf(NET.giveTo)}: ${it.name}`); renderInv(); return; } return o(i,wantOff); }; })();
-function giftIn(m){ const it=deItem(m.it); if(!it) return; if(P.bag.length<24){ P.bag.push(it); noteBest(it); } else dropItem(it,P.x,P.y-10,true); AU.coin(); toast(`${nameOf(m.from)} gave you ${it.name}.`); if(mode==='inv') renderInv(); }
+function giftIn(m){ const it=deItem(m.it); if(!it) return; if(bagAdd(it)){ noteBest(it); } else dropItem(it,P.x,P.y-10,true); AU.coin(); toast(`${nameOf(m.from)} gave you ${it.name}.`); if(mode==='inv') renderInv(); }
 
 /* ---------- down, revive, wipe ---------- */
 (function(){ const o=onDeath; onDeath=function(){ if(!COOP) return o(); if(!NET.downShown){ NET.downShown=true; bannerEl.innerHTML='You\'re down<small>A teammate can stand over you to bring you back</small>'; bannerEl.hidden=false; AU.setTension(.3); } }; })();
@@ -419,7 +419,7 @@ function rollResolve(){ const r=NET.roll; r.resolved=true; const yes=NET.seats.m
     m={t:'roll',rid:r.rid,cands:yes.map((s,i)=>[s,+(ws[i]/tot*100).toFixed(1)]),win,it:ser,debt:NET.debt}; }
   bcast(m); rollIn(m); setTimeout(()=>{ NET.roll=null; const q=NET.chq.shift(); if(q) hostChest(q[0],q[1],q[2]); },5400); }
 function rollIn(m){ const cc=NET.cc; const it=cc&&cc.rid===m.rid?cc.win:deItem(m.it);
-  if(!cc||cc.rid!==m.rid||$('#case').hidden){ if(m.win===NET.me&&it){ if(P.bag.length<24) P.bag.push(it); else dropItem(it,P.x,P.y-10,true); toast(`You won ${it.name}.`); } return; }
+  if(!cc||cc.rid!==m.rid||$('#case').hidden){ if(m.win===NET.me&&it){ if(!bagAdd(it)) dropItem(it,P.x,P.y-10,true); toast(`You won ${it.name}.`); } return; }
   if(reveal) reveal.finish(); const res=$('#result'); const box=document.createElement('div'); box.className='rollv';
   if(m.none){ box.innerHTML=`<div class="rh">Nobody rolled for it.</div><div class="rwin" style="color:#9a8a7a">It lies by the chest for whoever wants it.</div>`; res.innerHTML=''; res.appendChild(box); setTimeout(()=>finishCoopCase(m,it),1900); return; }
   box.innerHTML=`<div class="rh">Fate decides</div><div class="reel"><div class="strip" id="rstrip"></div><div class="marker"></div></div><div class="nodds">${m.cands.map(([s,p])=>`<span style="color:${SEAT_C[s]}">${nameOf(s)} ${p}%</span>`).join(' · ')}</div><div class="rwin" id="rwin"></div>`;
@@ -433,7 +433,7 @@ function rollIn(m){ const cc=NET.cc; const it=cc&&cc.rid===m.rid?cc.win:deItem(m
     if(p<1) requestAnimationFrame(step); else { cards[WI].classList.add('won'); const w=$('#rwin'); w.style.color=SEAT_C[m.win]; w.textContent=m.win===NET.me?`You take it.`:`${nameOf(m.win)} takes it.`; AU.reveal(Math.min(5,it?it.rarity:1)); if(AU.caseHit) AU.caseHit(it?it.rarity:1); setTimeout(()=>finishCoopCase(m,it),1900); } };
   requestAnimationFrame(step); }
 function finishCoopCase(m,it){ if(NET.cc&&NET.cc.rid!==m.rid) return; $('#case').hidden=true; caseState=null; reveal=null; NET.cc=null; if(m.debt) NET.debtSeen=m.debt;
-  if(m.win===NET.me&&it){ if(P.bag.length<24){ P.bag.push(it); AU.coin(); noteBest(it); } else dropItem(it,P.x,P.y-10,true); toast(`${it.name} is yours.`); }
+  if(m.win===NET.me&&it){ if(bagAdd(it)){ AU.coin(); noteBest(it); } else dropItem(it,P.x,P.y-10,true); toast(`${it.name} is yours.`); }
   else if(m.win!=null&&it) toast(`${nameOf(m.win)} takes ${it.name}.`);
   if(mode==='case'){ mode='play'; hud.hidden=false; } }
 

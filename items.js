@@ -149,3 +149,34 @@ function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=
 /* ---------- serialise for save/continue ---------- */
 const serItem=it=>it&&{s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set};
 const deItem=o=>o&&fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t});
+
+/* ---------- the satchel grid (v21): items take up room by size ----------
+   16 × 10 cells. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon 1×2 to 2×3,
+   a two-hander or a polearm up to 2×4. Each item in P.bag carries its cell (bx, by); P.bag stays a plain list so
+   every older module that splices it still works. Saved as a separate list (bp) beside the items. */
+const BAG_W=16, BAG_H=10;
+function itemSize(it){ if(!it) return [1,1]; const b=it.base||{};
+  if(it.slot==='ring'||it.slot==='amulet') return [1,1];
+  if(it.slot==='helm') return [2,2];
+  if(it.slot==='armor') return [2,3];
+  if(b.cls==='shield') return b.name==='Pavise'?[2,3]:[2,2];
+  if(b.cls==='xbow') return [2,2];
+  if(b.h===2){ const thin=b.cls==='spear'||b.cls==='scythe'||(b.wid||0)<=3; return [thin?1:2,(b.len||0)>=30||thin?4:3]; }
+  return [(b.wid||0)>=6?2:1,(b.len||0)<=12?2:3]; }
+function bagFits(it,x,y,ignore){ const [w,h]=itemSize(it); if(x<0||y<0||x+w>BAG_W||y+h>BAG_H) return false;
+  for(const o of P.bag){ if(o===it||(ignore&&ignore.includes(o))||o.bx==null) continue; const [ow,oh]=itemSize(o);
+    if(x<o.bx+ow&&x+w>o.bx&&y<o.by+oh&&y+h>o.by) return false; }
+  return true; }
+function bagSpot(it,ignore){ for(let y=0;y<BAG_H;y++) for(let x=0;x<BAG_W;x++) if(bagFits(it,x,y,ignore)) return [x,y]; return null; }
+const bagRoom=it=>!!bagSpot(it);
+function bagAdd(it){ if(!it||!P) return false; const s=bagSpot(it); if(!s) return false; it.bx=s[0]; it.by=s[1]; P.bag.push(it); return true; }
+/* take item i out and put `old` where it was (or anywhere it fits, or at your feet) */
+function bagSwapOut(i,old){ const it=P.bag[i]; const x=it?it.bx:null, y=it?it.by:null; P.bag.splice(i,1);
+  if(!old) return; if(x!=null&&bagFits(old,x,y)){ old.bx=x; old.by=y; P.bag.push(old); return; }
+  if(!bagAdd(old)){ dropItem(old,P.x-P.face*10,P.y-10,true); if(typeof toast==='function') toast(`No room in the satchel. ${old.name} fell at your feet.`); } }
+/* repair the grid: anything without a cell, or overlapping, gets a new one; what can't fit goes to the stash or the floor */
+function bagEnsure(){ if(!P||!P.bag) return; const ok=[], lost=[];
+  for(const it of P.bag){ const keep=it.bx!=null&&(()=>{ const [w,h]=itemSize(it); if(it.bx<0||it.by<0||it.bx+w>BAG_W||it.by+h>BAG_H) return false;
+      for(const o of ok){ const [ow,oh]=itemSize(o); if(it.bx<o.bx+ow&&it.bx+w>o.bx&&it.by<o.by+oh&&it.by+h>o.by) return false; } return true; })();
+    if(keep) ok.push(it); else { it.bx=null; lost.push(it); } }
+  P.bag=ok; for(const it of lost) if(!bagAdd(it)){ if(typeof STASH!=='undefined'&&STASH.length<STASH_N){ STASH.push(it); saveStash(); } else if(typeof L!=='undefined'&&L) dropItem(it,P.x,P.y-10,true); } }

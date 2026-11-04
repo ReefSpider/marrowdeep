@@ -54,7 +54,7 @@ function updGroundTips(){ const layer=$('#drolls'); if(!layer) return;
 
 /* ---------- equip straight from a chest or the floor ---------- */
 function equipItem(it){ const slot=targetSlot(it); if(slot==='off'&&!has('off')){ toast('Off hand only. Learn Second Hand (Steel) first.'); return false; }
-  const old=P.equip[slot]; P.equip[slot]=it; if(old){ if(P.bag.length<24) P.bag.push(old); else dropItem(old,P.x-P.face*10,P.y-10,true); }
+  const old=P.equip[slot]; P.equip[slot]=it; if(old){ if(!bagAdd(old)) dropItem(old,P.x-P.face*10,P.y-10,true); }
   if(slot==='weapon'&&it.base.h===2&&P.equip.off&&has('off')) toast('Two-handed: your off hand rests.');
   calcStats(); noteBest(it); AU.tone('triangle',420,300,.08,.12,.1); AU.pickup(); sparks(P.x,P.y-16,8,RCOL[it.rarity]); toast(`Equipped ${it.name}${old?` · ${old.name} went to your satchel`:''}`); gtKey=''; return true; }
 function underfoot(){ return drops.filter(d=>d.kind==='item'&&Math.abs(d.x-P.x)<28&&Math.abs(d.y-P.y)<26).sort((a,b)=>Math.abs(a.x-P.x)-Math.abs(b.x-P.x)); }
