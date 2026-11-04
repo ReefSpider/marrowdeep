@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-13';
+const NET_V='marrowdeep-14';
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,
@@ -46,23 +46,29 @@ function iceWhy(info){ if(!info) return 'No answer from the host\'s machine.';
   if(info.state==='failed'||info.state==='disconnected') return info.relay?'Found the host, but no route between your networks worked, not even through the relay. One of you is on a network that blocks games like this (some work, school or mobile networks).':METERED_TURN?'Found the host, but your networks couldn\'t reach each other and the relay server didn\'t answer.':'Found the host, but your networks can\'t reach each other directly, and no relay server is set up to carry the game.';
   if(!info.srflx&&!info.relay) return 'Found the host, but your browser didn\'t share any network route. A privacy setting or extension may be blocking WebRTC (Brave shields, uBlock\'s "prevent WebRTC leak", a VPN).';
   return 'Found the host, but the connection never finished opening. A strict network on one side, most likely.'; }
-class PeerTr{ constructor(h){ this.h=h; this.conns=new Map(); }
+class PeerTr{ constructor(h){ this.h=h; this.conns=new Map(); this.parts={}; }
   async host(code){ await loadPeer(); const cfg=await iceConfig(); return new Promise((res,rej)=>{ const p=new Peer('marrowdeep-'+code,{debug:0,config:cfg}); this.peer=p; let done=false;
     p.on('open',()=>{ done=true; res(); });
     p.on('error',e=>{ if(!done){ done=true; rej(e); } });
     p.on('connection',c=>{ if(this.h.knock) this.h.knock(); watchIce(c,st=>{ if(st==='failed'&&this.h.knockFail) this.h.knockFail(c._ice); });
-      c.on('open',()=>{ const id=c.peer; this.conns.set(id,c); c.on('data',d=>this.h.msg(id,d)); c.on('close',()=>{ if(this.conns.get(id)===c){ this.conns.delete(id); this.h.drop(id); } }); c.on('error',()=>{}); this.h.open(id); }); });
+      c.on('open',()=>{ const id=c.peer; this.conns.set(id,c); c.on('data',d=>this.rx(id,d)); c.on('close',()=>{ if(this.conns.get(id)===c){ this.conns.delete(id); this.h.drop(id); } }); c.on('error',e=>console.warn('co-op link',e)); this.h.open(id); }); });
     p.on('disconnected',()=>{ try{ if(!p.destroyed) p.reconnect(); }catch(e){} });
     setTimeout(()=>{ if(!done){ done=true; rej(new Error('timeout')); } },20000); }); }
   async join(code){ await loadPeer(); const cfg=await iceConfig(); return new Promise((res,rej)=>{ const p=new Peer(undefined,{debug:0,config:cfg}); this.peer=p; let done=false, c=null;
     const fail=e=>{ if(done) return; done=true; rej(e); };
     p.on('open',()=>{ if(this.h.stage) this.h.stage('Found the matchmaker. Calling the host…'); c=p.connect('marrowdeep-'+code,{reliable:true,serialization:'json'});
       watchIce(c,(st,info)=>{ if(st==='checking'&&this.h.stage) this.h.stage('Found the host. Finding a route between your networks…'); if(st==='failed') setTimeout(()=>fail({type:'ice',info}),1500); });
-      c.on('open',()=>{ if(done) return; done=true; this.conns.set('host',c); c.on('data',d=>this.h.msg('host',d)); c.on('close',()=>this.h.drop('host')); res(); });
+      c.on('open',()=>{ if(done) return; done=true; this.conns.set('host',c); c.on('data',d=>this.rx('host',d)); c.on('error',e=>console.warn('co-op link',e)); c.on('close',()=>this.h.drop('host')); res(); });
       c.on('error',e=>fail(e)); });
     p.on('error',e=>{ if(!done) fail(e); else if(e&&e.type==='peer-unavailable') this.h.drop('host'); });
     setTimeout(()=>fail({type:'ice',info:c&&c._ice,timeout:1}),30000); }); }
-  send(id,m){ const c=this.conns.get(id); if(c&&c.open) try{ c.send(m); }catch(e){} }
+  /* PeerJS's JSON channel silently drops any message over ~16 KB (a level with a crowd of foes is bigger),
+     so long messages go in pieces of 4,000 characters (under 12 KB even if every character were 3 bytes) */
+  send(id,m){ const c=this.conns.get(id); if(!(c&&c.open)) return; try{ const s=JSON.stringify(m); if(s.length<=4000){ c.send(m); return; }
+      const p=(this.pid=(this.pid||0)+1), k=Math.ceil(s.length/4000); for(let i=0;i<k;i++) c.send({t:'_pt',p,i,n:k,s:s.slice(i*4000,(i+1)*4000)}); }catch(e){ console.warn('co-op send',e); } }
+  rx(id,d){ if(d&&d.t==='_pt'){ const key=id+':'+d.p, b=this.parts[key]||(this.parts[key]={got:0,a:[]}); if(b.a[d.i]==null){ b.a[d.i]=d.s; b.got++; }
+      if(b.got===d.n){ delete this.parts[key]; let m=null; try{ m=JSON.parse(b.a.join('')); }catch(e){ console.warn('co-op message lost',e); } if(m) this.h.msg(id,m); } return; }
+    this.h.msg(id,d); }
   close(){ try{ for(const c of this.conns.values()) c.close(); }catch(e){} try{ this.peer&&this.peer.destroy(); }catch(e){} this.conns.clear(); } }
 /* tabs of one browser, for testing: ?net=local, optionally &ping=150 to fake a slow line */
 class LocalTr{ constructor(h){ this.h=h; this.id='L'+Math.random().toString(36).slice(2,9); this.bc=new BroadcastChannel('marrowdeep-net'); this.bc.onmessage=ev=>this.on(ev.data); this.peers=new Set(); this.ping=+(QS.get('ping')||0); }

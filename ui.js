@@ -168,7 +168,7 @@ function renderInv(){
   for(let i=0;i<24;i++){ const d=document.createElement('div'); d.className='slot'; const it=P.bag[i];
     if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); bindTip(d,it);
       d.onclick=e=>{ if(e.shiftKey){ dropFromBag(i); return; } equipFromBag(i,false); };
-      d.oncontextmenu=e=>{ e.preventDefault(); if(it.slot==='weapon') equipFromBag(i,true); else dropFromBag(i); }; }
+      d.oncontextmenu=e=>{ e.preventDefault(); equipFromBag(i,it.slot==='weapon'&&has('off')); }; }
     bag.appendChild(d); }
   const s=P.stats; const rate=s.spd*(1+s.as/100);
   $('#stats').innerHTML=[['Level',`${P.lvl} (${P.xp} / ${xpNext(P.lvl)})`],['Damage',`${s.min}–${s.max} ${elemSummary(s)}`],offActive()&&s.omax?['Off hand',`${s.omin}–${s.omax}`]:null,['Defense',s.def],['Life',`${Math.ceil(P.life)} / ${s.life}`],['Attack rate',rate.toFixed(2)+'×'],['Critical strike',s.crit+'%'],['Life stolen',s.ls+'%'],['Magic find',s.mf+'%'],['Gold',P.gold]].filter(Boolean).map(([a,b])=>`<span>${a}</span><b>${b}</b>`).join('');
