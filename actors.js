@@ -295,14 +295,19 @@ function killEnemy(e,dir,crit){
   if(e.type==='bloat') explodeBloat(e);
   gainXP(e.xp*(1+lvlIdx*.12)*(typeof xpMul==='function'?xpMul():1));
   const gf=1+P.stats.gf/100;
-  if(e.type==='debtor'){ for(let i=0;i<10;i++) dropGold(e.x+rnd(-10,10),e.y-8,Math.round(ri(8,16)*(1+lvlIdx*.6)*gf)); for(let i=0;i<2;i++) dropItem(genItem(ilvlNow()+3,[0,40,40,9,10,.02],P.stats.mf+100),e.x+rnd(-8,8),e.y-8); toast('The Gilded Debtor\'s debts come loose.'); }
-  if(e.rare||e.unique){ const n=e.unique?ri(2,3):ri(1,2); for(let i=0;i<n;i++) dropItem(genItem(ilvlNow()+(e.unique?3:2),e.unique?[0,30,48,10,11.5,.03]:[0,52,38,5,4.8,.006],P.stats.mf+(e.unique?60:25)),e.x+rnd(-10,10),e.y-8); if(e.unique){ AU.roar(); showBossName(e.name,'討','Struck down.'); } }
+  if(e.type==='debtor'){ for(let i=0;i<10;i++) dropGold(e.x+rnd(-10,10),e.y-8,Math.round(ri(8,16)*(1+lvlIdx*.6)*gf)); dropChest(e,1); toast('The Gilded Debtor\'s debts come loose: a reliquary falls out of his coat.'); }
+  if(e.rare||e.unique){ if(R()<(e.unique?CHEST_DROP.unique:CHEST_DROP.rare)) dropChest(e,1); if(e.unique){ AU.roar(); showBossName(e.name,'討','Struck down.'); } }
   if(R()<.7||e.champ) dropGold(e.x,e.y-6,Math.round(ri(2,6)*(1+lvlIdx*.6)*gf*(e.champ?3:e.type==='brute'?2:e.pack?.6:1)));
   if(R()<.08) drops.push({kind:'potion',x:e.x,y:e.y-8,vy:-120,vx:rnd(-40,40)});
   if(has('feast')) for(let i=0;i<2;i++) drops.push({kind:'orb',x:e.x+rnd(-4,4),y:e.y-10,vy:-rnd(80,160),vx:rnd(-50,50)});
-  const ch=e.type==='debtor'||e.rare||e.unique?0:e.champ?1:(e.type==='brute'||e.type==='knight'?.4:e.pack?.06:.12)*(ngp?1:.6);
-  if(R()<ch){ const w=e.champ?[0,60,32,5,2.9,.002]:[72,22,5,.6,.38,.0005]; dropItem(genItem(ilvlNow()+(e.champ?2:0),w,P.stats.mf),e.x,e.y-8); }
+  /* items only come from chests; an elite now and then leaves one behind */
+  if(e.champ&&!e.rare&&!e.unique&&R()<CHEST_DROP.champ) dropChest(e,0);
   if(R()<.18) bark('kill'); }
+/* items only come out of chests (v14). Elites rarely leave one: champion 1.5% (a coffer), rare 3%, unique 6% (a reliquary).
+   The Gilded Debtor always drops a reliquary. */
+const CHEST_DROP={champ:.015,rare:.03,unique:.06};
+function dropChest(e,tier){ if(typeof COOP!=='undefined'&&COOP&&!NET.host) return; const fy=findFloor(e.x,e.y-6);
+  chests.push({x:Math.round(e.x),y:fy-60,tier,open:false,t:0,falling:true,vy:-120,floorY:fy}); AU.chest(); sparks(e.x,e.y-12,10,'#ffe1a0'); toast(tier?'A reliquary falls from the body.':'A coffer falls from the body.'); }
 function explodeBloat(e){ if(e.exploded) return; e.exploded=true; e.dead=true; e.deadT=1.6; const x=e.x, y=e.y-10;
   AU.boom(1); shake(6); for(let i=0;i<40;i++){ const a=R()*Math.PI*2, sp=rnd(60,260); part({type:'blood',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-60,g:520,life:rnd(.5,1.2),col:pick(['#5a5a2a','#6a1010','#3e3e1a','#8a1414']),size:ri(1,2)}); }
   for(let i=0;i<12;i++) part({type:'dust',x:x+rnd(-14,14),y:y+rnd(-10,6),vx:rnd(-20,20),vy:rnd(-20,-5),g:-4,life:rnd(1,1.8),col:'rgba(110,120,60,.45)',size:3});

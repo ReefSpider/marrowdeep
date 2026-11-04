@@ -1,6 +1,8 @@
 'use strict';
 /* ===== items: generation, grades, tooltips, icons, save/restore ===== */
 let IID=0;
+/* you can wear an item once you're within 6 levels of its item level */
+const REQ_GAP=6, reqLvl=it=>Math.max(1,((it&&it.ilvl)||1)-REQ_GAP);
 const sumAff=(it,k)=>it.aff.reduce((s,a)=>s+(a.k===k?a.v:0),0);
 const varies=a=>a.lo!=null&&a.lo!==a.hi;
 const isShield=it=>it&&it.base.cls==='shield';
@@ -57,6 +59,7 @@ function tipParts(it,reel){
     if(b.h===1) h+=`<div class="g">Off hand: ${offComboFor(it).map(m=>MV[m].nm).join(' · ')}</div>`; }
   if(it.def!=null) h+=`<div class="w">Defense: <span class="${edfA.length?'m':'w'}">${hold(String(it.def))}</span></div>`;
   if(it.ilvl) h+=`<div class="g">Item Level: ${it.ilvl}</div>`;
+  { const rq=reqLvl(it); if(rq>1) h+=P&&P.lvl<rq?`<div style="color:#ff5a4a">Requires level ${rq} · you can't use it yet</div>`:`<div class="g">Requires level ${rq}</div>`; }
   for(const a of it.aff){
     if(reel&&varies(a)){ const id='sr'+(n++); rows.push({id,a}); h+=`<div class="srl" id="${id}"><div class="sw"><div class="ss"></div></div><span class="lb">${AFX[a.k][2]}</span><span class="gt"></span></div>`; continue; }
     const g=varies(a)?a.g:1; const vs=g===4?`<span class="abyss" style="color:var(--r5)">${FMT[a.k](a.v)}</span><span class="tag" style="color:var(--r5)">ABYSSAL</span>`:g===3?`<span class="max">${FMT[a.k](a.v)}</span>`:FMT[a.k](a.v);

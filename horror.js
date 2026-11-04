@@ -59,7 +59,7 @@ function performFinisher(e){ const side=Math.sign(e.x-P.x)||1, ey=e.y-e.h*.55; e
     {dur:1.3,zoom:1.25,skip:false,cam:{x:e.x,y:ey},fn:()=>{ for(let k=0;k<8;k++) ghosts.push({x:lerp(e.x-side*60,e.x+side*60,k/8),y:P.y,face:side,a:.3,oa:P.offA,life:.35}); P.x=e.x+side*(e.w/2+40); P.face=side;
         slash(side>0?-.12:.12,W*1.4,.8); impactT=.22; U.uWhite.value=.6; shake(14); AU.kill(); AU.gore&&AU.gore(); AU.toll&&AU.toll(); for(let i=0;i<5;i++) bleed(e.x,ey+rnd(-20,20),30,side,2.2); }}
   ],{keepMood:1}),()=>{ P.inv=1; e.hp=0; killEnemy(e,side,true);
-    P.life=P.stats.life; const it=genItem(ilvlNow()+4,[0,10,44,14,30,.3],P.stats.mf+120); dropItem(it,e.x,e.y-20); toast('止め — finished by your hand. The Pit pays extra for that.'); }); }
+    P.life=P.stats.life; dropChest(e,1); toast('止め — finished by your hand. The Pit pays extra: a second reliquary.'); }); }
 addEventListener('keydown',ev=>{ const k=ev.key.length===1?ev.key.toLowerCase():ev.key; if(ev.repeat) return; if(k==='f'||k==='e'){ const e=finTarget(); if(e){ ev.preventDefault(); ev.stopImmediatePropagation(); performFinisher(e); } } },true);
 const finEl=document.createElement('div'); finEl.id='finPrompt'; finEl.innerHTML='<b>止め</b><kbd>F</kbd>FINISH'; stage.appendChild(finEl);
 function updFinPrompt(){ const e=mode==='play'&&enemies.find(x=>x.boss&&!x.dead&&x.finWin>0); if(!e){ finEl.style.display='none'; return; }
