@@ -197,6 +197,7 @@ function onMsg(s,m){ const H=NET.host;
   case 'chest': if(!H){ const it=deItem(m.it); if(it) showCoopChest(m,it); } break;
   case 'need': if(H) rollAnswer(s,m.rid,!!m.y); break;
   case 'roll': if(!H) rollIn(m); break;
+  case 'sroll': if(!H&&typeof showSecretRoll==='function') showSecretRoll(!!m.hit,null); break;
   } }
 
 /* ---------- starting, levels ---------- */
@@ -217,7 +218,7 @@ function mkHero(x){ const p=newPlayer(); p.lvl=x.lvl||1; const sv=P; P=p; calcSt
   for(const h of Object.values(NET.heroes)){ h.st=null; h.rev=0; }
   if(NET.host){ NET.epoch++; const n=NET.n; if(n>1) scaleForCrowd(n);
     for(const e of enemies) e.nid=++NET.nid; for(const d of drops) d.nid=++NET.dnid; NET.chestN=chests.length;
-    bcast({t:'lvl',ep:NET.epoch,idx,ngp,wipe:NET.wipeFlag?1:0,a:enemies.map(espec),d:drops.map(dspec)}); NET.wipeFlag=false; NET.roll=null; NET.chq=[]; }
+    bcast({t:'lvl',ep:NET.epoch,idx,ngp,wipe:NET.wipeFlag?1:0,sec:(typeof SECRET!=='undefined'&&SECRET.on&&SECRET.from===idx)?1:0,a:enemies.map(espec),d:drops.map(dspec)}); NET.wipeFlag=false; NET.roll=null; NET.chq=[]; }
   else if(NET.pendingLvl){ const m=NET.pendingLvl; NET.pendingLvl=null; NET.epoch=m.ep; const boss=enemies.find(e=>e.boss); enemies=[]; spawnIn(m.a,boss); drops=[]; dropsIn(m.d||[]); NET.chestN=chests.length; NET.pend=[]; }
   return r; }; })();
 function scaleForCrowd(n){ const hp=1+.6*(n-1), dm=1+.08*(n-1), add=[];
@@ -234,7 +235,7 @@ function spawnIn(list,boss){ const have=new Set(enemies.map(e=>e.nid));
   for(const sp of list){ if(have.has(sp.nid)) continue; if(sp.boss){ const b=boss||enemies.find(e=>e.boss&&!e.nid); if(b){ b.nid=sp.nid; b.hp=sp.hp; b.maxhp=sp.maxhp; if(!enemies.includes(b)) enemies.push(b); } continue; }
     const e=Object.assign({},sp); if(sp.mods) e.mods=sp.mods.slice(); if(sp.elems) e.elems=sp.elems.slice(); if(sp.res) e.res=Object.assign({},sp.res); e.hitId=-1; e.sts=null; e._b=e.hp; enemies.push(e); } }
 function lvlIn(m){ closeMenus(); if(!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; } $('#death').hidden=true; hideCard();
-  ngp=m.ngp; NET.pendingLvl=m; goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; } }
+  ngp=m.ngp; NET.pendingLvl=m; if(typeof SECRET!=='undefined'){ SECRET.on=!!m.sec; SECRET.from=m.idx; } goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; } }
 /* close any menu so a shared moment (a chest, a boss, a new level) can take the screen */
 function closeMenus(){ if(mode==='inv') toggleInv(false); if(mode==='pause') closePause(); if(!$('#card').hidden&&mode==='card'){ hideCard(); mode='play'; } if(!stashScr.hidden){ stashScr.hidden=true; mode='play'; } hideTip(); if(mode==='map'&&!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; mode='play'; } }
 

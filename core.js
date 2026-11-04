@@ -89,11 +89,11 @@ stage.insertBefore(renderer.domElement,stage.firstChild);
 const mkTex=(c,filt)=>{const t=new THREE.CanvasTexture(c);t.magFilter=filt;t.minFilter=filt;t.generateMipmaps=false;return t;};
 const tBase=mkTex(cv,THREE.NearestFilter), tEmis=mkTex(ev,THREE.LinearFilter);
 const LMAX=32; const uL=[],uC=[]; for(let i=0;i<LMAX;i++){uL.push(new THREE.Vector4());uC.push(new THREE.Vector3());}
-const U={tBase:{value:tBase},tEmis:{value:tEmis},uTime:{value:0},uImpact:{value:0},uHurt:{value:0},uLow:{value:0},uFade:{value:1},uSlow:{value:0},uRed:{value:0},uWhite:{value:0},uL:{value:uL},uC:{value:uC},uN:{value:0},uAmb:{value:new THREE.Vector3(.4,.37,.42)}};
+const U={tBase:{value:tBase},tEmis:{value:tEmis},uTime:{value:0},uImpact:{value:0},uHurt:{value:0},uLow:{value:0},uFade:{value:1},uSlow:{value:0},uRed:{value:0},uWhite:{value:0},uAlt:{value:0},uL:{value:uL},uC:{value:uC},uN:{value:0},uAmb:{value:new THREE.Vector3(.4,.37,.42)}};
 const FRAG=`precision highp float;
 varying vec2 vUv;
 uniform sampler2D tBase; uniform sampler2D tEmis;
-uniform float uTime,uImpact,uHurt,uLow,uFade,uSlow,uRed,uWhite;
+uniform float uTime,uImpact,uHurt,uLow,uFade,uSlow,uRed,uWhite,uAlt;
 uniform vec4 uL[${LMAX}]; uniform vec3 uC[${LMAX}]; uniform int uN; uniform vec3 uAmb;
 float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
 void main(){
@@ -122,6 +122,7 @@ void main(){
   if(uImpact>0.){ float m=step(.2,l); vec3 imp=mix(vec3(.93,.9,.82),vec3(.06,.02,.03),m); imp=mix(imp,vec3(.78,.06,.05),step(.3,em.r-em.g)); col=mix(col,imp,uImpact); }
   col=mix(col,vec3(.45,.02,.02),clamp(uHurt*(d*3.+.1),0.,.8));
   col=mix(col,vec3(.3,0.,0.),clamp(uLow*d*2.*(.6+.4*sin(uTime*7.)),0.,.6));
+  col=mix(col,vec3(l)*vec3(.8,.93,1.16)+em*.45,uAlt*.38); col+=vec3(.0,.015,.05)*(1.-l)*uAlt;
   col*=1.-d*.75;
   col*=.965+.035*sin(gl_FragCoord.y*3.14159);
   col+=(hash(gl_FragCoord.xy*.5+fract(uTime*7.)*91.)-.5)*.04;
