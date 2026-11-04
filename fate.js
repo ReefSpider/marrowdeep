@@ -13,13 +13,20 @@ const SEAL_MAX=3, SEAL_BOSS=.4, SEAL_FINISH=.7, SEAL_DEBTOR=.2;
 const sealsOf=()=>P?(P.seals|0):0;
 function giveSeal(why){ if(!P) return; if(sealsOf()>=SEAL_MAX){ toast(`Kintsugi Seal ${why?'· '+why+' ':''}— you already carry ${SEAL_MAX}. It crumbles to gold dust.`); P.gold+=50*(1+lvlIdx); return; }
   P.seals=sealsOf()+1; AU.reveal(3); sparks(P.x,P.y-16,16,'#ffd27a'); toast(`金継 Kintsugi Seal${why?' · '+why:''}. You carry ${P.seals}. If you die, it breaks instead of your gear.`); updBelt(); saveGame(); }
-function breakOnDeath(){ if(!P||!L||L.def.kind==='cabin'||L.def.id==='wall') return null;
+/* v18 (playtest: "mobs out-leveled me and I lost all my gear"): at most one item breaks per visit to a level, and
+   nothing breaks when the foes are 3 or more levels above you. The death screen says why and points at Abandon. */
+let BROKE_HERE=-1, SPARED='';
+(function(){ const o=goLevel; goLevel=function(i){ BROKE_HERE=-1; return o(i); }; })();
+function breakOnDeath(){ SPARED=''; if(!P||!L||L.def.kind==='cabin'||L.def.id==='wall') return null;
+  if(BROKE_HERE===lvlIdx){ SPARED='The Pit already took its due on this level. Your gear is safe until you climb on.'; return null; }
+  const over=(typeof curMlvl==='function'?curMlvl():1)-P.lvl; if(over>=3){ SPARED=`These foes are ${over} levels above you, so the Pit spares your gear. Pause → Abandon the descent to go home and grow stronger.`; return null; }
   const ks=Object.keys(P.equip).filter(k=>P.equip[k]&&P.equip[k].rarity<5); if(!ks.length) return null;
   const k=pick(ks), it=P.equip[k];
-  if(sealsOf()>0){ P.seals--; updBelt(); return {saved:true,it}; }
+  BROKE_HERE=lvlIdx; if(sealsOf()>0){ P.seals--; updBelt(); return {saved:true,it}; }
   P.equip[k]=null; calcStats(); P.life=Math.min(P.life,P.stats.life); return {saved:false,it}; }
 function deathNote(r){ if(!r) return ''; return r.saved?`A Kintsugi Seal shattered to save your ${r.it.name}. ${sealsOf()} left.`:`Your ${r.it.name} broke.`; }
 (function(){ const o=onDeath; onDeath=function(){ const fresh=!deathShown&&!(typeof COOP!=='undefined'&&COOP); const r=fresh?breakOnDeath():null; o();
+  if(!r&&fresh&&SPARED){ const sub=$('#deathSub'); if(sub) sub.textContent=SPARED+' '+sub.textContent; }
   if(r){ const sub=$('#deathSub'); if(sub) sub.textContent=deathNote(r)+' '+sub.textContent; if(!r.saved) setTimeout(()=>toast(`The Pit kept your ${r.it.name}. Kintsugi Seals (from bosses) stop this once each.`),2800); saveGame(); } }; })();
 /* a co-op wipe is a death for everyone; being downed and revived is not */
 (function(){ const o=wipeIn; wipeIn=function(){ o(); const r=breakOnDeath(); if(r){ const sub=$('#deathSub'); if(sub) sub.textContent=deathNote(r)+' '+sub.textContent; saveGame(); } }; })();

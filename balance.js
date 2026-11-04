@@ -16,8 +16,9 @@ const curMlvl=()=>typeof mlvl==='function'?mlvl():1;
 (function(){ const o=spawnBoss; spawnBoss=function(key){ const e=o(key); const m=curMlvl(); e.hp=e.maxhp=Math.round(e.maxhp*RAMP.bossHp(m)); e.dmg*=RAMP.bossDmg(m); return e; }; })();
 
 /* ---------- the level gap ---------- */
-function levelGap(){ if(!P) return 0; return Math.max(0,curMlvl()-P.lvl-2); }
-const gapDealt=()=>Math.max(.25,1-.03*levelGap()), gapTaken=()=>Math.min(3,1+.05*levelGap());
+/* v18: the penalty starts 4 levels above you (was 2) and bites more gently: −2.5% dealt, +4% taken per level */
+function levelGap(){ if(!P) return 0; return Math.max(0,curMlvl()-P.lvl-4); }
+const gapDealt=()=>Math.max(.25,1-.025*levelGap()), gapTaken=()=>Math.min(3,1+.04*levelGap());
 (function(){ const o=dmgEnemy; dmgEnemy=function(e,d,...rest){ if(P&&!P._remote&&L&&L.def.kind!=='cabin') d*=gapDealt(); return o(e,d,...rest); }; })();
 (function(){ const o=hurtPlayer; hurtPlayer=function(d,src){ if(P&&L&&L.def.kind!=='cabin') d*=gapTaken(); return o(d,src); }; })();
 
@@ -34,4 +35,4 @@ const canWear=it=>!it||!P||P.lvl>=reqLvl(it);
   for(const k of P.inactive){ const el=eq.querySelector(`[data-slot="${k}"]`)||null; if(el) el.style.outline='2px solid #ff5a4a'; }
   invMsg(`Too low a level to use: ${P.inactive.map(k=>P.equip[k]&&P.equip[k].name).filter(Boolean).join(', ')}. They give nothing until you catch up.`); }; })();
 (function(){ const o=gainXP; gainXP=function(n){ const was=P&&P.lvl; const r=o(n); if(P&&P.lvl!==was&&P.inactive&&P.inactive.length){ calcStats(); if(!P.inactive.length) toast('You can use all your gear again.'); } return r; }; })();
-(function(){ const o=loadLevel; loadLevel=function(idx,opt){ const r=o(idx,opt); const g=levelGap(); if(g>0&&L&&L.def.kind!=='cabin') setTimeout(()=>toast(`These foes are ${g+2} levels above you: you deal ${Math.round(gapDealt()*100)}% damage and take ${Math.round(gapTaken()*100)}%.`),3200); return r; }; })();
+(function(){ const o=loadLevel; loadLevel=function(idx,opt){ const r=o(idx,opt); const g=levelGap(); if(g>0&&L&&L.def.kind!=='cabin') setTimeout(()=>toast(`These foes are ${g+4} levels above you: you deal ${Math.round(gapDealt()*100)}% damage and take ${Math.round(gapTaken()*100)}%.`),3200); return r; }; })();
