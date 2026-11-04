@@ -7,6 +7,7 @@ const SAVEKEY='marrowdeep.v2';
 
 /* ---------- small HUD helpers ---------- */
 function bark(kind,force){ if(!force&&barkCd>0) return; const arr=BARKS[kind]; if(!arr) return; const el=$('#bark'); el.textContent=pick(arr); el.classList.add('on'); barkT=3.4; barkCd=force?3:8; }
+const POT_MAX=4; /* belt size; dying refills it (v22) */
 function updBelt(){ $('#belt').querySelectorAll('i').forEach((el,i)=>el.classList.toggle('f',i<P.potions)); }
 /* v21 (playtest: "it keeps telling me I've levelled up but I haven't"): a one-shot banner that faded out kept its
    class, and a CSS animation replays whenever its parent is shown again, so "Level N · a skill point" came back after
@@ -115,7 +116,7 @@ function statReel(it,box,done,opt){ opt=opt||{}; const fast=!!opt.fast;
   const finishCat=(r,quiet)=>{ r.ss.style.transform=`translateX(${-r.tx}px)`; r.ss.children[r.WI].classList.add('win'); r.el.classList.remove('cat'); r.el.querySelector('.lb').textContent=AFX[r.a.k][2]; if(!quiet) AU.lock(); };
   const finishRow=r=>{ r.done=true; r.ss.style.transform=`translateX(${-r.tx}px)`; r.ss.children[r.WI].classList.add('win'); r.el.style.setProperty('--gc',GR[r.a.g].c); r.el.classList.add('done');
     const gt=r.el.querySelector('.gt'); gt.textContent=GR[r.a.g].n.toUpperCase(); gt.style.color=GR[r.a.g].c;
-    if(r.a.g===4){ AU.abyssStat(); box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); } else if(r.a.g===3) AU.perfect(); else if(!fast||r.i===rows.length-1) AU.lock(); };
+    if(r.a.g===4){ AU.abyssStat(); box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); } else if(r.a.g===3) AU.perfect(); else if(!fast||r.i===rows.length-1) AU.lock(); if(typeof JP!=='undefined') JP.stat(r.a.g,fast,r.el); };
   rows.forEach(r=>setup(r,now0+(RM?0:fast?140:450)));
   let raf=0, lastTick=0, live=true;
   const end=()=>{ if(!live) return; live=false; if(!fast) reveal=null; cancelAnimationFrame(raf);
@@ -248,7 +249,7 @@ function finishLevel(){ /* v21: never leave a level in the same breath it opened
   AU.door(); const def=LEVELS[lvlIdx];
   if(def.id==='count'){ playEnding(); return; }
   mode='card'; merchantCard(()=>nextLevel()); }
-function respawn(){ if(typeof MUS!=='undefined') MUS.setMood(moodFor(LEVELS[lvlIdx])); const stain=P.gold>0?{x:P.x,y:Math.min(P.y,L.h*T-T),n:P.gold}:null; P.gold=0; P.life=P.stats.life; P.grit=100; P.rage=0;
+function respawn(){ if(typeof MUS!=='undefined') MUS.setMood(moodFor(LEVELS[lvlIdx])); const stain=P.gold>0?{x:P.x,y:Math.min(P.y,L.h*T-T),n:P.gold}:null; P.gold=0; P.life=P.stats.life; P.grit=100; P.rage=0; P.potions=Math.max(P.potions,POT_MAX); updBelt();
   loadLevel(lvlIdx,{stain,noSave:true}); mode='play'; hud.hidden=false; $('#death').hidden=true; bark('respawn',true); }
 function onDeath(){ if(deathShown) return; deathShown=true; mode='death'; hud.hidden=true; const el=$('#death'); el.hidden=false;
   const dl=pick(DEATH_LINES); $('#death .shi').textContent=dl.k; $('#deathLine').textContent=dl.t; if(typeof MUS!=='undefined') MUS.setMood('silent');

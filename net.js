@@ -264,7 +264,7 @@ function spawnIn(list,boss){ const have=new Set(enemies.map(e=>e.nid));
   for(const sp of list){ if(have.has(sp.nid)) continue; if(sp.boss){ const b=boss||enemies.find(e=>e.boss&&!e.nid); if(b){ b.nid=sp.nid; b.hp=sp.hp; b.maxhp=sp.maxhp; if(!enemies.includes(b)) enemies.push(b); } continue; }
     const e=Object.assign({},sp); if(sp.mods) e.mods=sp.mods.slice(); if(sp.elems) e.elems=sp.elems.slice(); if(sp.res) e.res=Object.assign({},sp.res); e.hitId=-1; e.sts=null; e._b=e.hp; enemies.push(e); } }
 function lvlIn(m){ closeMenus(); if(!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; } $('#death').hidden=true; hideCard();
-  ngp=m.ngp; NET.pendingLvl=m; if(typeof SECRET!=='undefined'){ SECRET.on=!!m.sec; SECRET.from=m.idx; } if(typeof LVVAR!=='undefined') LVVAR={idx:m.idx,v:m.vs|0,ngp:m.ngp}; goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; } }
+  ngp=m.ngp; NET.pendingLvl=m; if(typeof SECRET!=='undefined'){ SECRET.on=!!m.sec; SECRET.from=m.idx; } if(typeof LVVAR!=='undefined') LVVAR={idx:m.idx,v:m.vs|0,ngp:m.ngp}; goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; P.potions=Math.max(P.potions,POT_MAX); updBelt(); } }
 /* close any menu so a shared moment (a chest, a boss, a new level) can take the screen */
 function closeMenus(){ if(mode==='inv') toggleInv(false); if(mode==='pause') closePause(); if(!$('#card').hidden&&mode==='card'){ hideCard(); mode='play'; } if(!stashScr.hidden){ stashScr.hidden=true; mode='play'; } hideTip(); if(mode==='map'&&!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; mode='play'; } }
 
@@ -358,7 +358,7 @@ function tickRevive(dt){ for(const h of Object.values(NET.heroes)){ if(!heroLive
     const close=P&&!P.dead&&Math.abs(P.x-h.p.x)<26&&Math.abs(P.y-h.p.y)<30; h.rev=close?h.rev+dt:Math.max(0,h.rev-dt*2);
     if(h.rev>=2.4&&h.revCd<=0){ h.rev=0; h.revCd=3; const m={t:'rev',to:h.s,from:NET.me}; if(NET.host) sendSeat(h.s,m); else toHost(m); toast(`You pull ${h.name} back up.`); AU.lvl(); } } }
 function wipeCheck(dt){ const all=[P].concat(Object.values(NET.heroes).filter(heroLive).map(h=>h.p)); const down=all.every(p=>p.dead);
-  NET.wipeT=down?NET.wipeT+dt:0; if(NET.wipeT>2.6&&!NET.wiping){ NET.wiping=true; bcast({t:'wipe'}); wipeIn(); setTimeout(()=>{ NET.wiping=false; if(!COOP) return; NET.wipeFlag=true; P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; $('#death').hidden=true; goLevel(lvlIdx); },3200); } }
+  NET.wipeT=down?NET.wipeT+dt:0; if(NET.wipeT>2.6&&!NET.wiping){ NET.wiping=true; bcast({t:'wipe'}); wipeIn(); setTimeout(()=>{ NET.wiping=false; if(!COOP) return; NET.wipeFlag=true; P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; P.potions=Math.max(P.potions,POT_MAX); updBelt(); $('#death').hidden=true; goLevel(lvlIdx); },3200); } }
 function wipeIn(){ closeMenus(); bannerEl.hidden=true; const el=$('#death'); el.hidden=false; const dl=pick(DEATH_LINES); $('#death .shi').textContent=dl.k; $('#deathLine').textContent='The Pit takes all of you.'; $('#deathSub').textContent=`Back to the start of ${LEVELS[lvlIdx].name}, together.`; mode='death'; hud.hidden=true; if(typeof MUS!=='undefined') MUS.setMood('silent'); }
 (function(){ const o=respawn; respawn=function(){ if(COOP) return; return o(); }; })();
 
