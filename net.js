@@ -26,19 +26,47 @@ const cleanCode=s=>(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 let peerLib=null;
 function loadPeer(){ if(window.Peer) return Promise.resolve(); if(peerLib) return peerLib;
   peerLib=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'; sc.onload=()=>res(); sc.onerror=()=>{ peerLib=null; rej(new Error('lib')); }; document.head.appendChild(sc); }); return peerLib; }
+/* Where two machines find a route to each other. STUN finds a direct path; when a network won't allow one
+   (mobile data, carrier-grade NAT, office firewalls) the TURN relays carry the game instead.
+   METERED_TURN: paste a Metered TURN credentials URL here (free account, 20 GB a month) for a dedicated relay:
+   'https://YOURAPP.metered.live/api/v1/turn/credentials?apiKey=YOURKEY' */
+const METERED_TURN='';
+let ICE=null, iceAt=0;
+async function iceConfig(){ if(ICE&&Date.now()-iceAt<6*3600e3) return ICE;
+  const sv=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']},
+    {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'}];
+  /* Open Relay (Metered's free public TURN), with short-lived credentials made the standard way from its public secret */
+  try{ const user=(Math.floor(Date.now()/1000)+24*3600)+':marrowdeep', enc=new TextEncoder();
+    const key=await crypto.subtle.importKey('raw',enc.encode('openrelayprojectsecret'),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+    const sig=new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(user))); const cred=btoa(String.fromCharCode(...sig));
+    sv.push({urls:['turn:staticauth.openrelay.metered.ca:80','turn:staticauth.openrelay.metered.ca:443?transport=tcp','turns:staticauth.openrelay.metered.ca:443?transport=tcp'],username:user,credential:cred}); }catch(e){}
+  if(METERED_TURN) try{ const r=await fetch(METERED_TURN); if(r.ok){ const a=await r.json(); if(Array.isArray(a)) sv.push(...a); } }catch(e){}
+  ICE={iceServers:sv}; iceAt=Date.now(); return ICE; }
+/* watch a connection's route-finding, so a failure can say what went wrong */
+function watchIce(c,on){ const t0=Date.now(); const poll=setInterval(()=>{ const pc=c.peerConnection; if(!pc) { if(Date.now()-t0>30000) clearInterval(poll); return; } clearInterval(poll);
+    const info={relay:false,host:false,srflx:false,state:'new'}; c._ice=info;
+    pc.addEventListener('icecandidate',ev=>{ const cd=ev.candidate&&ev.candidate.candidate||''; if(/ typ relay/.test(cd)) info.relay=true; else if(/ typ srflx/.test(cd)) info.srflx=true; else if(/ typ host/.test(cd)) info.host=true; });
+    pc.addEventListener('iceconnectionstatechange',()=>{ info.state=pc.iceConnectionState; if(on) on(info.state,info); }); },50); }
+function iceWhy(info){ if(!info) return 'No answer from the host\'s machine.';
+  if(info.state==='failed'||info.state==='disconnected') return info.relay?'Found the host, but no route between your networks worked, not even through the relay. One of you is on a network that blocks games like this (some work, school or mobile networks).':'Found the host, but your networks couldn\'t reach each other and the relay servers didn\'t answer.';
+  if(!info.srflx&&!info.relay) return 'Found the host, but your browser didn\'t share any network route. A privacy setting or extension may be blocking WebRTC (Brave shields, uBlock\'s "prevent WebRTC leak", a VPN).';
+  return 'Found the host, but the connection never finished opening. A strict network on one side, most likely.'; }
 class PeerTr{ constructor(h){ this.h=h; this.conns=new Map(); }
-  host(code){ return loadPeer().then(()=>new Promise((res,rej)=>{ const p=new Peer('marrowdeep-'+code,{debug:0}); this.peer=p; let done=false;
+  async host(code){ await loadPeer(); const cfg=await iceConfig(); return new Promise((res,rej)=>{ const p=new Peer('marrowdeep-'+code,{debug:0,config:cfg}); this.peer=p; let done=false;
     p.on('open',()=>{ done=true; res(); });
     p.on('error',e=>{ if(!done){ done=true; rej(e); } });
-    p.on('connection',c=>{ c.on('open',()=>{ const id=c.peer; this.conns.set(id,c); c.on('data',d=>this.h.msg(id,d)); c.on('close',()=>{ if(this.conns.get(id)===c){ this.conns.delete(id); this.h.drop(id); } }); c.on('error',()=>{}); this.h.open(id); }); });
+    p.on('connection',c=>{ if(this.h.knock) this.h.knock(); watchIce(c,st=>{ if(st==='failed'&&this.h.knockFail) this.h.knockFail(c._ice); });
+      c.on('open',()=>{ const id=c.peer; this.conns.set(id,c); c.on('data',d=>this.h.msg(id,d)); c.on('close',()=>{ if(this.conns.get(id)===c){ this.conns.delete(id); this.h.drop(id); } }); c.on('error',()=>{}); this.h.open(id); }); });
     p.on('disconnected',()=>{ try{ if(!p.destroyed) p.reconnect(); }catch(e){} });
-    setTimeout(()=>{ if(!done){ done=true; rej(new Error('timeout')); } },20000); })); }
-  join(code){ return loadPeer().then(()=>new Promise((res,rej)=>{ const p=new Peer(undefined,{debug:0}); this.peer=p; let done=false;
-    p.on('open',()=>{ const c=p.connect('marrowdeep-'+code,{reliable:true,serialization:'json'});
+    setTimeout(()=>{ if(!done){ done=true; rej(new Error('timeout')); } },20000); }); }
+  async join(code){ await loadPeer(); const cfg=await iceConfig(); return new Promise((res,rej)=>{ const p=new Peer(undefined,{debug:0,config:cfg}); this.peer=p; let done=false, c=null;
+    const fail=e=>{ if(done) return; done=true; rej(e); };
+    p.on('open',()=>{ if(this.h.stage) this.h.stage('Found the matchmaker. Calling the host…'); c=p.connect('marrowdeep-'+code,{reliable:true,serialization:'json'});
+      watchIce(c,(st,info)=>{ if(st==='checking'&&this.h.stage) this.h.stage('Found the host. Finding a route between your networks…'); if(st==='failed') setTimeout(()=>fail({type:'ice',info}),1500); });
       c.on('open',()=>{ if(done) return; done=true; this.conns.set('host',c); c.on('data',d=>this.h.msg('host',d)); c.on('close',()=>this.h.drop('host')); res(); });
-      c.on('error',e=>{ if(!done){ done=true; rej(e); } }); });
-    p.on('error',e=>{ if(!done){ done=true; rej(e); } else if(e&&e.type==='peer-unavailable') this.h.drop('host'); });
-    setTimeout(()=>{ if(!done){ done=true; rej(new Error('timeout')); } },25000); })); }
+      c.on('error',e=>fail(e)); });
+    p.on('error',e=>{ if(!done) fail(e); else if(e&&e.type==='peer-unavailable') this.h.drop('host'); });
+    setTimeout(()=>fail({type:'ice',info:c&&c._ice,timeout:1}),30000); }); }
   send(id,m){ const c=this.conns.get(id); if(c&&c.open) try{ c.send(m); }catch(e){} }
   close(){ try{ for(const c of this.conns.values()) c.close(); }catch(e){} try{ this.peer&&this.peer.destroy(); }catch(e){} this.conns.clear(); } }
 /* tabs of one browser, for testing: ?net=local, optionally &ping=150 to fake a slow line */
@@ -127,9 +155,9 @@ function renderCoop(code){ const lobby=NET.conn;
   if($('#cpStart')) $('#cpStart').onclick=hostStart; $('#cpLeave').onclick=()=>netLeave(); }
 function cpMsg(t){ coopStatus=t; const m=$('#cpMsg'); if(m) m.textContent=t; }
 function saveName(){ const n=($('#cpName')&&$('#cpName').value||'').replace(/[<>&"]/g,'').trim().slice(0,16); if(n) store.set('marrowdeep.coopname',n); return n||myName(); }
-function newTransport(){ const h={open:id=>{},msg:(id,m)=>netRecv(id,m),drop:id=>netDrop(id)}; return QS.get('net')==='local'?new LocalTr(h):new PeerTr(h); }
+function newTransport(){ const h={open:id=>{},msg:(id,m)=>netRecv(id,m),drop:id=>netDrop(id),stage:t=>cpMsg(t),knock:()=>cpMsg('Someone is knocking. Connecting…'),knockFail:info=>cpMsg('Someone tried to join, but your networks couldn\'t connect. '+(info&&info.relay?'Even the relay failed.':'The relay servers didn\'t answer.'))}; return QS.get('net')==='local'?new LocalTr(h):new PeerTr(h); }
 function errText(e){ const t=e&&e.type; if(e&&e.message==='lib') return 'Couldn\'t load the networking library (are you online?)'; if(t==='peer-unavailable') return 'No game with that code.'; if(t==='unavailable-id') return 'That code is taken.';
-  if(t==='browser-incompatible') return 'This browser can\'t do peer-to-peer.'; if(e&&e.message==='timeout') return 'No answer. A strict network on one side, or the host is gone.'; return 'Couldn\'t reach the matchmaking server'+(t?` (${t})`:'')+'.'; }
+  if(t==='browser-incompatible') return 'This browser can\'t do peer-to-peer.'; if(t==='ice') return iceWhy(e.info); if(e&&e.message==='timeout') return 'No answer. A strict network on one side, or the host is gone.'; return 'Couldn\'t reach the matchmaking server'+(t?` (${t})`:'')+'.'; }
 async function netHost(){ const name=saveName(); cpMsg('Opening a door…');
   for(let tries=0;tries<4;tries++){ const code=makeCode(); const tr=newTransport(); try{ await tr.host(code); NET.tr=tr; NET.code=code; break; } catch(e){ tr.close(); if(e&&e.type==='unavailable-id') continue; cpMsg(errText(e)); return; } }
   if(!NET.tr){ cpMsg('That code is taken.'); return; }
