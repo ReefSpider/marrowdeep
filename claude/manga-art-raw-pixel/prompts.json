@@ -1,0 +1,209 @@
+{
+  "method": "Built-in image generation tool; image references and targeted edits",
+  "style": "Use case: illustration-story. ONE standalone Marrowdeep game cutscene bitmap. Attached image is STYLE reference ONLY. STRICT COARSE PIXEL ART: looks drawn at just 160 pixels across then enlarged 10 TIMES nearest-neighbor. Every edge and internal mark uses same BIG visible square pixel grid, prominent square staircase contours, primitive economical block shapes. Face at most 12 pixels across; eyes 1-2 square blocks, no wrinkle lines or fine features. No small details within pixels. Black and bone-white FLAT colors ONLY; saturated blood-red ONLY if scene asks. Sparse large checkerboard dither clusters. Heavy raw black shapes, broken white pixel highlights. Absolutely no smooth ink, fine lines, hatching, gradients, glossy textures, antialiasing, photorealism, polished anime illustration, tiny detail, text/bubbles/border unless exact block lettering specified. Original characters, no recognizable manga character likeness. ONLY IF the scene explicitly includes the sellsword: deep hood hides almost all face, no spiky hair, no broad heroic jaw, plain normal longsword. Do not add a sellsword to other scenes. Render ONLY objects and people specified in the scene. Essential content central 70%, quiet areas top and bottom for engine overlays. ",
+  "continuity": [
+    "Sellsword face mostly hidden by deep hood",
+    "One swaddled baby throughout Agathe sequence",
+    "Seven faces in both Choir panels",
+    "Two candles in ending relighting and final window"
+  ],
+  "panels": [
+    {
+      "id": "op-1-wall",
+      "ratio": "21:9",
+      "scene": "Huge city wall at night, white braziers, full moon, endless undead ranks, tiny red horizon."
+    },
+    {
+      "id": "op-2-window",
+      "ratio": "2:1",
+      "scene": "Ilse nineteen thin long straight dark hair dark shawl, one candle at stone window, medieval rooftops at night."
+    },
+    {
+      "id": "op-3-candle",
+      "ratio": "2:1",
+      "scene": "Exactly two hands: thin bare hand gives one lit candle stub to battered gauntlet. Approved raw pixel reference."
+    },
+    {
+      "id": "op-5-crow",
+      "ratio": "2.5:1",
+      "scene": "One large crow on stone sill with rolled letter tied to leg, red wax seal and moon."
+    },
+    {
+      "id": "op-6-count",
+      "ratio": "2.5:1",
+      "scene": "Older gaunt Count raises hollow crown in both hands beneath huge red eye-wound; deliberately extremely coarse square blocks."
+    },
+    {
+      "id": "op-4-eyes",
+      "ratio": "1:1",
+      "scene": "Extreme close-up deep ragged hood fills frame. Sellsword's face almost entirely swallowed in pure black hood shadow. Only two tiny weary eye slits barely visible under hood, one faint red glint. NO visible hair, NO eye scar, NO heavy eyebrows, NO muscular jaw. Ordinary vulnerable man, never smiles. Face identity obscured."
+    },
+    {
+      "id": "a1-1-fall",
+      "ratio": "3:1",
+      "scene": "Deep-hooded sellsword falling headfirst among tumbling blocks of collapsing wall into black void, fist grips tiny candle stub. Hood hides face completely, slight ordinary build, ragged cloak battered mail plain normal longsword. Strong diagonal fall."
+    },
+    {
+      "id": "a1-2-eye",
+      "ratio": "2:1",
+      "scene": "Colossal blood-red eye-shaped wound across black sky, tiny falling human silhouettes beneath, vast cosmic horror."
+    },
+    {
+      "id": "a1-3-stub",
+      "ratio": "2:1",
+      "scene": "Dirty battered male fist tightly clutches unlit half-melted candle stub in blackness. Clearly black wick, no flame."
+    },
+    {
+      "id": "a1-5-bones",
+      "ratio": "2:1",
+      "scene": "Man's battered hand pushes upward from heap of large skulls and bones in dark ossuary, unlit candle stub beside hand. Large bone shapes and black sockets."
+    },
+    {
+      "id": "a1-6-up",
+      "ratio": "2:1",
+      "scene": "Sellsword from behind at bottom of immense stone shaft looking up at small far white light circle. Ragged deep hood hides face, slim ordinary build, battered mail, plain normal longsword. Small figure against vertical dark."
+    },
+    {
+      "id": "b1-2-agathe",
+      "ratio": "2.5:1",
+      "scene": "Agathe very old ghostly hooded midwife, deeply wrinkled but simplified face, gentle sad eyes, cradles swaddled bundle and looks toward viewer with tiny knowing sad smile. Large portrait, kindly and uncanny."
+    },
+    {
+      "id": "b1-3-cradle",
+      "ratio": "2.5:1",
+      "scene": "Exactly ONE swaddled baby in central wooden cradle, same baby as Agathe holds. Hooded sellsword left, dark crypt. No other bundles."
+    },
+    {
+      "id": "b1-4-rise",
+      "ratio": "2.5:1",
+      "scene": "Edit corrected b1-3-cradle preserving all contents and camera. Add only trail of five small rising white square lights. Still exactly ONE baby."
+    },
+    {
+      "id": "a2-2-bell",
+      "ratio": "2:1",
+      "scene": "Great chapel bell submerged in black water, heavy chains rising into darkness, broken concentric ripple rings convey sound. Huge bell silhouette spare white rim."
+    },
+    {
+      "id": "a2-3-letter",
+      "ratio": "2:1",
+      "scene": "Rough paper letter held open in darkness, red wax seal, crow foot at edge. Illegible chunky handwriting marks only. Clear top area for engine text."
+    },
+    {
+      "id": "b2-2-mouths",
+      "ratio": "2:1",
+      "scene": "Exactly SEVEN eyeless faces bound together: three upper arc, two sides, two lower sides, no bottom-centre face. Seven open tooth-filled mouths."
+    },
+    {
+      "id": "b2-3-eyes",
+      "ratio": "2:1",
+      "scene": "Extreme close-up sellsword under deep ragged hood. Face almost all solid black shadow, only small weary eye slit and one white tear track on visible narrow cheek sliver as he sings. No hair, no heavy brows, no eye scar. Hood dominates, ordinary man."
+    },
+    {
+      "id": "b2-4-shut",
+      "ratio": "16:9",
+      "scene": "Edit corrected seven-face Choir preserving every face and cloth. Close all seven mouths to short dark resting lines; add sparse dust pixels."
+    },
+    {
+      "id": "a3-2-ledger",
+      "ratio": "2.5:1",
+      "scene": "Enormous open ledger on stone lectern, rows of names suggested with illegible chunky marks, small lit candle beside. Oppressive accounts, huge white pages."
+    },
+    {
+      "id": "a3-3-father",
+      "ratio": "2.5:1",
+      "scene": "Extreme close-up old ledger page, one old dark name-shaped group of illegible pixel marks underlined. Black page-edge shadow, no readable lettering."
+    },
+    {
+      "id": "a3-4-ilse",
+      "ratio": "2.5:1",
+      "scene": "Close-up ledger page, freshly added short name written in wet blood-red ink beneath old black underlined entry. New name must read exactly ILSE using VERY SIMPLE BLOCK CAPITALS. Only new entry red. Big simple letters, no other readable writing."
+    },
+    {
+      "id": "b3-2-cage",
+      "ratio": "2:1",
+      "scene": "Iron cage door swings open in dark crypt. Three gaunt adult debtors climb out offering coins in outstretched white palms. Large weary silhouettes."
+    },
+    {
+      "id": "b3-3-struck",
+      "ratio": "2:1",
+      "scene": "Battered man's hand uses quill to strike red name ILSE out of ledger with heavy black stroke, ink splatters. Central close-up, simple block capitals beneath strike."
+    },
+    {
+      "id": "a4-2-letter",
+      "ratio": "2:1",
+      "scene": "Letter, red wax seal, nearly melted lit candle, stone table and window with red sky. No humans or hands."
+    },
+    {
+      "id": "a4-3-stub",
+      "ratio": "2:1",
+      "scene": "Short unlit candle stub alone on stone floor, black wick, ONE red drop on wax. No hands, no flame."
+    },
+    {
+      "id": "b4-2-mask",
+      "ratio": "2.5:1",
+      "scene": "Pale ceremonial metallic mask with red tear tracks falls away from exhausted adult woman's face in black shadow. Mask formerly gold rendered in bone-white. Dignified and tired, no gore."
+    },
+    {
+      "id": "b4-3-arms",
+      "ratio": "2.5:1",
+      "scene": "Saint Aurel dignified exhausted adult martyr woman, modest ragged robes, slowly lowers both outstretched arms. Loose iron nails fall from open hands, hard white light behind, relief on simple face. No gore or exposed wounds."
+    },
+    {
+      "id": "b4-4-ghost",
+      "ratio": "2.5:1",
+      "scene": "Exactly ONE hooded sellsword, seen from behind in stone shaft, made ghostly by broken coarse dither. No duplicate apparition; light above, face hidden."
+    },
+    {
+      "id": "a5-2-sky",
+      "ratio": "2:1",
+      "scene": "Ash falls UPWARD into blood-red sky split by giant eye-shaped wound, black city spires below. Huge simple cosmic horror shapes."
+    },
+    {
+      "id": "a5-3-window",
+      "ratio": "2:1",
+      "scene": "Thin nineteen-year-old Ilse long straight dark hair plain dress dark shawl asleep head on stone window sill beside nearly burnt-out lit candle. Medieval rooftops beyond. Exhausted vigil, no red."
+    },
+    {
+      "id": "a6-2-count",
+      "ratio": "1:1",
+      "scene": "Count Varhollow thin fifty-year-old aristocrat receding hairline long straight grey hair at sides, long nose thin lips small weary eyes, plain rich dark robes and hollow iron crown. Stands waiting among ranks of kneeling undead on battlefield. Large central figure."
+    },
+    {
+      "id": "b5-2-face",
+      "ratio": "2:1",
+      "scene": "Count Varhollow close-up, thin fifty-year-old aristocrat receding hairline grey hair sides long nose thin downturned lips small tired eyes. Half face in black shadow, hollow iron crown has red crack running down face. Restrained remorse, no gore, simplify face to big pixel marks."
+    },
+    {
+      "id": "b5-3-crown",
+      "ratio": "2:1",
+      "scene": "Broken hollow iron crown lies in black battlefield mud, a few red drops around. Empty hollow opening, white broken rim. Quiet aftermath."
+    },
+    {
+      "id": "e-1-dawn",
+      "ratio": "3:1",
+      "scene": "Ordinary dawn over besieged medieval city skyline, broken roofs spires, simple white sun rays and black crows flying. Sparse black-white dither implies grey, no red, understated peace."
+    },
+    {
+      "id": "e-2-door",
+      "ratio": "2:1",
+      "scene": "Stone house door opens spilling hard white interior light. Thin nineteen-year-old Ilse long straight dark hair dark shawl plain dress in doorway holding nearly exhausted candle. Tender simple silhouette."
+    },
+    {
+      "id": "e-3-light",
+      "ratio": "2:1",
+      "scene": "Exactly two hands: Ilse thin pale bare hand holds short lit candle, brother battered gauntleted hand holds shorter stub tilted so its wick catches from hers. Two small blocky white flames almost touch. Match approved candle handoff, dark background."
+    },
+    {
+      "id": "e-4-embrace",
+      "ratio": "1:1",
+      "scene": "Brother and sister embracing tightly in bright stone doorway, silhouettes against white interior light and long shadows toward viewer. Brother slim ordinary build ragged deep hood, battered mail, face entirely hidden inside hood against sister shoulder. Ilse thin nineteen-year-old long straight dark hair shawl plain dress. Tender sibling reunion."
+    },
+    {
+      "id": "e-5-window",
+      "ratio": "1:1",
+      "scene": "Two short lumpy lit candles side by side on stone sill at dawn, one shorter, crow beside them, simple medieval rooftops beyond. Two chunky white flames, quiet ending, no red."
+    }
+  ],
+  "reference": "op-3-candle.png",
+  "note": "Final reproduction specifications; revised images were made with targeted edits of preceding versions."
+}
