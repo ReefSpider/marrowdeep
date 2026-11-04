@@ -38,7 +38,7 @@ function calcStats(){ const s={min:1+Math.floor(P.lvl/2),max:3+P.lvl,spd:1.1,omi
   s.elm={main:{},off:{}}; for(const k in P.equip){ const it=P.equip[k]; if(!it||(k==='off'&&!offActive())) continue; for(const a of it.aff){ if(!ELEM_KEYS.includes(a.k)) continue; for(const h of k==='weapon'?['main']:k==='off'?['off']:['main','off']) s.elm[h][a.k]=(s.elm[h][a.k]||0)+a.v; } }
   s.mf+=ngp*20;
   s.life=Math.max(10,Math.round(s.life)); P.stats=s; P.power=gearPower(); P.life=Math.min(P.life,s.life); }
-function gainXP(n){ if(!P||P.dead) return; P.xp+=Math.round(n); while(P.lvl<100&&P.xp>=xpNext(P.lvl)){ P.xp-=xpNext(P.lvl); P.lvl++; P.sp++; calcStats(); P.life=P.stats.life; levelUpFX(); } }
+function gainXP(n){ if(!P||P.dead) return; P.xp+=Math.round(n); while(P.xp>=xpNext(P.lvl)){ P.xp-=xpNext(P.lvl); P.lvl++; P.sp++; calcStats(); P.life=P.stats.life; levelUpFX(); } }
 function heroState(){ const p=P; return p.dead?'dead':p.dash>0?'dash':p.iai?'iai':p.attack?'atk':p.hurtT>0?'hurt':p.teth&&p.teth.state==='pull'?'jump':(p.wallT>0&&!p.onGround)?'wall':!p.onGround?(p.vy<0?'jump':'fall'):Math.abs(p.vx)>12?'run':'idle'; }
 const heroBr=()=>{ const st=heroState(); return st==='idle'?Math.round(Math.sin(time*2.2)*.6):st==='run'?-Math.round(Math.abs(Math.sin(P.runPh))*1.4):0; };
 function armExt(hand){ const a=P.attack; if(!a||a.hand!==hand||a.mv.t!=='thrust') return 0; const pr=a.t/a.dur; return Math.round(pr<.25?-4*pr/.25:pr<.6?7:7*(1-(pr-.6)/.4)); }

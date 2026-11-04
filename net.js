@@ -208,7 +208,7 @@ function coopStart(m){ NET.running=true; COOP=NET; NET.n=Math.max(1,m.n|0); NET.
   toast(`Together · ${m.seats.map(x=>x.name).join(', ')}`);
   if(NET.host){ META.runs++; NET.going=true; goLevel(1); }
   else { mode='card'; hud.hidden=true; showCard({title:'The descent',jp:'下降',body:'The rope creaks under more than one of you.'}); } }
-function mkHero(x){ const p=newPlayer(); p.lvl=x.lvl||1; const sv=P; P=p; calcStats(); P=sv; p.life=p.stats.life; return {s:x.s,name:x.name,p,st:null,rt:-9,rev:0,revCd:0,seenT:-9}; }
+function mkHero(x){ const p=newPlayer(); p._remote=1; p.lvl=x.lvl||1; const sv=P; P=p; calcStats(); P=sv; p.life=p.stats.life; return {s:x.s,name:x.name,p,st:null,rt:-9,rev:0,revCd:0,seenT:-9}; }
 /* every level load: the host numbers the enemies, makes them tougher for a crowd, and sends the list */
 (function(){ const o=loadLevel; loadLevel=function(idx,opt){
   if(COOP&&LEVELS[idx]&&LEVELS[idx].kind==='cabin'){ const r=o(idx,opt); setTimeout(()=>{ if(COOP) netLeave(true); },0); return r; }
