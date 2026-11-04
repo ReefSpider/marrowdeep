@@ -64,19 +64,25 @@ $('#contBtn').onclick=()=>continueGame();
 $('#startBtn').onclick=()=>newGame();
 
 /* ---------- the shared stash ---------- */
-const STASH_N=48;
-let STASH=(store.get(STASH_KEY)||[]).map(deItem).filter(Boolean);
-const saveStash=()=>store.set(STASH_KEY,STASH.map(serItem));
+/* v21: the stash is a grid with tabs. Cells are saved beside the items (marrowdeep.stashPos); tabs open as characters
+   finish the campaign (marrowdeep.stashTabs). Stashes from before v21 are placed into the grid on load. */
+const STASH_POS_KEY='marrowdeep.stashPos', STASH_TABS_KEY='marrowdeep.stashTabs';
+let STASH=(()=>{ const pos=store.get(STASH_POS_KEY)||[]; return (store.get(STASH_KEY)||[]).map((o,i)=>{ const it=deItem(o); const p=pos[i]; if(it&&p&&p[1]!=null){ [it.bt,it.bx,it.by]=p; } return it; }).filter(Boolean); })();
+let STASH_TABS=(()=>{ let n=store.get(STASH_TABS_KEY)|0; if(!n){ const db=store.get(SLOTS_KEY); let c=0; for(const sl of (db&&db.list)||[]){ const m=sl.data&&sl.data.meta; if(m) c+=Math.max(m.clears|0,(m.cleared||[]).length); } n=1+c; store.set(STASH_TABS_KEY,n); } return n; })();
+const saveStash=()=>{ store.set(STASH_KEY,STASH.map(serItem)); store.set(STASH_POS_KEY,STASH.map(it=>[it.bt|0,it.bx,it.by])); };
+{ /* an old 48-slot stash may not fit one tab of cells: open as many tabs as it needs, never lose anything */
+  let lost=gEnsure(GSTASH); while(lost.length&&STASH_TABS<STASH_TABS_MAX){ STASH.push(...lost); STASH_TABS++; store.set(STASH_TABS_KEY,STASH_TABS); lost=gEnsure(GSTASH); }
+  if(lost.length) STASH.push(...lost.map(it=>(it.bt=0,it.bx=null,it))); saveStash(); }
 const stashScr=document.createElement('div'); stashScr.className='screen'; stashScr.id='stashScr'; stashScr.hidden=true; stage.appendChild(stashScr);
 function slotEl(it,onclick){ const d=document.createElement('div'); d.className='slot'; if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); bindTip(d,it); d.onclick=onclick; } return d; }
 function openStash(){ mode='inv'; hud.hidden=true; stashScr.hidden=false; renderStash(); }
 function closeStash(){ stashScr.hidden=true; hideTip(); mode='play'; hud.hidden=false; saveGame(); }
-function renderStash(){ stashScr.innerHTML=`<h2 class="mh">The stash 蔵</h2><div class="pane"><div class="panel"><h3>Satchel</h3><div class="bag" id="sbBag"></div><div class="hint">Click or drag onto the stash to store · drag to rearrange</div></div>
-  <div class="panel"><h3>Stash · ${STASH.length}/${STASH_N}</h3><div class="bag stash" id="sbStash"></div><div class="hint">Shared by every character · click to take</div></div></div><div class="row"><button class="btn" id="sbClose">Close <kbd>Esc</kbd></button></div>`;
-  const b=$('#sbBag'), s=$('#sbStash');
-  const toStash=i=>{ if(STASH.length>=STASH_N){ toast('The stash is full.'); return false; } const it=P.bag.splice(i,1)[0]; it.bx=it.by=null; STASH.push(it); saveStash(); hideTip(); AU.coin(); renderStash(); return true; };
-  renderBagGrid(b,{cell:'calc(var(--u)*2.45)',click:(it,i)=>toStash(i),drops:{'#sbStash':(it,i)=>toStash(i)},after:renderStash});
-  for(let i=0;i<STASH_N;i++){ const it=STASH[i]; s.appendChild(slotEl(it,()=>{ if(!bagAdd(STASH[i])){ toast('No room in your satchel for that.'); return; } STASH.splice(i,1); saveStash(); hideTip(); AU.coin(); renderStash(); })); }
+function renderStash(){ stashScr.innerHTML=`<h2 class="mh">The stash 蔵</h2><div class="pane"><div class="panel"><div class="gHead"><h3>Satchel</h3><button class="btn ghost sortBtn" id="sbSortB">Sort</button></div><div id="sbBag"></div><div class="hint">Click or drag across to store · drag to rearrange</div></div>
+  <div class="panel"><div class="gHead"><h3>Stash</h3><button class="btn ghost sortBtn" id="sbSortS">Sort</button></div><div id="sbStash"></div><div class="hint">Shared by every character · click or drag across to take</div></div></div><div class="row"><button class="btn" id="sbClose">Close <kbd>Esc</kbd></button></div>`;
+  const cell='calc(var(--u)*2.3)';
+  renderGrid($('#sbBag'),GBAG,{cell,click:it=>{ if(!stashAdd(it,GVIEW.stash)){ toast('The stash is full.'); return; } P.bag.splice(P.bag.indexOf(it),1); hideTip(); AU.coin(); renderStash(); },after:()=>{ saveStash(); renderStash(); }});
+  renderGrid($('#sbStash'),GSTASH,{cell,click:it=>{ if(!bagAdd(it,GVIEW.bag)){ toast('No room in your satchel for that.'); return; } STASH.splice(STASH.indexOf(it),1); saveStash(); hideTip(); AU.coin(); renderStash(); },after:()=>{ saveStash(); renderStash(); }});
+  $('#sbSortB').onclick=()=>{ if(sortGrid(GBAG,GVIEW.bag)) renderStash(); }; $('#sbSortS').onclick=()=>{ if(sortGrid(GSTASH,GVIEW.stash)){ saveStash(); renderStash(); } };
   $('#sbClose').onclick=closeStash; }
 
 /* ---------- loadouts: three saved sets of gear on the rack ---------- */
@@ -85,8 +91,8 @@ function findItem(f){ for(const k in P.equip) if(fp(P.equip[k])===f) return {whe
 function saveLoadout(n){ META.loadouts[n]={equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,fp(v)])),names:Object.fromEntries(Object.entries(P.equip).filter(([k,v])=>v).map(([k,v])=>[k,v.name]))}; saveGame(); toast(`Loadout ${n+1} saved.`); }
 function wearLoadout(n){ const lo=META.loadouts[n]; if(!lo) return; let missing=0;
   for(const k in lo.equip){ const f=lo.equip[k]; if(!f){ continue; } if(fp(P.equip[k])===f) continue; const at=findItem(f); if(!at){ missing++; continue; }
-    let it; if(at.where==='bag') it=P.bag.splice(at.i,1)[0]; else if(at.where==='stash') it=STASH.splice(at.i,1)[0]; else { it=P.equip[at.k]; P.equip[at.k]=null; }
-    const old=P.equip[k]; P.equip[k]=it; if(old){ if(!bagAdd(old)) STASH.push(old); } }
+    let it; if(at.where==='bag') it=P.bag.splice(at.i,1)[0]; else if(at.where==='stash'){ it=STASH.splice(at.i,1)[0]; saveStash(); } else { it=P.equip[at.k]; P.equip[at.k]=null; }
+    const old=P.equip[k]; P.equip[k]=it; if(old){ if(!bagAdd(old)&&!stashAdd(old)) dropItem(old,P.x,P.y-10,true); } }
   saveStash(); calcStats(); P.life=P.stats.life; saveGame(); AU.pickup(); toast(missing?`Loadout ${n+1} worn · ${missing} piece${missing>1?'s':''} no longer owned`:`Loadout ${n+1} worn.`); }
 function loadoutCard(){ const row=n=>{ const lo=META.loadouts[n]; return lo?Object.values(lo.names).join(' · '):'Empty'; };
   showCard({title:'The weapon rack',jp:'武具掛け',body:'Three pegs, three ways to go down. Wear a set and anything it needs comes off the rack, out of the satchel or out of the stash.\n\n'+[0,1,2].map(n=>`${n+1}. ${row(n)}`).join('\n'),
@@ -97,7 +103,10 @@ function diffCard(){ const rows=DIFFS.map((d,t)=>{ const [a,b]=tierRange(t), ope
     return {label:`<span class="dj">${d.jp}</span> ${d.n} <small>${open?`Monster level ${a}–${b} · ${d.d}${done?' · cleared':''}`:`Locked · clear the campaign on ${DIFFS[Math.max(0,t-3)].n} or higher`}</small>`,disabled:!open,ghost:t!==META.pick,fn:()=>{ META.pick=t; saveGame(); AU.tone('triangle',600,400,.1,.1,.2); diffCard(); }}; });
   showCard({title:'The map table',jp:'地図台',body:`Ilse has drawn the Pit on the table in candle wax. Pick how deep you go. Clearing the campaign unlocks the next three tiers at once.\n\nChosen: ${DIFFS[META.pick].n}. You are level ${P.lvl}.`,buttons:rows.concat([{label:'Done',fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])});
   $('#cardBtns').classList.add('koan','diffs'); }
-function campaignCleared(toTitleAfter){ const t=tierNow(); if(!META.cleared.includes(t)) META.cleared.push(t); const before=META.unlocked; META.unlocked=Math.max(META.unlocked,Math.min(TOP_TIER,t+3)); META.pick=Math.min(META.unlocked,Math.max(META.pick,t+1));
+function campaignCleared(toTitleAfter){ const t=tierNow();
+  { const bt0=bagTabs(), st0=stashTabs(); META.clears=charClears()+1; STASH_TABS=Math.min(STASH_TABS_MAX,STASH_TABS+1); store.set(STASH_TABS_KEY,STASH_TABS);
+    const got=[]; if(bagTabs()>bt0) got.push(`your satchel gained a pocket (tab ${['I','II','III','IV'][bagTabs()-1]})`); if(stashTabs()>st0) got.push(`the stash gained a tab (${stashTabs()} of ${STASH_TABS_MAX})`);
+    if(got.length) setTimeout(()=>toast(`More room: ${got.join(', and ')}.`),toTitleAfter?400:4200); } if(!META.cleared.includes(t)) META.cleared.push(t); const before=META.unlocked; META.unlocked=Math.max(META.unlocked,Math.min(TOP_TIER,t+3)); META.pick=Math.min(META.unlocked,Math.max(META.pick,t+1));
   if(META.unlocked>before) setTimeout(()=>toast(`Unlocked: ${DIFFS.slice(before+1,META.unlocked+1).map(d=>d.n).join(', ')}.`),toTitleAfter?0:2200);
   P.life=P.stats.life; goCabin(); if(toTitleAfter) saveGame(); }
 

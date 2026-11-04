@@ -150,11 +150,13 @@ function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=
 const serItem=it=>it&&{s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set};
 const deItem=o=>o&&fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t});
 
-/* ---------- the satchel grid (v21): items take up room by size ----------
-   16 × 10 cells. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon 1×2 to 2×3,
-   a two-hander or a polearm up to 2×4. Each item in P.bag carries its cell (bx, by); P.bag stays a plain list so
-   every older module that splices it still works. Saved as a separate list (bp) beside the items. */
-const BAG_W=16, BAG_H=10;
+/* ---------- grids (v21): the satchel and the stash, items take up room by size ----------
+   Each grid is 16 × 10 cells per tab. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon
+   1×2 to 2×3, a two-hander or a polearm up to 2×4. Every item in a grid carries its tab and cell (bt, bx, by); the lists
+   (P.bag, STASH) stay plain arrays so older modules that splice them still work.
+   Tabs unlock with play: the satchel gains a tab each time this character finishes the campaign (up to 4); the shared
+   stash gains a tab each time any character does (up to 6). */
+const BAG_W=16, BAG_H=10, BAG_TABS_MAX=4, STASH_TABS_MAX=6;
 function itemSize(it){ if(!it) return [1,1]; const b=it.base||{};
   if(it.slot==='ring'||it.slot==='amulet') return [1,1];
   if(it.slot==='helm') return [2,2];
@@ -163,20 +165,33 @@ function itemSize(it){ if(!it) return [1,1]; const b=it.base||{};
   if(b.cls==='xbow') return [2,2];
   if(b.h===2){ const thin=b.cls==='spear'||b.cls==='scythe'||(b.wid||0)<=3; return [thin?1:2,(b.len||0)>=30||thin?4:3]; }
   return [(b.wid||0)>=6?2:1,(b.len||0)<=12?2:3]; }
-function bagFits(it,x,y,ignore){ const [w,h]=itemSize(it); if(x<0||y<0||x+w>BAG_W||y+h>BAG_H) return false;
-  for(const o of P.bag){ if(o===it||(ignore&&ignore.includes(o))||o.bx==null) continue; const [ow,oh]=itemSize(o);
-    if(x<o.bx+ow&&x+w>o.bx&&y<o.by+oh&&y+h>o.by) return false; }
+const charClears=()=>{ if(typeof META==='undefined'||!META) return 0; return Math.max(META.clears|0,(META.cleared||[]).length); };
+const bagTabs=()=>clamp(1+charClears(),1,BAG_TABS_MAX);
+const stashTabs=()=>clamp(typeof STASH_TABS!=='undefined'?STASH_TABS|0:1,1,STASH_TABS_MAX);
+const GBAG={id:'bag',name:'satchel',list:()=>P.bag,set:v=>{ P.bag=v; },tabs:()=>bagTabs(),max:BAG_TABS_MAX};
+const GSTASH={id:'stash',name:'stash',list:()=>STASH,set:v=>{ STASH=v; },tabs:()=>stashTabs(),max:STASH_TABS_MAX};
+const overlaps=(a,ax,ay,b)=>{ const [w,h]=itemSize(a), [ow,oh]=itemSize(b); return ax<b.bx+ow&&ax+w>b.bx&&ay<b.by+oh&&ay+h>b.by; };
+function gFits(G,it,t,x,y,ignore){ const [w,h]=itemSize(it); if(t<0||t>=G.tabs()||x<0||y<0||x+w>BAG_W||y+h>BAG_H) return false;
+  for(const o of G.list()){ if(o===it||(ignore&&ignore.includes(o))||o.bx==null||(o.bt|0)!==t) continue; if(overlaps(it,x,y,o)) return false; }
   return true; }
-function bagSpot(it,ignore){ for(let y=0;y<BAG_H;y++) for(let x=0;x<BAG_W;x++) if(bagFits(it,x,y,ignore)) return [x,y]; return null; }
-const bagRoom=it=>!!bagSpot(it);
-function bagAdd(it){ if(!it||!P) return false; const s=bagSpot(it); if(!s) return false; it.bx=s[0]; it.by=s[1]; P.bag.push(it); return true; }
+function gSpot(G,it,ignore,pref){ const n=G.tabs(), order=[]; if(pref!=null&&pref<n) order.push(pref); for(let t=0;t<n;t++) if(t!==pref) order.push(t);
+  for(const t of order) for(let y=0;y<BAG_H;y++) for(let x=0;x<BAG_W;x++) if(gFits(G,it,t,x,y,ignore)) return [t,x,y]; return null; }
+function gAdd(G,it,pref){ if(!it) return false; const s=gSpot(G,it,null,pref); if(!s) return false; [it.bt,it.bx,it.by]=s; G.list().push(it); return true; }
+/* repair a grid: anything without a cell, outside an open tab, or overlapping gets a new cell; returns what didn't fit */
+function gEnsure(G){ const ok=[], lost=[], n=G.tabs();
+  for(const it of G.list()){ const t=it.bt|0, [w,h]=itemSize(it);
+    const keep=it.bx!=null&&t<n&&it.bx>=0&&it.by>=0&&it.bx+w<=BAG_W&&it.by+h<=BAG_H&&!ok.some(o=>(o.bt|0)===t&&overlaps(it,it.bx,it.by,o));
+    if(keep){ it.bt=t; ok.push(it); } else { it.bx=null; lost.push(it); } }
+  G.set(ok); return lost.filter(it=>!gAdd(G,it)); }
+/* the satchel */
+const bagFits=(it,x,y,ignore,t)=>gFits(GBAG,it,t==null?(it.bt|0):t,x,y,ignore);
+const bagSpot=(it,ignore,pref)=>gSpot(GBAG,it,ignore,pref);
+const bagRoom=it=>!!gSpot(GBAG,it);
+function bagAdd(it,pref){ if(!it||!P) return false; return gAdd(GBAG,it,pref); }
 /* take item i out and put `old` where it was (or anywhere it fits, or at your feet) */
-function bagSwapOut(i,old){ const it=P.bag[i]; const x=it?it.bx:null, y=it?it.by:null; P.bag.splice(i,1);
-  if(!old) return; if(x!=null&&bagFits(old,x,y)){ old.bx=x; old.by=y; P.bag.push(old); return; }
-  if(!bagAdd(old)){ dropItem(old,P.x-P.face*10,P.y-10,true); if(typeof toast==='function') toast(`No room in the satchel. ${old.name} fell at your feet.`); } }
-/* repair the grid: anything without a cell, or overlapping, gets a new one; what can't fit goes to the stash or the floor */
-function bagEnsure(){ if(!P||!P.bag) return; const ok=[], lost=[];
-  for(const it of P.bag){ const keep=it.bx!=null&&(()=>{ const [w,h]=itemSize(it); if(it.bx<0||it.by<0||it.bx+w>BAG_W||it.by+h>BAG_H) return false;
-      for(const o of ok){ const [ow,oh]=itemSize(o); if(it.bx<o.bx+ow&&it.bx+w>o.bx&&it.by<o.by+oh&&it.by+h>o.by) return false; } return true; })();
-    if(keep) ok.push(it); else { it.bx=null; lost.push(it); } }
-  P.bag=ok; for(const it of lost) if(!bagAdd(it)){ if(typeof STASH!=='undefined'&&STASH.length<STASH_N){ STASH.push(it); saveStash(); } else if(typeof L!=='undefined'&&L) dropItem(it,P.x,P.y-10,true); } }
+function bagSwapOut(i,old){ const it=P.bag[i]; const t=it?it.bt|0:0, x=it?it.bx:null, y=it?it.by:null; P.bag.splice(i,1);
+  if(!old) return; if(x!=null&&gFits(GBAG,old,t,x,y)){ old.bt=t; old.bx=x; old.by=y; P.bag.push(old); return; }
+  if(!bagAdd(old,t)){ dropItem(old,P.x-P.face*10,P.y-10,true); if(typeof toast==='function') toast(`No room in the satchel. ${old.name} fell at your feet.`); } }
+function bagEnsure(){ if(!P||!P.bag) return; for(const it of gEnsure(GBAG)){ if(typeof stashAdd==='function'&&stashAdd(it)) continue; if(typeof L!=='undefined'&&L) dropItem(it,P.x,P.y-10,true); } }
+/* the stash */
+const stashAdd=(it,pref)=>{ const r=gAdd(GSTASH,it,pref); if(r&&typeof saveStash==='function') saveStash(); return r; };

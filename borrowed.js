@@ -4,8 +4,8 @@
    Forgive, Remember, Endure, Seek); then a reel spins for its rarity, and you get a power that lasts until the run
    ends (you go home: by the door, by Abandon, by running out of lives, or by finishing the campaign). Powers stack.
    The old permanent vows are gone: the stats you had sworn no longer apply.
-     Magic    50%  a strong boost in the answer's kind
-     Rare     30%  a bigger one
+     Magic    50%  a small boost in the answer's kind (v21: hard nerf, e.g. +2% crit, +3% damage)
+     Rare     30%  a slightly bigger one (+3% crit, +6% damage)
      Legendary 13% a miracle: Heaven's Gate, an oni fighting for you, Raijin's lightning…
      Unique    6%  a Bargain: something huge, at a real cost. You may refuse it and take a Rare boon instead.
      Abyssal   1%  a god comes down with you.
@@ -20,19 +20,20 @@ const TH={release:{k:'放',n:'Release'},carry:{k:'担',n:'Carry'},forgive:{k:'�
 
 /* ---------- the powers ---------- */
 const POWERS={
-  /* Magic and Rare: by kind */
-  carry1:{r:1,th:'carry',k:'力',n:'Borrowed Strength',d:'+25% damage.',st:{dmg:25}},
-  carry2:{r:2,th:'carry',k:'剛',n:'Iron Arm',d:'+45% damage.',st:{dmg:45}},
-  endure1:{r:1,th:'endure',k:'堅',n:'Borrowed Hide',d:'+30% life.',st:{lifeP:30}},
-  endure2:{r:2,th:'endure',k:'城',n:'Walled Heart',d:'+50% life and +40% defense.',st:{lifeP:50,defP:40}},
-  release1:{r:1,th:'release',k:'疾',n:'Borrowed Haste',d:'+15% attack speed, +12% run speed.',st:{as:15,ms:12}},
-  release2:{r:2,th:'release',k:'迅',n:'Lightfoot',d:'+25% attack speed, +20% run speed, rolling costs half the grit.',st:{as:25,ms:20},halfRoll:1},
-  forgive1:{r:1,th:'forgive',k:'癒',n:'Borrowed Mercy',d:'+4% life stolen.',st:{ls:4}},
-  forgive2:{r:2,th:'forgive',k:'慈',n:'Open Hand',d:'+7% life stolen, +3 life a second.',st:{ls:7,regen:3}},
-  remember1:{r:1,th:'remember',k:'鋭',n:'Borrowed Eye',d:'+12% critical strike.',st:{crit:12}},
-  remember2:{r:2,th:'remember',k:'閃',n:'Second Sight',d:'+20% critical strike; critical strikes deal 50% more.',st:{crit:20},critDmg:.5},
-  seek1:{r:1,th:'seek',k:'運',n:'Borrowed Luck',d:'+75% magic find and gold find.',st:{mf:75,gf:75}},
-  seek2:{r:2,th:'seek',k:'福',n:'Fortune\'s Child',d:'+150% magic find and gold find.',st:{mf:150,gf:150}},
+  /* Magic and Rare: by kind. v21 (playtest: "too OP, only Legendary and above can stay, the rest need a hard nerf,
+     like 2% not 15%"): cut to roughly a seventh of v20 (v20 values in brackets). */
+  carry1:{r:1,th:'carry',k:'力',n:'Borrowed Strength',d:'+3% damage.',st:{dmg:3}},                                   /* [+25%] */
+  carry2:{r:2,th:'carry',k:'剛',n:'Iron Arm',d:'+6% damage.',st:{dmg:6}},                                            /* [+45%] */
+  endure1:{r:1,th:'endure',k:'堅',n:'Borrowed Hide',d:'+4% life.',st:{lifeP:4}},                                       /* [+30%] */
+  endure2:{r:2,th:'endure',k:'城',n:'Walled Heart',d:'+7% life and +5% defense.',st:{lifeP:7,defP:5}},                 /* [+50%, +40%] */
+  release1:{r:1,th:'release',k:'疾',n:'Borrowed Haste',d:'+2% attack speed, +2% run speed.',st:{as:2,ms:2}},          /* [+15%, +12%] */
+  release2:{r:2,th:'release',k:'迅',n:'Lightfoot',d:'+4% attack speed, +3% run speed.',st:{as:4,ms:3}},                /* [+25%, +20%, half-grit rolls] */
+  forgive1:{r:1,th:'forgive',k:'癒',n:'Borrowed Mercy',d:'+0.5% life stolen.',st:{ls:.5}},                            /* [+4%] */
+  forgive2:{r:2,th:'forgive',k:'慈',n:'Open Hand',d:'+1% life stolen, +0.4 life a second.',st:{ls:1,regen:.4}},        /* [+7%, +3/s] */
+  remember1:{r:1,th:'remember',k:'鋭',n:'Borrowed Eye',d:'+2% critical strike.',st:{crit:2}},                          /* [+12%] */
+  remember2:{r:2,th:'remember',k:'閃',n:'Second Sight',d:'+3% critical strike.',st:{crit:3}},                          /* [+20%, crits +50%] */
+  seek1:{r:1,th:'seek',k:'運',n:'Borrowed Luck',d:'+10% magic find and gold find.',st:{mf:10,gf:10}},                 /* [+75%] */
+  seek2:{r:2,th:'seek',k:'福',n:'Fortune\'s Child',d:'+20% magic find and gold find.',st:{mf:20,gf:20}},              /* [+150%] */
   /* Legendary: miracles */
   gate:{r:3,th:'forgive',k:'天門',n:'Heaven\'s Gate',d:'Every 12 s, when foes press close, a pillar of holy light crashes down on you: it wipes out the ordinary foes around you and heals you 15%.'},
   rain:{r:3,th:'forgive',k:'血雨',n:'Blood Rain',d:'Every 15 s, blood rains around you for 5 s: foes in it bleed heavily, you drink 2% life a second.'},

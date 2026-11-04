@@ -8,6 +8,10 @@ const SAVEKEY='marrowdeep.v2';
 /* ---------- small HUD helpers ---------- */
 function bark(kind,force){ if(!force&&barkCd>0) return; const arr=BARKS[kind]; if(!arr) return; const el=$('#bark'); el.textContent=pick(arr); el.classList.add('on'); barkT=3.4; barkCd=force?3:8; }
 function updBelt(){ $('#belt').querySelectorAll('i').forEach((el,i)=>el.classList.toggle('f',i<P.potions)); }
+/* v21 (playtest: "it keeps telling me I've levelled up but I haven't"): a one-shot banner that faded out kept its
+   class, and a CSS animation replays whenever its parent is shown again, so "Level N · a skill point" came back after
+   every card, map and menu. Banners that fade away now drop the class when they finish. */
+document.addEventListener('animationend',e=>{ if(['lu','bn','im','epi'].includes(e.animationName)) e.target.classList.remove('on'); },true);
 function levelUpFX(){ AU.lvl(); impactT=Math.max(impactT,.05); const el=$('#lvlup'); el.querySelector('b').textContent='Level '+P.lvl; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
   for(let i=0;i<24;i++){ const a=i/24*Math.PI*2; part({x:P.x,y:P.y-14,vx:Math.cos(a)*120,vy:Math.sin(a)*80,g:0,life:.6,em:true,col:'#ffd890'}); } bark('level',true); }
 function showBossName(name,jp,sub){ const el=$('#bossname'); el.querySelector('b').textContent=name; el.querySelector('span').textContent=jp; el.querySelector('em').textContent=sub||''; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); }
@@ -166,7 +170,7 @@ function renderInv(){
   [['weapon','Main hand','1 / 1 / 3 / 2'],['helm','Helm','1 / 2 / 2 / 3'],['armor','Armour','2 / 2 / 3 / 3'],['off','Off hand','1 / 3 / 3 / 4'],['amulet','Amulet','1 / 4 / 2 / 5'],['ring','Ring','2 / 4 / 3 / 5']].forEach(([s,lab,area])=>{
     const d=document.createElement('div'); d.className='slot'; d.dataset.slot=s; d.style.gridArea=area; const it=P.equip[s];
     if(s==='off'&&!has('off')){ d.classList.add('lockd'); d.innerHTML='<span class="kj">双</span><span class="lab">Second Hand</span>'; d.onpointerenter=()=>showTipHTML('<div class="w">Off hand</div><div class="g">Learn Second Hand in the Steel brand.</div>',d); d.onpointerleave=hideTip; eq.appendChild(d); return; }
-    if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); if(s==='off'&&!offActive()) d.classList.add('idle'); bindTip(d,it); d.onclick=()=>{ if(bagAdd(it)){ P.equip[s]=null; calcStats(); hideTip(); renderInv(); } else invMsg('No room in the satchel for that.'); }; }
+    if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); if(s==='off'&&!offActive()) d.classList.add('idle'); bindTip(d,it); d.onclick=()=>{ if(bagAdd(it,typeof GVIEW!=='undefined'?GVIEW.bag:0)){ P.equip[s]=null; calcStats(); hideTip(); renderInv(); } else invMsg('No room in the satchel for that.'); }; }
     else { const l=document.createElement('span'); l.className='lab'; l.textContent=lab; d.appendChild(l); }
     eq.appendChild(d); });
   renderBagGrid($('#bag'),{click:(it,i,e)=>{ if(e.shiftKey){ dropFromBag(i); return; } equipFromBag(i,false); },
