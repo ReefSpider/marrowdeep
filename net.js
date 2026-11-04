@@ -371,7 +371,7 @@ function hostGo(){ if(NET.going) return; NET.going=true; hideCard(); nextLevel()
   if(mode==='map') setTimeout(()=>{ if(COOP&&mode==='map'&&!mapScr.hidden&&mapScr._close) mapScr._close(); },2600); }
 
 /* ---------- shared chests: watch, roll for it or pass, fate decides ---------- */
-(function(){ const o=openChest; openChest=function(c){ if(!COOP||NET.seats.length<2) return o(c); const ci=chests.indexOf(c);
+(function(){ const o=openChest; openChest=function(c){ if(!c||c.open) return; if(!COOP||NET.seats.length<2) return o(c); const ci=chests.indexOf(c);
   if(NET.host) hostChest(ci,0,P.stats.mf); else { if(c._pend&&time-c._pend<2) return; c._pend=time; toHost({t:'copen',ci,mf:P.stats.mf}); } }; })();
 function hostChest(ci,s,mf){ const c=chests[ci]; if(!c||c.open) return; if(NET.roll){ if(!NET.chq.some(q=>q[0]===ci)) NET.chq.push([ci,s,mf]); return; }
   c.open=true; c.t=0; dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+lvlIdx*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));

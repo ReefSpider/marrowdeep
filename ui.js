@@ -53,7 +53,7 @@ function takeRelic(){ const r=L.relic; r.taken=true; P.equip.weapon=mkBase('Rust
 const CW=[[60,29,9,1.4,.55,.001],[18,46,28,5.5,2.4,.006],[0,22,48,14,15.95,.05],[48,34,13,2.5,1.2,.004]];
 const CNAME=['Iron-Bound Coffer','Bone Reliquary','Tithe Hoard',"The Pale Merchant's Box"];
 function fmtOdds(p){ return p>=1?p.toFixed(1)+'%':p>=.1?p.toFixed(2)+'%':'1 in '+Math.round(100/p).toLocaleString('en-US'); }
-function openChest(c){ c.open=true; c.t=0; AU.chest(); shake(2); bark('chest',true);
+function openChest(c){ if(!c||c.open) return; c.open=true; c.t=0; AU.chest(); shake(2); bark('chest',true);
   for(let i=0;i<14;i++) part({x:c.x+rnd(-6,6),y:c.y-12,vx:rnd(-40,40),vy:rnd(-120,-40),g:200,life:rnd(.4,.9),em:true,col:pick(['#ffe1a0','#ffd06a','#fff'])});
   dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+lvlIdx*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));
   const ilvl=ilvlNow()+(c.tier?2:0)+(c.tier===2?2:0)+ri(0,2); const win=genItem(ilvl,CW[c.tier],P.stats.mf);
@@ -122,8 +122,10 @@ function closeCase(take){ const cs=caseState; if(!cs||!cs.ready) return; caseSta
   $('#case').hidden=true; if(cs.onClose) cs.onClose(); else { hud.hidden=false; mode='play'; } }
 
 /* ---------- chest cinematic: a close-up before the reel ---------- */
+/* the close-up glows in the chest's own colour; the item's rarity stays hidden until the reel lands */
+const CHEST_GLOW=['#f0e6d0','#ffd27a','#ff7a4a','#d8c8ff','#bfeaff'];
 function playChestCine(tier,rar,done){ const el=$('#cine'), cvs=$('#cineCv'), g=cvs.getContext('2d'); g.imageSmoothingEnabled=false; el.hidden=false;
-  const dur=RM?500:[1500,2200,3400,1500][tier]; const t0=performance.now(); const col=hex(rar>=3?RCOL[rar]:'#f0e6d0'); const sn=new Set(); const cps=[];
+  const dur=RM?500:[1500,2200,3400,1500][tier]; const t0=performance.now(); const col=hex(CHEST_GLOW[tier]||CHEST_GLOW[0]); const sn=new Set(); const cps=[];
   const step=now=>{ const k=Math.min(1,(now-t0)/dur); const openAt=tier===2?.66:.6, open=k>openAt;
     const cue=(n,f)=>{ if(!sn.has(n)&&k>=f){ sn.add(n); return true; } return false; };
     if(tier>=1&&cue('c1',.3)){ AU.chain(); for(let i=0;i<14;i++) cps.push({x:120-14,y:68,vx:rnd(-60,60),vy:rnd(-80,20),l:.6}); }
@@ -280,7 +282,7 @@ function playEnding(){ playCut(ENDING.map((s,i)=>({dur:4.4,cap:s.cap,jp:s.jp,fad
     buttons:[{label:'Go home',fn:()=>{ hideCard(); campaignCleared(); }},{label:'Rest',ghost:1,fn:()=>{ hideCard(); campaignCleared(true); toTitle(); }}]}); }); }
 
 /* ---------- input: menus ---------- */
-function uiKey(k,e){
+function uiKey(k,e){ const m0=mode; /* a key that closes a screen must not also act in the world */
   if(mode==='cut'&&(k==='Enter'||k==='space'||k==='e'||k==='Escape')){ e.preventDefault(); skipCut(); return; }
   if(mode==='inv'&&(k==='i'||k==='Tab'||k==='Escape'||k==='t')){ e.preventDefault(); if((k==='t'&&$('#paneTree').hidden)||(k==='i'&&$('#paneBag').hidden)){ setTab(k==='t'?'tree':'bag'); return; } toggleInv(false); return; }
   if(mode==='play'&&(k==='i'||k==='Tab'||k==='t'||k==='c')){ e.preventDefault(); toggleInv(true,k==='t'?'tree':k==='c'?'codex':'bag'); return; }
@@ -288,7 +290,7 @@ function uiKey(k,e){
   if(mode==='pause'&&(k==='Escape'||k==='Enter')){ e.preventDefault(); closePause(); return; }
   if(mode==='case'&&caseState&&caseState.landed){ if(reveal){ if(k==='e'||k==='Enter'||k==='space'||k==='Escape'){ e.preventDefault(); reveal.finish(); } return; }
     if(caseState.ready){ if(k==='e'||k==='Enter'){ e.preventDefault(); closeCase(true); } else if(k==='Escape') closeCase(false); } }
-  if(mode==='play'&&k==='e'&&interact){ interact.act(); }
+  if(m0==='play'&&mode==='play'&&k==='e'&&interact){ interact.act(); }
   if(mode==='death'&&(k==='Enter'||k==='space')) respawn(); }
 
 /* ---------- render ---------- */

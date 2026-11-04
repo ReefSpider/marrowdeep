@@ -97,7 +97,7 @@ function showSecretRoll(hit,done){
 
 /* ---------- the Hollow Reliquary: fixed odds, its own look ---------- */
 (function(){ const o=oddsW; oddsW=function(w,mf){ return w===CW[4]?w.slice():o(w,mf); }; })();
-(function(){ const o=playChestCine; playChestCine=function(tier,rar,done){ return o(tier===4?2:tier,rar,done); }; })();
+(function(){ const o=playChestCine; playChestCine=function(tier,rar,done){ if(tier!==4) return o(tier,rar,done); const g2=CHEST_GLOW[2]; CHEST_GLOW[2]=CHEST_GLOW[4]; try{ return o(2,rar,done); } finally{ CHEST_GLOW[2]=g2; } }; })();
 (function(){ const o=showCase; showCase=function(tier,ilvl,win,onClose){ o(tier,ilvl,win,onClose); if(tier===4) $('#caseSub').textContent='THE HOLLOW GARDEN · SECRET'; }; })();
 (function(){ const o=findInteract; findInteract=function(){ const b=o(); if(b&&b.o&&b.o.tier===4&&typeof b.txt==='string') b.txt=b.txt.replace('undefined','The Hollow Reliquary'); return b; }; })();
 (function(){ const o=drawChest; drawChest=function(c,ch){ if(ch.tier!==4) return o(c,ch); const op=ch.open;
