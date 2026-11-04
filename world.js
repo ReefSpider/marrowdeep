@@ -33,6 +33,7 @@ function genRooms(def,safe){
     const lr=r.entry==='L'&&(r.exit==='R'); const q=R();
     if(i>=2&&arenas<maxA&&r.entry!=='B'&&r.exit==='R'&&q<.22){ r.kind='arena'; arenas++; return; }
     const tw=env==='debt'?.34:env==='bone'?.18:.12;
+    if(lr&&R()<.36){ r.kind=pick(['cave','cave','perch','ruin']); return; } /* v16 room kinds (gen2.js) */
     if(lr&&R()<tw){ r.kind='tunnel'; return; }
     if(lr&&R()<.2){ r.kind='chasm'; return; }
     if(R()<.16){ r.kind='hall'; return; }
@@ -146,12 +147,13 @@ function populate(Lv,r,res,isRel){
     if(t==='archer'||t==='nun'){ const f=feats.find(f=>f.k==='plats'||f.k==='tower'||f.k==='gallery'); if(f&&R()<.7){ Lv.spawns.push(Object.assign({x:ox+f.x+R()*f.len,y:oy+f.y,t},extra)); return; } }
     Lv.spawns.push(Object.assign({x:ox+x+.5,y:oy+floorAt(x),t},extra)); };
   const pickT=()=>{ let t=wpick(pool); if(r.kind==='tunnel'&&(t==='brute'||t==='knight')) t='ghoul'; return t; };
-  let n=r.entry==='S'?(Lv.surface?1:0):ri(2,4)+(def.id==='breach'?1:0)+extraFoes();
+  const thin=ngp===0; /* the first descent is sparse but tough (tune.js); the hordes start on Ashen */
+  let n=r.entry==='S'?(Lv.surface?1:0):(thin?ri(1,3):ri(2,4)+(def.id==='breach'?1:0))+extraFoes();
   if(r.kind==='arena') n=0; if(r.kind==='shaft') n=Math.min(n,2);
   for(let i=0;i<n&&cols.length;i++) put(pickT(),pick(cols));
   // packs: the reason a strong build feels strong. Weak alone, a tide together.
-  if(def.packs&&r.entry!=='S'&&r.kind!=='arena'&&r.kind!=='shaft'&&R()<(def.packP||.45)+Math.min(.3,ngp*.1)&&cols.length){
-    const pk=pick(def.packs), c0=pick(cols), cnt=ri(pk.n[0],pk.n[1])+Math.min(ngp,4)*3; const lead=R()<eliteChance('lead');
+  if(def.packs&&r.entry!=='S'&&r.kind!=='arena'&&r.kind!=='shaft'&&R()<((def.packP||.45)+Math.min(.3,ngp*.1))*(thin?.4:1)&&cols.length){
+    const pk=pick(def.packs), c0=pick(cols), cnt=thin?Math.ceil(ri(pk.n[0],pk.n[1])*.55):ri(pk.n[0],pk.n[1])+Math.min(ngp,4)*3; const lead=R()<eliteChance('lead');
     for(let i=0;i<cnt;i++){ const x=clamp(c0+ri(-3,3),4,RW-5); if(fl[x]>=99) continue; put(pk.t,x,{pack:1}); }
     if(lead){ const x=clamp(c0,4,RW-5); if(fl[x]<99) put(pk.t,x,{leader:1}); } }
   if(r.kind==='shaft'&&R()<.6) Lv.spawns.push({x:ox+RW/2,y:oy+7,t:pool.witch&&R()<.4?'witch':pool.swarm&&R()<.5?'swarm':'wraith'});

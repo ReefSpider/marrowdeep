@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-15';
+const NET_V='marrowdeep-16';
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,
@@ -247,7 +247,7 @@ function mkHero(x){ const p=newPlayer(); p._remote=1; p.lvl=x.lvl||1; const sv=P
   for(const h of Object.values(NET.heroes)){ h.st=null; h.rev=0; }
   if(NET.host){ NET.epoch++; const n=NET.n; if(n>1) scaleForCrowd(n);
     for(const e of enemies) e.nid=++NET.nid; for(const d of drops) d.nid=++NET.dnid; NET.chestN=chests.length;
-    bcast({t:'lvl',ep:NET.epoch,idx,ngp,wipe:NET.wipeFlag?1:0,sec:(typeof SECRET!=='undefined'&&SECRET.on&&SECRET.from===idx)?1:0,a:enemies.map(espec),d:drops.map(dspec)}); NET.wipeFlag=false; NET.roll=null; NET.chq=[]; }
+    bcast({t:'lvl',ep:NET.epoch,idx,ngp,vs:(typeof LVVAR!=='undefined'?LVVAR.v:0),wipe:NET.wipeFlag?1:0,sec:(typeof SECRET!=='undefined'&&SECRET.on&&SECRET.from===idx)?1:0,a:enemies.map(espec),d:drops.map(dspec)}); NET.wipeFlag=false; NET.roll=null; NET.chq=[]; }
   else if(NET.pendingLvl){ const m=NET.pendingLvl; NET.pendingLvl=null; NET.epoch=m.ep; const boss=enemies.find(e=>e.boss); enemies=[]; spawnIn(m.a,boss); drops=[]; dropsIn(m.d||[]); NET.chestN=chests.length; NET.pend=[]; }
   return r; }; })();
 function scaleForCrowd(n){ const hp=1+.6*(n-1), dm=1+.08*(n-1), add=[];
@@ -264,7 +264,7 @@ function spawnIn(list,boss){ const have=new Set(enemies.map(e=>e.nid));
   for(const sp of list){ if(have.has(sp.nid)) continue; if(sp.boss){ const b=boss||enemies.find(e=>e.boss&&!e.nid); if(b){ b.nid=sp.nid; b.hp=sp.hp; b.maxhp=sp.maxhp; if(!enemies.includes(b)) enemies.push(b); } continue; }
     const e=Object.assign({},sp); if(sp.mods) e.mods=sp.mods.slice(); if(sp.elems) e.elems=sp.elems.slice(); if(sp.res) e.res=Object.assign({},sp.res); e.hitId=-1; e.sts=null; e._b=e.hp; enemies.push(e); } }
 function lvlIn(m){ closeMenus(); if(!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; } $('#death').hidden=true; hideCard();
-  ngp=m.ngp; NET.pendingLvl=m; if(typeof SECRET!=='undefined'){ SECRET.on=!!m.sec; SECRET.from=m.idx; } goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; } }
+  ngp=m.ngp; NET.pendingLvl=m; if(typeof SECRET!=='undefined'){ SECRET.on=!!m.sec; SECRET.from=m.idx; } if(typeof LVVAR!=='undefined') LVVAR={idx:m.idx,v:m.vs|0,ngp:m.ngp}; goLevel(m.idx); if(m.wipe){ P.dead=false; P.deadT=0; P.life=P.stats.life; P.inv=2; } }
 /* close any menu so a shared moment (a chest, a boss, a new level) can take the screen */
 function closeMenus(){ if(mode==='inv') toggleInv(false); if(mode==='pause') closePause(); if(!$('#card').hidden&&mode==='card'){ hideCard(); mode='play'; } if(!stashScr.hidden){ stashScr.hidden=true; mode='play'; } hideTip(); if(mode==='map'&&!mapScr.hidden){ cancelAnimationFrame(mapAnim); mapScr.hidden=true; mode='play'; } }
 
@@ -311,15 +311,25 @@ function hitIn(s,m){ const map=byNid(); for(const [n,d,cls,el,dir] of m.h){ cons
 function dieIn(m){ const e=byNid().get(m.n); if(!e||e.dead) return; NET.applying=true;
   try{ if(m.k){ if(m.lh) e.lastHit=Object.assign({t:time},m.lh); e.hp=Math.min(e.hp,0); killEnemy(e,m.r||1,!!m.c); } else { e.dead=true; e.deadT=2.2; if(!e.escaped) ash(e.x,e.y-e.h/2,10); } }
   finally{ NET.applying=false; } for(const x of enemies) x._b=x.hp; }
+/* v16: a snapshot also carries what the host's foe is doing (stunned, frozen, dropped from its noose or the ceiling,
+   mid-attack), so a foe the host has knocked down is knocked down on every screen, not still walking at you there. */
+const SNAP_ST=['idle','chase','wind','lunge','slam','hang','drop','pounce','spin','combo','cast','spit','crawl','dive','rec','tele','draw','thrust','lash','rise','leap','burrow','bite','shield','raise'];
 function snapIn(m){ NET.pend=NET.pend.filter(p=>p.q>m.ak); const ps={}; for(const p of NET.pend) ps[p.n]=(ps[p.n]||0)+p.d; const map=byNid();
-  for(const [n,x,y,vx,vy,f,hp] of m.e){ const e=map.get(n); if(!e||e.dead) continue; const disp=hp-(ps[n]||0);
+  for(const [n,x,y,vx,vy,f,hp,sn,fz,fl,si] of m.e){ const e=map.get(n); if(!e||e.dead) continue; const disp=hp-(ps[n]||0);
     if(disp<e.hp-.5){ e.flash=.1; if(R()<.4) bleed(e.x,e.y-e.h*.55,3,R()<.5?1:-1,.7); } e.hp=disp; e._b=e.hp;
-    if(e.boss&&e.intro) continue; const dx=x-e.x, dy=y-e.y; if(Math.abs(dx)>56||Math.abs(dy)>56){ e.x=x; e.y=y; } else { e.x+=dx*.3; e.y+=dy*.3; }
-    e.vx=vx; if(e.fly) e.vy=vy; e.face=f; } }
-function snapFor(s){ const h=NET.heroes[s]; const hx=h&&h.st?h.p.x:null, hy=h&&h.st?h.p.y:null; const out=[];
-  for(const e of enemies){ if(e.dead||!e.nid) continue; if(hx!=null&&(Math.abs(e.x-hx)>W*1.4||Math.abs(e.y-hy)>H*1.6)) continue;
-    out.push([e.nid,Math.round(e.x*10)/10,Math.round(e.y*10)/10,Math.round(e.vx),Math.round(e.vy),e.face,Math.round(e.hp*10)/10]); }
+    if(e.boss&&e.intro) continue;
+    if(sn>0) e.stun=Math.max(e.stun||0,sn);
+    if(fz>0&&typeof freezeFoe==='function'&&!(e.sts&&e.sts.frozen)) freezeFoe(e,fz);
+    if(fl&1&&e.ceil) e.ceil=0; if(fl&2&&e.state==='hang') e.state='drop'; if(fl&4) e.seen=1;
+    if(si!=null&&!e.boss&&SNAP_ST[si]&&e.state!==SNAP_ST[si]&&(si<=1||SNAP_ST[si]==='drop')) e.state=SNAP_ST[si];
+    const dx=x-e.x, dy=y-e.y; if(Math.abs(dx)>48||Math.abs(dy)>48){ e.x=x; e.y=y; } else { e.x+=dx*.45; e.y+=dy*.45; }
+    e.vx=vx; e.vy=vy; e.face=f; } }
+function snapFor(s){ const h=NET.heroes[s]; const hx=h&&h.st?h.p.x:null, hy=h&&h.st?h.p.y:null; const out=[]; NET.snapK=(NET.snapK||0)+1; const all=NET.snapK%4===0;
+  for(const e of enemies){ if(e.dead||!e.nid) continue; if(!all&&hx!=null&&(Math.abs(e.x-hx)>W*1.4||Math.abs(e.y-hy)>H*1.6)) continue;
+    const fz=e.sts&&e.sts.frozen?+e.sts.frozen.t.toFixed(2):0, fl=(e.ceil?0:1)|(e.state==='hang'?0:2)|(e.seen?4:0), si=SNAP_ST.indexOf(e.state);
+    out.push([e.nid,Math.round(e.x*10)/10,Math.round(e.y*10)/10,Math.round(e.vx),Math.round(e.vy),e.face,Math.round(e.hp*10)/10,e.stun>0?+e.stun.toFixed(2):0,fz,fl,si<0?null:si]); }
   return {t:'sn',ep:NET.epoch,ak:NET.ack[s]||0,e:out}; }
+function netSeed(...parts){ let h=2166136261; for(const ch of [NET.code].concat(parts).join('|')){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
 
 /* ---------- drops, items, projectiles ---------- */
 function dspec(d){ return {n:d.nid,k:d.kind,x:+d.x.toFixed(1),y:+d.y.toFixed(1),vx:Math.round(d.vx||0),vy:Math.round(d.vy||0),nn:d.n,big:d.big?1:0,it:d.item?serItem(d.item):undefined}; }
@@ -354,7 +364,7 @@ function wipeIn(){ closeMenus(); bannerEl.hidden=true; const el=$('#death'); el.
 
 /* ---------- arenas, the last chamber, bosses: the host's call ---------- */
 (function(){ const o=updArenas; updArenas=function(dt){ if(!COOP) return o(dt); if(!NET.host) return;
-  let trig=null; if(L.arenas) for(const a of L.arenas){ if(a.state!==0) continue; const inA=p=>!p.dead&&p.x>a.x0+4*T&&p.x<a.x1-4*T&&p.y>a.y0&&p.y<a.y1; if(inA(P)){ trig=null; break; } for(const h of Object.values(NET.heroes)) if(heroLive(h)&&inA(h.p)) trig=trig||h.p; }
+  let trig=null; if(L.arenas) for(const a of L.arenas){ if(a.state!==0||a.hold) continue; const inA=p=>!p.dead&&p.x>a.x0+4*T&&p.x<a.x1-4*T&&p.y>a.y0&&p.y<a.y1; if(inA(P)){ trig=null; break; } for(const h of Object.values(NET.heroes)) if(heroLive(h)&&inA(h.p)) trig=trig||h.p; }
   if(trig){ const sv=P; P=trig; NET.swapped=true; NET.lp=sv; try{ o(dt); } finally{ P=sv; NET.swapped=false; } } else o(dt);
   if(!L.arenas) return; L.arenas.forEach((a,i)=>{ const pv=NET.arSt[i]||[0,0]; if(pv[0]!==a.state||pv[1]!==a.wave){ NET.arSt[i]=[a.state,a.wave]; bcast({t:'ar',ep:NET.epoch,i,st:a.state,w:a.wave,ws:a.waves}); } }); }; })();
 function arenaIn(m){ const a=L.arenas&&L.arenas[m.i]; if(!a) return;
@@ -413,11 +423,11 @@ function rollIn(m){ const cc=NET.cc; const it=cc&&cc.rid===m.rid?cc.win:deItem(m
   if(reveal) reveal.finish(); const res=$('#result'); const box=document.createElement('div'); box.className='rollv';
   if(m.none){ box.innerHTML=`<div class="rh">Nobody rolled for it.</div><div class="rwin" style="color:#9a8a7a">It lies by the chest for whoever wants it.</div>`; res.innerHTML=''; res.appendChild(box); setTimeout(()=>finishCoopCase(m,it),1900); return; }
   box.innerHTML=`<div class="rh">Fate decides</div><div class="reel"><div class="strip" id="rstrip"></div><div class="marker"></div></div><div class="nodds">${m.cands.map(([s,p])=>`<span style="color:${SEAT_C[s]}">${nameOf(s)} ${p}%</span>`).join(' · ')}</div><div class="rwin" id="rwin"></div>`;
-  res.innerHTML=''; res.appendChild(box); const strip=$('#rstrip'), N=44, WI=36; const cards=[];
-  const pickC=()=>{ let x=Math.random()*100; for(const [s,p] of m.cands){ x-=p; if(x<=0) return s; } return m.cands[0][0]; };
+  res.innerHTML=''; res.appendChild(box); const strip=$('#rstrip'), N=44, WI=36; const cards=[]; const prevRNG=RNG; RNG=mulberry(netSeed('fate',m.rid));
+  const pickC=()=>{ let x=R()*100; for(const [s,p] of m.cands){ x-=p; if(x<=0) return s; } return m.cands[0][0]; };
   for(let i=0;i<N;i++){ let s=i===WI?m.win:pickC(); if(Math.abs(i-WI)===1&&m.cands.length>1) while(s===m.win) s=pick(m.cands)[0];
     const d=document.createElement('div'); d.className='card'; d.style.setProperty('--rc',SEAT_C[s]); d.style.setProperty('--rg',SEAT_C[s]+'55'); d.innerHTML=`<div class="n" style="color:${SEAT_C[s]}">${nameOf(s)}</div>`; strip.appendChild(d); cards.push(d); }
-  const reelW=strip.parentElement.clientWidth, cw=cards[1].offsetLeft-cards[0].offsetLeft, cardW=cards[0].offsetWidth; const x0=Math.max(0,2*cw-reelW/2), target=WI*cw+rnd(.15,.85)*cardW-reelW/2; const dur=RM?600:2800, t0=performance.now(); let li=-1;
+  const reelW=strip.parentElement.clientWidth, cw=cards[1].offsetLeft-cards[0].offsetLeft, cardW=cards[0].offsetWidth; const x0=Math.max(0,2*cw-reelW/2), target=WI*cw+rnd(.15,.85)*cardW-reelW/2; RNG=prevRNG; const dur=RM?600:2800, t0=performance.now(); let li=-1;
   if(AU.caseDrums) AU.caseDrums(dur/1000,1);
   const step=now=>{ const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,4), x=x0+(target-x0)*e; strip.style.transform=`translateX(${-x}px)`; const idx=Math.floor((x+reelW/2)/cw); if(idx!==li){ li=idx; AU.tick(); }
     if(p<1) requestAnimationFrame(step); else { cards[WI].classList.add('won'); const w=$('#rwin'); w.style.color=SEAT_C[m.win]; w.textContent=m.win===NET.me?`You take it.`:`${nameOf(m.win)} takes it.`; AU.reveal(Math.min(5,it?it.rarity:1)); if(AU.caseHit) AU.caseHit(it?it.rarity:1); setTimeout(()=>finishCoopCase(m,it),1900); } };
@@ -446,7 +456,7 @@ function bgRun(rdt){ const ks={}; for(const k in keys){ ks[k]=keys[k]; keys[k]=f
 function netTick(dt){ if(!NET.running) return; tickNeed(); if(NET.host) tickRoll();
   const now=performance.now();
   if(now-NET.tSt>50){ NET.tSt=now; if(L&&P&&!NET.betweenLevels){ const st=heroSt(); if(NET.host){ const a=[st]; for(const h of Object.values(NET.heroes)) if(h.st) a.push(h.st); bcast({t:'hs',a}); } else toHost(Object.assign({t:'st'},st)); } }
-  if(NET.host&&now-NET.tSn>66&&!NET.betweenLevels){ NET.tSn=now; for(const x of NET.seats) if(x.s!==0) sendSeat(x.s,snapFor(x.s)); }
+  if(NET.host&&now-NET.tSn>50&&!NET.betweenLevels){ NET.tSn=now; for(const x of NET.seats) if(x.s!==0) sendSeat(x.s,snapFor(x.s)); }
   if(now-NET.tEq>500){ NET.tEq=now; const eq=Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])); const key=JSON.stringify(eq)+[...P.skills].join(); if(key!==NET.eqKey){ NET.eqKey=key; const m={t:'eq',s:NET.me,eq,sk:[...P.skills],lvl:P.lvl}; if(NET.host) bcast(m); else toHost(m); } }
   drawCoopHud(); }
 function drawCoopHud(){ const show=mode==='play'||mode==='inv'||mode==='pause'; teamEl.hidden=!show; tagsEl.hidden=!show; if(!show) return;

@@ -78,7 +78,7 @@ function showSecretRoll(hit,done){
   const tile=h=>{ const d=document.createElement('div'); d.className='srt'+(h?' h':''); d.innerHTML=h?'<i>隠</i>???':'<i>上</i>The way up'; return d; };
   /* the strip shows the door now and then, and on a miss it sometimes stops one short of it */
   const near=!hit&&R()<.55?WI+(R()<.5?1:-1):-1;
-  for(let i=0;i<N;i++){ const h=i===WI?hit:i===near?true:(Math.abs(i-WI)>2&&Math.random()<.06); const d=tile(h); strip.appendChild(d); tiles.push(d); }
+  for(let i=0;i<N;i++){ const h=i===WI?hit:i===near?true:(Math.abs(i-WI)>2&&R()<.06); const d=tile(h); strip.appendChild(d); tiles.push(d); }
   const reel=el.querySelector('.srreel'), reelW=reel.clientWidth, cw=tiles[1].offsetLeft-tiles[0].offsetLeft, tw=tiles[0].offsetWidth;
   const x0=Math.max(0,2*cw-reelW/2), target=WI*cw+(near>WI?.72:near>=0?.28:rnd(.15,.85))*tw-reelW/2;
   const dur=RM?700:2600, t0=performance.now(); let li=-1, ended=false, landed=false, raf=0;

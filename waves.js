@@ -16,7 +16,7 @@ function chamberSpots(a){ const out=[]; for(let x=a.ox+2;x<a.ox+RW-2;x++){ for(l
   return out; }
 /* the last chamber's foes rise out of the floor instead of dropping from the ceiling, so low ceilings and pits are safe */
 (function(){ const o=spawnWave; spawnWave=function(a){ if(!a.final) return o(a);
-  a.wave++; const def=L.def; const n=4+a.wave*2+Math.min(ngp,4)*3+Math.floor(lvlIdx/3); a.list=[]; AU.roar(); shake(4);
+  a.wave++; const def=L.def; const n=ngp===0?2+a.wave+Math.floor(lvlIdx/4):4+a.wave*2+Math.min(ngp,4)*3+Math.floor(lvlIdx/3); a.list=[]; AU.roar(); shake(4);
   showBossName(`The last chamber · wave ${a.wave} of ${a.waves}`,['一','二','三'][a.wave-1]||'',a.wave===a.waves?'Kill them and the way up opens.':'The door above stays shut.');
   const spots=chamberSpots(a); if(!spots.length){ a.next=1; return; }
   for(let i=0;i<n;i++){ const pk=def.packs?pick(def.packs).t:wpick(def.enemies); const t=(pk==='hanged'||pk==='spitter'||pk==='anchor'||pk==='relicx')?'ghoul':pk; const fly=EDEF[t].fly; const [sx,sy]=pick(spots);

@@ -156,7 +156,7 @@ function renameMagic(it){ if(it.rarity!==1) return; const p=it.aff.find(a=>a.pre
 function blessItem(it){ const nl=Math.min(110,(it.ilvl||1)+ri(3,8));
   if(it.rarity===0){ let r=rollRarity([0,62,30,6,1.8,.05],0); if(r===0) r=1; return genItem(nl,[0,1,2,3,4,5].map(i=>i===r?1:0),0,it.slot); }
   it.ilvl=nl; rerollAffs(it,nl);
-  if((it.rarity===2||it.rarity===3)&&it.aff.length<6&&R()<.35){ const used=new Set(it.aff.map(a=>a.k)); const a=rollAff(R()<.5?PRE:SUF,affSlot(it),it.rarity===3?nl+6:nl,used); if(a) it.aff.push(a); }
+  if((it.rarity===2||it.rarity===3)&&it.aff.length<6&&R()<.35){ const used=new Set(it.aff.map(a=>a.k).concat(ELEM_KEYS)); const a=rollAff(R()<.5?PRE:SUF,affSlot(it),it.rarity===3?nl+6:nl,used); if(a) it.aff.push(a); }
   it.dq=Math.min(115,(it.dq||100)+ri(0,4)); renameMagic(it); return fin(it); }
 function stripItem(it){ rerollAffs(it,it.ilvl||1); it.aff=it.aff.filter(a=>!varies(a)||a.g>0); renameMagic(it); return fin(it); }
 const VERDICT={bless:{k:'祝',t:'Blessed',c:'#ffd27a',s:'The gods drink the smoke and give it back better.'},strip:{k:'剥',t:'Stripped',c:'#b9b0a0',s:'They took what was weak. What is left was rolled again.'},

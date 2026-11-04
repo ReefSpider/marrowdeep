@@ -170,7 +170,7 @@ const SKILLS=[
   {id:'wing',br:2,tier:0,k:'翼',name:'Ash Wings',desc:'Jump again in midair on a burst of grave ash.'},
   {id:'claw',br:2,tier:1,k:'爪',name:'Grave Claw',desc:'Cling to walls and slide down them. Jump off to climb higher.'},
   {id:'shade',br:2,tier:2,k:'影',name:'Shade Step',desc:'Your roll leaves a shade where you stood. It copies your next attack from there.'},
-  {id:'bell',br:2,tier:3,k:'鐘',name:'Funeral Bell',key:'4',desc:'Toll a bell no one else can hear. Everything near you is stunned and shaken.'},
+  {id:'bell',br:2,tier:3,k:'鐘',name:'Funeral Bell',key:'4',desc:'Toll a bell no one else can hear. It does no harm, but everything near you stands stunned for nearly three seconds, and bosses reel. Costs 40 grit; tolls once every 12 seconds.'},
   {id:'last',br:2,tier:4,k:'息',name:'Last Breath',desc:'Once per level, refuse death. Become a shade for a few seconds, untouchable and burning, then crawl back with a third of your life.'}
 ];
 const SK=Object.fromEntries(SKILLS.map(s=>[s.id,s]));

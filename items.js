@@ -14,28 +14,59 @@ function valueFor(lo,hi,g){ while(g>0){ const r=gradeRange(lo,hi,g); if(r[0]<=r[
 function rollStat(lo,hi){ if(lo===hi) return {v:lo,g:3}; let r=R()*GR.reduce((a,b)=>a+b.w,0), g=0; for(let i=0;i<GR.length;i++){ r-=GR[i].w; if(r<=0){g=i;break;} }
   while(g>0&&g<3){ const rg=gradeRange(lo,hi,g); if(rg[0]<=rg[1]) break; g--; } return {v:valueFor(lo,hi,g),g}; }
 function fin(it){ const ed=sumAff(it,'ed'),edef=sumAff(it,'edef');
-  if(it.slot==='weapon'&&it.base.max>0){const sc=1+Math.max(0,(it.ilvl||1)-1)*.075;it.min=Math.max(1,Math.round(it.base.min*sc*(1+ed/100)));it.max=Math.max(it.min+1,Math.round(it.base.max*sc*(1+ed/100)));}
-  if(it.base.def!=null) it.def=Math.round(it.base.def*(it.dq||100)/100*(1+edef/100)*(1+Math.max(0,(it.ilvl||1)-1)*.05));
+  if(it.slot==='weapon'&&it.base.max>0){const sc=(1+Math.max(0,(it.ilvl||1)-1)*.075)*(it.rarity>=4?uniqueFloor(it):1);it.min=Math.max(1,Math.round(it.base.min*sc*(1+ed/100)));it.max=Math.max(it.min+1,Math.round(it.base.max*sc*(1+ed/100)));}
+  if(it.base.def!=null) it.def=Math.round(it.base.def*(it.rarity>=4&&it.slot!=='weapon'?defFloor(it)*(it.rarity===5?1.2:1.05):1)*(it.dq||100)/100*(1+edef/100)*(1+Math.max(0,(it.ilvl||1)-1)*.05));
   return it; }
 /* every stat category that can appear on this slot, each counted once, so all are equally likely */
 function catPool(slot){ const ks=[]; for(const a of PRE.concat(SUF)) if(a.s.includes(slot)&&!ks.includes(a.k)) ks.push(a.k); return ks; }
+
+/* ---------- v16 loot fixes (see v16 notes: measured over 20,000 rolls per item level) ----------
+   1. Weapon bases used to come from the 7 highest-level bases, and above item level 14 those are all two-handers and
+      off-hand crossbows: no one-handed weapon could drop at all. Now a class is picked first (every class equally likely),
+      then one or two hands where the class has both, then the best base of that kind for the item level.
+   2. Flat stats (life, the ten damage types, thorns, regen) stopped growing at item level 12. They now grow 5% per item
+      level above 12, so late jewellery keeps up with late monsters. Percent stats are unchanged.
+   3. Uniques were weaker than legendaries (fixed early bases, three stats). A unique now hits as hard as the best base of
+      its kind at its item level ×1.05 (abyssal ×1.2), armour and helms get the best base's defense the same way, its own
+      stats roll 20% higher, and it gains two extra stats rolled at legendary strength (item level +6). */
+const FLAT_K=new Set(['life','thorns','regen'].concat(ELEM_KEYS));
+const flatMul=(k,ilvl)=>FLAT_K.has(k)?1+.05*Math.max(0,(ilvl||1)-12):1;
+function flatScale(k,lo,hi,ilvl){ const m=flatMul(k,ilvl); if(m===1) return [lo,hi]; return [Math.round(lo*m),Math.max(Math.round(lo*m),Math.round(hi*m))]; }
+function pickWeaponBase(ilvl){ const ok=BASES.weapon.filter(b=>b.lvl<=ilvl+1); const cls=[...new Set(ok.map(b=>b.cls))]; const c=pick(cls);
+  const inC=ok.filter(b=>b.cls===c), hs=[...new Set(inC.map(b=>b.h))], h=pick(hs); const pool=inC.filter(b=>b.h===h).sort((a,b)=>b.lvl-a.lvl);
+  return pool[pool.length>1&&R()<.3?1:0]; }
+function uniqueFloor(it){ const b=it.base; if(!(b.max>0)) return 1; const il=it.ilvl||1; let best=b;
+  for(const x of BASES.weapon) if(x.h===b.h&&x.cls===b.cls&&x.max>0&&x.lvl<=il+1&&x.min+x.max>best.min+best.max) best=x;
+  return Math.max(1,(best.min+best.max)/(b.min+b.max)*(it.rarity===5?1.2:1.05)); }
+function defFloor(it){ const b=it.base; if(!b.def||!BASES[it.slot]) return 1; const il=it.ilvl||1; let best=b; for(const x of BASES[it.slot]) if(x.def&&x.lvl<=il+1&&x.def>best.def) best=x; return best.def/b.def; }
+/* v16: damage types are what make a unique (and an abyssal) unique. Lesser items never roll them; every unique carries
+   one, its own, at the strongest tier, rolled 20% higher (abyssal 50%) and growing with item level like any flat stat. */
+const SIG_EL={"Widow's Promise":'blood','Grave Mother':'bone','The Mourning Hatchet':'shadow',"Sister's Needle":'poison','Gravedigger':'cold','Last Wall of Hollowmere':'holy','Ironheart':'fire','Hollow Crown':'shadow',"The Debtor's Chain":'water',
+  'The Unpaid Debt':'blood',"Ilse's Candle":'holy',"Rope's End":'wind',"The Hound's Jaw":'blood'};
+function signatureElem(it,ilvl){ const k=SIG_EL[it.name]||ELEM_KEYS[(it.name||'').length%ELEM_KEYS.length]; const d=PRE.find(x=>x.k===k); if(!d) return null; const t=d.v.length-1;
+  const m=(it.rarity===5?1.5:1.2)*flatMul(k,ilvl); const lo=Math.round(d.v[t][0]*m), hi=Math.max(lo+1,Math.round(d.v[t][1]*m)); const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:d.n[t],pre:true}; }
+function empower(it,ilvl){ for(const a of it.aff){ if(a.hi<=0) continue; const m=(it.rarity===4?1.2:1)*flatMul(a.k,ilvl); if(m===1) continue; a.lo=Math.round(a.lo*m); a.hi=Math.max(a.lo,Math.round(a.hi*m)); const rs=rollStat(a.lo,a.hi); a.v=rs.v; a.g=rs.g; }
+  if(!it.aff.some(a=>ELEM_KEYS.includes(a.k))){ const a=signatureElem(it,ilvl); if(a) it.aff.push(a); }
+  if(it.rarity!==4) return it; const used=new Set(it.aff.map(a=>a.k)); const as=affSlot(it);
+  for(let i=0;i<2;i++){ const a=rollAff(i?SUF:PRE,as,ilvl+6,used)||rollAff(i?PRE:SUF,as,ilvl+6,used); if(a){ a.x=1; it.aff.push(a); } }
+  return it; }
 function rollAff(list,slot,ilvl,used){ const hasEl=[...used].some(k=>ELEM_KEYS.includes(k)); const keys=catPool(slot).filter(k=>!used.has(k)&&!(hasEl&&ELEM_KEYS.includes(k))); if(!keys.length) return null; const k=pick(keys); used.add(k);
   const defs=PRE.concat(SUF).filter(d=>d.k===k&&d.s.includes(slot)); const a=defs.find(d=>list.includes(d))||pick(defs);
-  const mt=Math.min(a.v.length-1,Math.floor(ilvl/4)); const t=ri(Math.max(0,mt-1),mt); const lo=a.v[t][0],hi=a.v[t][1]; const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:a.n[t],pre:PRE.includes(a)}; }
+  const mt=Math.min(a.v.length-1,Math.floor(ilvl/4)); const t=ri(Math.max(0,mt-1),mt); const [lo,hi]=flatScale(k,a.v[t][0],a.v[t][1],ilvl); const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:a.n[t],pre:PRE.includes(a)}; }
 /* one stat of a known category, rolled at the tier this item level reaches (used by legendaries and the altar) */
 function affOf(k,slot,ilvl,preferPre){ const defs=PRE.concat(SUF).filter(d=>d.k===k&&d.s.includes(slot)); if(!defs.length) return null; const a=defs.find(d=>preferPre==null||PRE.includes(d)===preferPre)||defs[0];
-  const mt=Math.min(a.v.length-1,Math.floor(ilvl/4)); const t=ri(Math.max(0,mt-1),mt); const lo=a.v[t][0],hi=a.v[t][1]; const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:a.n[t],pre:PRE.includes(a)}; }
+  const mt=Math.min(a.v.length-1,Math.floor(ilvl/4)); const t=ri(Math.max(0,mt-1),mt); const [lo,hi]=flatScale(k,a.v[t][0],a.v[t][1],ilvl); const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:a.n[t],pre:PRE.includes(a)}; }
 function oddsW(w,mf){ const m=1+(mf||0)/100*.6; return w.map((v,i)=>i===0?v:v*(i>=4?Math.sqrt(m):m)); }
 function rollRarity(w,mf){ const ww=oddsW(w,mf); let s=ww.reduce((a,b)=>a+b,0),r=R()*s; for(let i=0;i<ww.length;i++){r-=ww[i];if(r<=0)return i;} return 0; }
 function mkFixed(def,rar){ return fin({id:++IID,slot:def.slot,base:baseByName(def.base),rarity:rar,name:def.name,ilvl:0,dq:ri(95,105),aff:def.aff.map(([k,lo,hi])=>{ const rs=rollStat(lo,hi); return {k,lo,hi,v:rs.v,g:rs.g}; }),fl:def.fl,set:def.set}); }
 function mkBase(name){ const b=baseByName(name); const slot=Object.keys(BASES).find(s=>BASES[s].includes(b)); return fin({id:++IID,slot,base:b,rarity:0,name:b.name,ilvl:1,dq:100,aff:[]}); }
 function genItem(ilvl,w,mf,forceSlot){
   let r=rollRarity(w,mf||0);
-  if(r===5){const it=mkFixed(pick(ABYSSAL),5);it.ilvl=ilvl;return fin(it);}
-  if(r===4){const it=mkFixed(pick(UNIQUES),4);it.ilvl=ilvl;return fin(it);}
+  if(r===5){const it=mkFixed(pick(ABYSSAL),5);it.ilvl=ilvl;empower(it,ilvl);return fin(it);}
+  if(r===4){const it=mkFixed(pick(UNIQUES),4);it.ilvl=ilvl;empower(it,ilvl);return fin(it);}
   const slot=forceSlot||wpick(SLOTW); if((slot==='ring'||slot==='amulet')&&r===0) r=1;
-  const bs=BASES[slot].filter(b=>b.lvl<=ilvl+1).sort((a,b)=>a.lvl-b.lvl); const base=slot==='weapon'?pick(bs.slice(-7)):bs[Math.max(0,bs.length-1-ri(0,2))]||BASES[slot][0];
-  const it={id:++IID,slot,base,rarity:r,ilvl,dq:ri(90,110),aff:[]}; const used=new Set(); const as=affSlot(it);
+  const bs=BASES[slot].filter(b=>b.lvl<=ilvl+1).sort((a,b)=>a.lvl-b.lvl); const base=slot==='weapon'?pickWeaponBase(ilvl):bs[Math.max(0,bs.length-1-ri(0,2))]||BASES[slot][0];
+  const it={id:++IID,slot,base,rarity:r,ilvl,dq:ri(90,110),aff:[]}; const used=new Set(ELEM_KEYS); /* damage types belong to uniques and abyssals only (v16) */ const as=affSlot(it);
   if(r===1){ const n=R()<.5?2:1; for(let i=0;i<n;i++){ const a=rollAff(i?SUF:PRE,as,ilvl,used); if(a) it.aff.push(a); }
     const p=it.aff.find(a=>a.pre), s=it.aff.find(a=>!a.pre); it.name=[p&&p.nm,base.name,s&&s.nm].filter(Boolean).join(' '); }
   else if(r===3){ const n=as==='ring'||as==='amulet'?5:ri(5,6), li=ilvl+6; for(let i=0;i<n;i++){const a=rollAff(i%2?SUF:PRE,as,li,used)||rollAff(i%2?PRE:SUF,as,li,used); if(a) it.aff.push(a);} if(slot==='weapon'&&!used.has('ed')){ const a=affOf('ed',as,li); if(a){ it.aff.unshift(a); if(it.aff.length>6) it.aff.pop(); } } it.name=pick(LEG1)+' '+base.name; }
