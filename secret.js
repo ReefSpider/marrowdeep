@@ -3,7 +3,7 @@
    After any level (not the Rope-House or the last battle) a reel rolls for a hidden door: 1 in 100.
    On a hit, the next level is the Hollow Garden instead: a porcelain-and-gold world under a cracked moon,
    with petals falling upward. Foes there have twice the life, hit twice as hard and give twice the XP.
-   Its last chamber drops the Hollow Reliquary, whose rarity odds are fixed: Abyssal exactly 1 in 100.
+   Its last chamber drops the Hollow Reliquary, whose rarity odds are fixed: always Unique or better, Abyssal 1 in 50.
    When it's cleared, the climb carries on to the level that would have come next.
    Testing: add ?secret=1 to the address and every roll hits.
    How it works: the garden is loaded at the index of the level you came from (so monster level, gold and
@@ -15,7 +15,7 @@ const HOLLOW={id:'hollow',kind:'dungeon',secret:1,name:'The Hollow Garden',jp:'�
 PALS.hollow={sky:['#02030a','#13234c','#0a1430'],shaft:'rgba(170,215,255,',stone:['#cfc8b6','#d9d3c3','#c3bba7','#e3ddce'],mortar:'#a8842f',cap:'#f1ece0',hi:'#ffffff',amb:[.6,.64,.76],motif:'hollow'};
 EPIGRAPH.hollow={k:'幽玄',r:'yūgen',t:'The grace of a thing too deep to see the bottom of.'};
 LETTERS.hollow='I dreamed of a white garden under a cracked moon. You were in it, mending something with gold. You looked up and didn\'t know me. Wake up.';
-CW[4]=[0,0,50,30,19,1];
+CW[4]=[0,0,0,0,98,2];   // Unique guaranteed, Abyssal 1 in 50
 CNAME[4]='The Hollow Reliquary';
 
 /* ---------- loading: the garden takes the place of the level you came from ---------- */
