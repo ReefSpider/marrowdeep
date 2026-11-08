@@ -78,9 +78,9 @@ function showCase(tier,ilvl,win,onClose){
   const x0=i0*cw+cardW/2-reelW/2; strip.style.transform=`translateX(${-x0}px)`; ne.classList.add('tease'); AU.tease();
   const target=WI*cw+rnd(.12,.88)*cardW-reelW/2; const dur=RM?1200:6400;
   caseState={win,landed:false,ready:false,el:els[WI],onClose};
-  setTimeout(()=>{ ne.classList.remove('tease'); const t0=performance.now(); let lastI=-1;
+  setTimeout(()=>{ ne.classList.remove('tease'); const t0=performance.now(); let lastI=-1, lastTk=0;
     const step=now=>{ const p=Math.min(1,(now-t0)/dur); const e=1-Math.pow(1-p,4); const x=x0+(target-x0)*e; strip.style.transform=`translateX(${-x}px)`;
-      const idx=Math.floor((x+reelW/2)/cw); if(idx!==lastI){ lastI=idx; AU.tick(); } if(p<1) requestAnimationFrame(step); else land(); };
+      const idx=Math.floor((x+reelW/2)/cw); if(idx!==lastI){ lastI=idx; if(now-lastTk>70){ AU.tick(); lastTk=now; } } if(p<1) requestAnimationFrame(step); else land(); };
     requestAnimationFrame(step); },RM?250:1100); }
 function land(){ const cs=caseState; cs.landed=true; cs.el.classList.add('won'); AU.reveal(cs.win.rarity); noteBest(cs.win);
   if(cs.win.rarity>=4){ bark('unique',true); } else if(cs.win.rarity===0) bark('meh',true);
@@ -122,7 +122,7 @@ function statReel(it,box,done,opt){ opt=opt||{}; const fast=!!opt.fast;
   const end=()=>{ if(!live) return; live=false; if(!fast) reveal=null; cancelAnimationFrame(raf);
     rows.forEach(r=>{ if(r.done) return; if(r.phase==='cat'){ finishCat(r,true); buildVal(r); setup(r,0); } finishRow(r); }); fillDmg(); done(); };
   const step=now=>{ let all=true; for(const r of rows){ if(r.done) continue; all=false; if(now<r.t0) continue; const pr=clamp((now-r.t0)/r.dur,0,1); const e=1-Math.pow(1-pr,4); const x=r.x0+(r.tx-r.x0)*e; r.ss.style.transform=`translateX(${-x}px)`;
-      const idx=Math.floor((x+r.ww/2)/r.cw); if(idx!==r.last){ r.last=idx; if(now-lastTick>(fast?55:28)){ AU.tick(); lastTick=now; } }
+      const idx=Math.floor((x+r.ww/2)/r.cw); if(idx!==r.last){ r.last=idx; if(now-lastTick>(fast?80:60)){ AU.tick(); lastTick=now; } }
       if(pr>=1){ if(r.phase==='cat'){ finishCat(r,fast&&r.i<rows.length-1); buildVal(r); setup(r,now+(RM?0:fast?160:420)); } else finishRow(r); } }
     if(all) end(); else raf=requestAnimationFrame(step); };
   if(!fast) reveal={finish:end}; raf=requestAnimationFrame(step); }
@@ -240,7 +240,7 @@ function loadLevel(idx,opt){ opt=opt||{}; lvlIdx=idx; interact=null; promptTxt='
   $('#floorName').textContent=def.name; $('#actTxt').textContent=def.act+(typeof diffLabel==='function'&&def.kind!=='cabin'?' · '+diffLabel():''); $('#floorJp').textContent=def.jp||'';
   targetE=null; lastHud=''; updBelt(); AU.setTension(0); deathShown=false; L.dark=0; L.cand=null; L.gaze=null; dropQ=[]; dropSlow=0; P.streak=0; $('#drolls').innerHTML=''; dropActive=null;
   if(!opt.noSave) saveGame(); }
-function nextLevel(){ const ni=lvlIdx+1; if(ni>=LEVELS.length){ ngp++; goLevel(1); return; } goLevel(ni); }
+function nextLevel(){ const ni=lvlIdx+1; if(ni>=LEVELS.length){ if(typeof META==='undefined'||META.hold===false) ngp++; goLevel(1); return; } goLevel(ni); }
 function goLevel(i){ if(cut){ cut=null; bars(false); caption(''); fadeTarget=1; } const prevAct=LEVELS[lvlIdx]&&LEVELS[lvlIdx].act; loadLevel(i); const act=LEVELS[i].act; mode='play'; hud.hidden=false;
   const begin=()=>{ mode='play'; hud.hidden=false; bark('start',true); setTimeout(()=>epigraph(LEVELS[i].id),400); if(typeof MUS!=='undefined') MUS.setMood(moodFor(LEVELS[i])); };
   if(act!==prevAct||ngp&&i===1) { mode='card'; actCard(act,begin); } else begin(); }

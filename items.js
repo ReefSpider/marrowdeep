@@ -147,8 +147,8 @@ function getIcon(it){ if(it._ic) return it._ic; const c=document.createElement('
 function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=32; c.getContext('2d').drawImage(getIcon(it),0,0); return c; }
 
 /* ---------- serialise for save/continue ---------- */
-const serItem=it=>it&&{s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set};
-const deItem=o=>o&&fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t});
+const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v23: rc = times offered at the altar, ins = insured */
+const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; } return it; };
 
 /* ---------- grids (v21): the satchel and the stash, items take up room by size ----------
    Each grid is 16 × 10 cells per tab. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon

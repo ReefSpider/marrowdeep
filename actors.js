@@ -155,7 +155,7 @@ function castBell(){ if(P.grit<40) return; P.grit-=40; P.cd.bell=7; AU.bell(); s
   for(const e of enemies){ if(e.dead||e.intro) continue; const d=Math.hypot(e.x-bx,e.y-e.h/2-by); if(d<135){ if(!e.boss){ e.stun=2.4; e.state=e.fly?'rec':'chase'; e.vy=e.fly?0:-120; } strike(e,MV.slash,id,'main',Math.sign(e.x-bx)||1,.9); } }
   fx.push({t:0,dur:1.1,draw(f){ const k=f.t/f.dur; const sx=bx-camR.x, sy=by-camR.y; ectx.strokeStyle=`rgba(210,215,240,${((1-k)*.7).toFixed(2)})`; ectx.lineWidth=2; ectx.beginPath(); ectx.ellipse(sx,sy,k*140,k*70,0,0,Math.PI*2); ectx.stroke();
     const a=(1-k)*.6; ectx.strokeStyle=`rgba(230,230,255,${a.toFixed(2)})`; ectx.lineWidth=1; ectx.beginPath(); ectx.moveTo(sx-10,sy-30); ectx.quadraticCurveTo(sx-12,sy-52,sx,sy-54); ectx.quadraticCurveTo(sx+12,sy-52,sx+10,sy-30); ectx.lineTo(sx+14,sy-26); ectx.lineTo(sx-14,sy-26); ectx.closePath(); ectx.stroke(); }}); }
-function startHound(){ P.houndT=10; AU.roar(); impactT=.12; shake(7); bark('hound',true); cutIn('hero','The Hound wears you','獣',1.2); unlockCodex('hound'); ash(P.x,P.y-14,30); calcStats(); }
+function startHound(){ P.houndT=10; AU.roar(); shake(4); bark('hound',true); unlockCodex('hound'); ash(P.x,P.y-14,30); calcStats(); }
 function performIai(){ const s=P.stats; const sx=P.x; let ex=P.x; for(let i=0;i<120;i+=4){ const nx=P.x+P.face*i; if(solidPx(nx+P.face*6,P.y-6)||solidPx(nx+P.face*6,P.y-20)) break; ex=nx; }
   const box={x:Math.min(sx,ex)-8,y:P.y-30,w:Math.abs(ex-sx)+16,h:32}; const tg=enemies.filter(e=>!e.dead&&!e.intro&&overlap(box,eBox(e)));
   for(let k=0;k<6;k++) ghosts.push({x:lerp(sx,ex,k/6),y:P.y,face:P.face,a:-.3,oa:P.offA,life:.3});
@@ -238,7 +238,7 @@ function updPlayer(dt){
   if(p.onGround&&!p.plat&&tileAt(Math.floor(p.x/T),Math.floor(p.y/T))===1&&tileAt(Math.floor((p.x-5)/T),Math.floor(p.y/T))===1&&tileAt(Math.floor((p.x+5)/T),Math.floor(p.y/T))===1){ p.safe.x=p.x; p.safe.y=p.y; }
   for(const pd of L.pends){ if(Math.hypot(pd.bx-p.x,pd.by+6-(p.y-12))<15) hurtPlayer(14+diff()*3,{x:pd.bx,hp:0,dead:true}); }
   if(p.lava&&!p.dead){ for(let i=0;i<20;i++) part({x:p.x+rnd(-6,6),y:p.y-4,vx:rnd(-60,60),vy:rnd(-160,-40),g:300,life:rnd(.3,.7),em:true,col:pick(['#ff9a3c','#ffcf7a','#ff4a1a'])}); AU.noise(.5,2000,200,1,.4,'lowpass',.2); }
-  if(p.spiked||p.y>L.h*T+30){ bleed(p.x,p.y-6,14,1,1.2); const ff=Math.round(s.life*.18); p.inv=0; p.dash=0; p.attack=null; p.teth=null; hurtPlayer(ff,{x:p.x,hp:0,dead:true}); if(!p.dead){ p.x=p.safe.x; p.y=p.safe.y; p.vx=p.vy=0; p.inv=1; } }
+  if(p.spiked||p.y>L.h*T+30){ bleed(p.x,p.y-6,14,1,1.2); const ff=Math.round(s.life*.25); p.inv=0; p.dash=0; p.attack=null; p.teth=null; hurtPlayer(ff,{x:p.x,hp:0,dead:true}); if(!p.dead){ if(typeof beamRespawn==='function') beamRespawn(p.safe.x,p.safe.y); else { p.x=p.safe.x; p.y=p.safe.y; p.vx=p.vy=0; p.inv=1; } } }
 }
 function hurtPlayer(d,src){
   if(P.dead||P.ghostT>0||mode!=='play') return;

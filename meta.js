@@ -30,7 +30,7 @@ function xpMul(){ return ngp>0?(1+mlvl()*.15)*(1+tierNow()*.3):1; }
 const SLOTS_KEY='marrowdeep.slots', STASH_KEY='marrowdeep.stash', MAX_SLOTS=8;
 const NAMES=['Aldric','Brenna','Corvin','Dagny','Edda','Garrick','Hild','Isak','Jory','Kael','Maren','Oswin','Rhosyn','Sabine','Torvald','Wren'];
 let META=freshMeta(), curSlot=null;
-function freshMeta(){ return {unlocked:0,cleared:[],runs:0,pick:0,inCabin:false,loadouts:[null,null,null]}; }
+function freshMeta(){ return {unlocked:0,cleared:[],runs:0,pick:0,hold:true,inCabin:false,loadouts:[null,null,null]}; }
 function slotsDB(){ let db=store.get(SLOTS_KEY); if(!db||!db.list){ db={list:[],last:null}; const old=store.get(SAVEKEY); if(old&&old.v===2){ db.list.push({id:'s'+Date.now(),name:pick(NAMES)+' of the Wall',created:Date.now(),data:old}); db.last=db.list[0].id; } store.set(SLOTS_KEY,db); } return db; }
 function slotGet(id){ return slotsDB().list.find(s=>s.id===id); }
 function newSlot(){ const db=slotsDB(); if(db.list.length>=MAX_SLOTS){ db.list.sort((a,b)=>(a.updated||0)-(b.updated||0)); } const used=new Set(db.list.map(s=>s.name.split(' ')[0])); const nm=(NAMES.find(n=>!used.has(n))||pick(NAMES))+' of the Wall';
@@ -86,7 +86,7 @@ function renderStash(){ stashScr.innerHTML=`<h2 class="mh">The stash 蔵</h2><di
   $('#sbClose').onclick=closeStash; }
 
 /* ---------- loadouts: three saved sets of gear on the rack ---------- */
-const fp=it=>it?JSON.stringify(serItem(it)):null;
+const fp=it=>{ if(!it) return null; const o=serItem(it); delete o.ins; return JSON.stringify(o); };
 function findItem(f){ for(const k in P.equip) if(fp(P.equip[k])===f) return {where:'equip',k}; let i=P.bag.findIndex(x=>fp(x)===f); if(i>=0) return {where:'bag',i}; i=STASH.findIndex(x=>fp(x)===f); if(i>=0) return {where:'stash',i}; return null; }
 function saveLoadout(n){ META.loadouts[n]={equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,fp(v)])),names:Object.fromEntries(Object.entries(P.equip).filter(([k,v])=>v).map(([k,v])=>[k,v.name]))}; saveGame(); toast(`Loadout ${n+1} saved.`); }
 function wearLoadout(n){ const lo=META.loadouts[n]; if(!lo) return; let missing=0;
@@ -101,13 +101,15 @@ function loadoutCard(){ const row=n=>{ const lo=META.loadouts[n]; return lo?Obje
 /* ---------- difficulty picker at the map table ---------- */
 function diffCard(){ const rows=DIFFS.map((d,t)=>{ const [a,b]=tierRange(t), open=t<=META.unlocked, done=META.cleared.includes(t);
     return {label:`<span class="dj">${d.jp}</span> ${d.n} <small>${open?`Monster level ${a}–${b} · ${d.d}${done?' · cleared':''}`:`Locked · clear the campaign on ${DIFFS[Math.max(0,t-3)].n} or higher`}</small>`,disabled:!open,ghost:t!==META.pick,fn:()=>{ META.pick=t; saveGame(); AU.tone('triangle',600,400,.1,.1,.2); diffCard(); }}; });
-  showCard({title:'The map table',jp:'地図台',body:`Ilse has drawn the Pit on the table in candle wax. Pick how deep you go. Clearing the campaign unlocks the next three tiers at once.\n\nChosen: ${DIFFS[META.pick].n}. You are level ${P.lvl}.`,buttons:rows.concat([{label:'Done',fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])});
+  const hold=META.hold!==false;
+  const hb={label:`${hold?'●':'○'} Hold this tier <small>${hold?'On · every descent stays on the tier you pick here until you change it':'Off · clearing the campaign moves you one tier deeper'}</small>`,ghost:!hold,fn:()=>{ META.hold=!hold; saveGame(); AU.tone('triangle',500,700,.1,.1,.2); diffCard(); }};
+  showCard({title:'The map table',jp:'地図台',body:`Ilse has drawn the Pit on the table in candle wax. Pick how deep you go. Clearing the campaign unlocks the next three tiers at once.\n\nChosen: ${DIFFS[META.pick].n}${hold?' (held)':''}. You are level ${P.lvl}.`,buttons:[hb].concat(rows).concat([{label:'Done',fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])});
   $('#cardBtns').classList.add('koan','diffs'); }
 function campaignCleared(toTitleAfter){ const t=tierNow();
   { const bt0=bagTabs(), st0=stashTabs(); META.clears=charClears()+1; STASH_TABS=Math.min(STASH_TABS_MAX,STASH_TABS+1); store.set(STASH_TABS_KEY,STASH_TABS);
     const got=[]; if(bagTabs()>bt0) got.push(`your satchel gained a pocket (tab ${['I','II','III','IV'][bagTabs()-1]})`); if(stashTabs()>st0) got.push(`the stash gained a tab (${stashTabs()} of ${STASH_TABS_MAX})`);
-    if(got.length) setTimeout(()=>toast(`More room: ${got.join(', and ')}.`),toTitleAfter?400:4200); } if(!META.cleared.includes(t)) META.cleared.push(t); const before=META.unlocked; META.unlocked=Math.max(META.unlocked,Math.min(TOP_TIER,t+3)); META.pick=Math.min(META.unlocked,Math.max(META.pick,t+1));
-  if(META.unlocked>before) setTimeout(()=>toast(`Unlocked: ${DIFFS.slice(before+1,META.unlocked+1).map(d=>d.n).join(', ')}.`),toTitleAfter?0:2200);
+    if(got.length) setTimeout(()=>toast(`More room: ${got.join(', and ')}.`),toTitleAfter?400:4200); } if(!META.cleared.includes(t)) META.cleared.push(t); const before=META.unlocked; META.unlocked=Math.max(META.unlocked,Math.min(TOP_TIER,t+3)); if(META.hold===false) META.pick=Math.min(META.unlocked,Math.max(META.pick,t+1)); /* v23: the tier holds unless the player lets it climb */
+  if(META.unlocked>before) setTimeout(()=>toast(`Unlocked: ${DIFFS.slice(before+1,META.unlocked+1).map(d=>d.n).join(', ')}.${META.hold===false?'':` You stay on ${DIFFS[META.pick].n} until you change it at the map table.`}`),toTitleAfter?0:2200);
   P.life=P.stats.life; goCabin(); if(toTitleAfter) saveGame(); }
 
 /* ---------- the Rope-House ---------- */

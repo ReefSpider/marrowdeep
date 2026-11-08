@@ -2,7 +2,9 @@
 /* ===== loot: war drums under the chest reel, tooltips for what you stand on, and comparison with what you wear ===== */
 
 /* ---------- drums ---------- */
-AU.drumBus=function(){ if(this._db||!this.c) return this._db; const g=this.c.createGain(); g.gain.value=1; g.connect(this.mm||this.m); const w=this.c.createGain(); w.gain.value=.35; g.connect(w); w.connect(this.rv); this._db=g; return g; };
+AU.drumBus=function(){ if(this._db||!this.c) return this._db; const g=this.c.createGain(); g.gain.value=.7;
+  // v23: a limiter so the accelerating roll can't sum past full scale (that clipping was the 'static' in headphones)
+  const L=this.c.createDynamicsCompressor(); L.threshold.value=-14; L.knee.value=6; L.ratio.value=12; L.attack.value=.003; L.release.value=.12; g.connect(L); L.connect(this.mm||this.m); const w=this.c.createGain(); w.gain.value=.35; g.connect(w); w.connect(this.rv); this._db=g; return g; };
 AU.taiko=function(v,at,pitch,dest){ if(!this.c) return; const c=this.c, t=at||c.currentTime, p=pitch||1, out=dest||this.drumBus();
   const o=c.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(115*p,t); o.frequency.exponentialRampToValueAtTime(44*p,t+.42); const g=c.createGain(); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.9*v,t+.006); g.gain.exponentialRampToValueAtTime(.0001,t+.6); o.connect(g); g.connect(out); o.start(t); o.stop(t+.65);
   const o2=c.createOscillator(); o2.type='triangle'; o2.frequency.setValueAtTime(230*p,t); o2.frequency.exponentialRampToValueAtTime(90*p,t+.08); const g2=c.createGain(); g2.gain.setValueAtTime(.0001,t); g2.gain.exponentialRampToValueAtTime(.35*v,t+.003); g2.gain.exponentialRampToValueAtTime(.0001,t+.12); o2.connect(g2); g2.connect(out); o2.start(t); o2.stop(t+.15);
@@ -10,15 +12,14 @@ AU.taiko=function(v,at,pitch,dest){ if(!this.c) return; const c=this.c, t=at||c.
 AU.rim=function(v,at){ if(!this.c) return; const c=this.c, t=at||c.currentTime; const s=c.createBufferSource(); s.buffer=this.nb; const f=c.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2600; f.Q.value=3; const g=c.createGain(); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.3*v,t+.002); g.gain.exponentialRampToValueAtTime(.0001,t+.05); s.connect(f); f.connect(g); g.connect(this.drumBus()); s.start(t,Math.random()*.5); s.stop(t+.06); };
 /* a war-drum build that accelerates with the reel and lands on its last card */
 AU.caseDrums=function(dur,tier){ if(!this.c) return; const c=this.c, t0=c.currentTime, bus=this.drumBus(); let t=0, i=0; const big=1+(tier||0)*.15;
-  while(t<dur-.12){ const k=t/dur, iv=.52*Math.pow(.13,k); const v=(.3+.7*k*k)*big; this.taiko(Math.min(1.3,v),t0+t,i%4===0?1:i%2?1.35:1.15,bus); if(k>.35&&i%2) this.rim(.3+.6*k,t0+t+iv/2); t+=iv; i++; }
+  while(t<dur-.12){ const k=t/dur, iv=Math.max(.12,.52*Math.pow(.13,k)); const v=(.3+.55*k*k)*big; this.taiko(Math.min(1,v),t0+t,i%4===0?1:i%2?1.35:1.15,bus); t+=iv; i++; }
   // the recorded war loop rises underneath, speeding up
   if(typeof SMP!=='undefined'&&SMP.has('drums_rhythm_154')){ const n=SMP.play('drums_rhythm_154',{v:0,loop:true,rate:.82,dest:bus}); if(n){ n.g.gain.setValueAtTime(.0001,t0); n.g.gain.exponentialRampToValueAtTime(.55*big,t0+dur*.7); n.g.gain.exponentialRampToValueAtTime(.8*big,t0+dur); n.g.gain.exponentialRampToValueAtTime(.0001,t0+dur+.25);
     n.s.playbackRate.setValueAtTime(.82,t0); n.s.playbackRate.linearRampToValueAtTime(1.22,t0+dur); n.s.stop(t0+dur+.3); } }
-  // a swelling riser over the last two seconds
-  const s=c.createBufferSource(); s.buffer=this.nb; s.loop=true; const f=c.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.2; f.frequency.setValueAtTime(300,t0+dur-2); f.frequency.exponentialRampToValueAtTime(5000,t0+dur); const g=c.createGain(); g.gain.setValueAtTime(.0001,t0+Math.max(0,dur-2)); g.gain.exponentialRampToValueAtTime(.18,t0+dur-.02); g.gain.exponentialRampToValueAtTime(.0001,t0+dur+.05); s.connect(f); f.connect(g); g.connect(bus); s.start(t0); s.stop(t0+dur+.1);
+  // (v23: the noise riser and rim clicks are gone: they read as static in headphones)
   if(typeof MUS!=='undefined'&&MUS.out){ MUS.out.gain.setTargetAtTime(.35,t0,.4); MUS.out.gain.setTargetAtTime(.9,t0+dur+.6,1.2); } };
 AU.caseHit=function(r){ if(!this.c) return; const t=this.c.currentTime, bus=this.drumBus(); const v=1+r*.12;
-  this.taiko(1.4*v,t,.8,bus); this.taiko(1.1*v,t+.01,1.1,bus); this.tone('sine',48,26,1.6,.9,.6); this.noise(1.6,6000,1200,.5,.35+r*.04,'highpass',.8);
+  this.taiko(1.4*v,t,.8,bus); this.taiko(1.1*v,t+.01,1.1,bus); this.tone('sine',48,26,1.6,.9,.6);
   if(r>=3){ this.taiko(1.2,t+.32,.75,bus); this.taiko(1.3,t+.48,.7,bus); } };
 (function(){ const o=showCase; showCase=function(tier,ilvl,win,onClose){ o(tier,ilvl,win,onClose); AU.caseDrums(RM?1.45:7.5,tier); }; })();
 (function(){ const o=land; land=function(){ const cs=caseState; if(cs) AU.caseHit(cs.win.rarity); o();

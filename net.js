@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-20';
+const NET_V='marrowdeep-23';
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,
@@ -379,7 +379,7 @@ bossIntroReady=function(b){ if(!COOP) return P.x>9*T; if(!NET.host) return false
 function hostFinish(){ if(NET.betweenLevels||L.locked||L.noExit) return; bcast({t:'fin',idx:lvlIdx}); NET.rdy=new Set(); coopFin(lvlIdx); }
 function coopFin(idx){ closeMenus(); NET.betweenLevels=true; const def=LEVELS[idx]; if(def.id==='count'){ AU.door(); toast('The war is over. Each of you goes home.'); NET.ending=true; setTimeout(()=>{ if(COOP){ const was=NET.host; playEnding(); } },400); return; }
   AU.door(); mode='card'; merchantCard(()=>{ hideCard(); coopReady(); }); }
-function coopReady(){ showCard({title:'Climb on',jp:'登れ',body:NET.host?'Waiting for the others to finish with the merchant…':'Waiting for the host to climb on…',buttons:NET.host?[{label:'Go on without them',fn:()=>hostGo()}]:[]});
+function coopReady(){ showCard({title:'Climb on',jp:'登れ',body:NET.host?'Waiting for the others to read on…':'Waiting for the host to climb on…',buttons:NET.host?[{label:'Go on without them',fn:()=>hostGo()}]:[]});
   if(NET.host){ NET.rdy.add(0); readyCheck(); } else toHost({t:'rdy'}); }
 function readyCheck(){ if(!NET.host||!NET.betweenLevels) return; if(NET.seats.every(x=>NET.rdy.has(x.s))) hostGo(); }
 function hostGo(){ if(NET.going) return; NET.going=true; hideCard(); nextLevel();
