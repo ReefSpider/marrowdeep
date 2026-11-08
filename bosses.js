@@ -2,7 +2,7 @@
 /* ===== bosses: pattern framework, horror sprites ===== */
 const FLOOR=()=>16*T;
 function spawnBoss(key){ const B=BOSSES[key]; const e={boss:1,kind:key,type:'boss',x:L.w*T-130,y:FLOOR(),w:B.w,h:B.h,vx:0,vy:0,face:-1,
-    hp:Math.round(B.hp*.8*(1+ngp*.9)),dmg:12+lvlIdx*2.2+ngp*9,phase:1,state:'idle',st:0,cd:1.6,pat:null,anim:0,flash:0,intro:true,fly:!!B.fly,hitId:-1,dead:false,deadT:0,
+    hp:Math.round(B.hp*.8*(1+ngp*.9)),dmg:12+dep()*2.2+ngp*9,phase:1,state:'idle',st:0,cd:1.6,pat:null,anim:0,flash:0,intro:true,fly:!!B.fly,hitId:-1,dead:false,deadT:0,
     name:B.name,jp:B.jp,last:'',alpha:1,onGround:false,minions:[]};
   e.maxhp=e.hp; if(e.fly) e.y=FLOOR()-70; return e; }
 function teleRect(x,y,w,h,dur){ fx.push({t:0,dur,haz:1,draw(f){ const a=.12+.3*Math.abs(Math.sin(f.t*12)); ectx.fillStyle=`rgba(255,40,30,${a.toFixed(2)})`; ectx.fillRect(x-camR.x,y-camR.y,w,h); ectx.fillStyle='rgba(255,140,110,.7)'; ectx.fillRect(x-camR.x,y+h-1-camR.y,w,1); }}); }

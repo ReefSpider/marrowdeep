@@ -11,7 +11,7 @@ function genLevel(def,seed){ return withSeed(seed,()=>{ if(def.kind==='boss') re
 const ENV_OF={wall:'war',ossuary:'bone',chapel:'water',warren:'debt',kiln:'fire',breach:'ash',count:'war'};
 
 function genRooms(def,safe){
-  const surf=def.kind==='surface', C=def.cols, RR=surf?1:def.rows;
+  const surf=def.kind==='surface'||!!def.open, C=def.cols, RR=def.rows||1; /* v24: open levels are outdoors with rows */
   const w=C*RW, h=RR*RH, g=newGrid(w,h,1), env=def.env||ENV_OF[def.id]||'bone';
   const Lv={w,h,g,spawns:[],chests:[],torches:[],fg:[],plats:[],pends:[],def,surface:surf,rooms:[],env,jets:[],winds:[],nests:[],arenas:[],stones:[],decor:[],safe};
   let cx=0, cy=RR-1, entry='S', ups=0, hin=-1;
@@ -29,7 +29,7 @@ function genRooms(def,safe){
   // choose a kind for each room so the descent never feels like one corridor repeated
   let arenas=0; const maxA=Lv.rooms.length>12?2:1;
   Lv.rooms.forEach((r,i)=>{ r.i=i; if(r.exit==='U'){ r.kind='shaft'; return; }
-    if(surf||safe||r.entry==='S'){ r.kind='normal'; return; }
+    if((surf&&!def.open)||safe||r.entry==='S'){ r.kind='normal'; return; }
     const lr=r.entry==='L'&&(r.exit==='R'); const q=R();
     if(i>=2&&arenas<maxA&&r.entry!=='B'&&r.exit==='R'&&q<.22){ r.kind='arena'; arenas++; return; }
     const tw=env==='debt'?.34:env==='bone'?.18:.12;
@@ -46,7 +46,7 @@ function genRooms(def,safe){
   const e=Lv.rooms[Lv.rooms.length-1]; Lv.exit={x:e.x*RW+RW-6,y:e.y*RH+14};
   Lv.torches.push({x:Lv.exit.x-3,y:Lv.exit.y-3},{x:Lv.exit.x+3,y:Lv.exit.y-3});
   for(let fx=240;fx<w*T*1.3;fx+=rnd(280,460)) Lv.fg.push({x:fx,w:ri(12,24),chain:R()<.5});
-  if(!surf) placeLevelSpecials(Lv);
+  if(!surf||def.open) placeLevelSpecials(Lv);
   return Lv;
 }
 function carveRoom(Lv,r){

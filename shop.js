@@ -18,9 +18,9 @@ merchantCardSilent=function(next){ merchantCard(next); if(typing){ clearInterval
 const SHOP={sell:false,ask:null,back:null};
 function shopRun(){ if(!META.shop||META.shop.run!==META.runs) META.shop={run:META.runs,stock:{},bought:0}; return META.shop; }
 function shopStock(){ const r=shopRun(); const k=lvlIdx+(typeof SECRET!=='undefined'&&SECRET.on?'h':''); return r.stock[k]||(r.stock[k]={box:L&&L.omen==='gilded'?3:2,pot:2}); }
-const boxBase=()=>70+35*lvlIdx;
+const boxBase=()=>Math.round(70+35*dep());
 const boxPrice=n=>Math.round(boxBase()*Math.pow(1.6,n==null?shopRun().bought:n));
-const potPrice=()=>20+lvlIdx*6;
+const potPrice=()=>Math.round(20+dep()*6);
 function sellPrice(it){ if(!it) return 0; const v=[4,12,35,80,120,300][it.rarity]||4; return Math.max(1,Math.round(v*(1+(it.ilvl||1)*.12))); }
 (function(){ const o=goCabin; goCabin=function(){ if(typeof META!=='undefined') META.shop=null; return o.apply(this,arguments); }; })();
 

@@ -41,7 +41,7 @@ function gridHash(){ let h=2166136261; for(let y=0;y<L.h;y+=3){ const r=L.g[y]; 
 const airCol=(tx,ty,n)=>{ for(let k=1;k<=n;k++) if(tileAt(tx,ty-k)!==0) return false; return true; };
 function placeTraps(){ L.traps=[]; const d=L.def; if(!d||d.kind==='cabin'||d.kind==='boss'||lvlIdx===0||!L.rooms) return;
   const rnd_=trapRng(gridHash()); const pickR=a=>a[Math.floor(rnd_()*a.length)];
-  const want=Math.min(7,(ngp===0?1:2)+Math.floor(lvlIdx/2)+(rnd_()<.5?1:0));
+  const want=Math.min(7,(ngp===0?1:2)+Math.floor(dep()/2)+(rnd_()<.5?1:0));
   const keep=[]; const far=(tx,ty)=>{ const sx=L.spawn.x/T, ex=L.exit.x; if(Math.abs(tx-sx)<10&&Math.abs(ty-L.spawn.y/T)<8) return false; if(Math.abs(tx-ex)<7&&Math.abs(ty-L.exit.y)<8) return false;
     for(const c of L.chests||[]) if(Math.abs(c.x-tx)<4&&Math.abs(c.y-ty)<4) return false; for(const s of L.stones||[]) if(Math.abs(s.x/T-tx)<4&&Math.abs(s.y/T-ty)<4) return false;
     if(L.merch&&Math.abs(L.merch.x/T-tx)<6&&Math.abs(L.merch.y/T-ty)<5) return false;

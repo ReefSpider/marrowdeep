@@ -61,7 +61,7 @@ const CNAME=['Iron-Bound Coffer','Bone Reliquary','Tithe Hoard',"The Pale Mercha
 function fmtOdds(p){ return p>=1?p.toFixed(1)+'%':p>=.1?p.toFixed(2)+'%':'1 in '+Math.round(100/p).toLocaleString('en-US'); }
 function openChest(c){ if(!c||c.open) return; c.open=true; c.t=0; AU.chest(); shake(2); bark('chest',true);
   for(let i=0;i<14;i++) part({x:c.x+rnd(-6,6),y:c.y-12,vx:rnd(-40,40),vy:rnd(-120,-40),g:200,life:rnd(.4,.9),em:true,col:pick(['#ffe1a0','#ffd06a','#fff'])});
-  dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+lvlIdx*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));
+  dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+dep()*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));
   const ilvl=ilvlNow()+(c.tier?2:0)+(c.tier===2?2:0)+ri(0,2); const win=genItem(ilvl,CW[c.tier],P.stats.mf);
   mode='case'; hud.hidden=true; setTimeout(()=>playChestCine(c.tier,win.rarity,()=>showCase(c.tier,ilvl,win)),280); }
 function cardEl(it){ const d=document.createElement('div'); d.className='card'+(it.rarity===5?' ab':''); d.style.setProperty('--rc',RCOL[it.rarity]); d.style.setProperty('--rg',RGLOW[it.rarity]); d.appendChild(iconEl(it)); const n=document.createElement('div'); n.className='n'; n.textContent=it.name; d.appendChild(n); return d; }
@@ -207,7 +207,7 @@ function hideCard(){ $('#card').hidden=true; $('#cardBtns').classList.remove('ko
 function stoneCard(st){ const c=CX[st.id]; if(!c) return; const first=unlockCodex(st.id); AU.bell(); const sworn=VOWS_TAKEN[st.id]; const back=()=>{ hideCard(); mode='play'; hud.hidden=false; };
   const btns=c.q&&!sworn?c.a.map(([txt,v])=>({label:`${txt}<small>${VOWS[v].jp}　Vow of ${VOWS[v].n} · ${VOWS[v].d}</small>`,fn:()=>{ VOWS_TAKEN[st.id]=v; calcStats(); back(); toast(`誓　You swore the Vow of ${VOWS[v].n}. ${VOWS[v].d}.`); AU.lvl(); impactT=.05; sparks(P.x,P.y-16,16,'#ffe0a0'); saveGame(); }})).concat([{label:'Not yet. Walk on.',ghost:1,fn:back}]):[{label:'Rise',fn:back}];
   showCard({title:c.t,jp:c.k,body:c.x+(c.q?`\n\n${c.q}`:'')+(sworn?`\n\nYou answered: ${c.a.find(a=>a[1]===sworn)[0]}`:''),buttons:btns}); if(c.q&&!sworn) $('#cardBtns').classList.add('koan'); }
-function merchantCard(next){ const def=LEVELS[lvlIdx]; const potC=20+lvlIdx*6, boxC=70+lvlIdx*35;
+function merchantCard(next){ const def=LEVELS[lvlIdx]; const potC=Math.round(20+dep()*6), boxC=Math.round(70+dep()*35);
   const letter=LETTERS[def.id];
   showCard({sal:letter?'A crow found you in the dark. A letter on its leg.':'You rest a moment.',body:letter?letter:'Your hands won\'t stop shaking. You let them.',sig:letter?'— Ilse':'',
     ledger:`Carried: <b>${P.gold}</b> crowns. In the dark beside the path, the Pale Merchant waits with a lantern and no face.`,
@@ -225,7 +225,7 @@ function skipCut(){ if(cut&&cut.t>.35&&cut.s.skip!==false) nextCutStep(); }
 function endCut(){ bars(false); caption(''); const f=cut.onEnd; cut=null; fadeTarget=1; camZT=1; mode='play'; hud.hidden=false; if(typeof MUS!=='undefined') MUS.setMood(moodFor(L&&L.def)); f&&f(); }
 
 /* ---------- levels, saves, story flow ---------- */
-function saveGame(){ store.set(SAVEKEY,{v:2,lvlIdx,ngp,codex:[...CODEX_OPEN],vows:VOWS_TAKEN,seen:seenIntro,P:{lvl:P.lvl,xp:P.xp,sp:P.sp,skills:[...P.skills],gold:P.gold,potions:P.potions,equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])),bag:P.bag.map(serItem)}}); }
+function saveGame(){ store.set(SAVEKEY,{v:2,camp:24,lvlIdx,ngp,codex:[...CODEX_OPEN],vows:VOWS_TAKEN,seen:seenIntro,P:{lvl:P.lvl,xp:P.xp,sp:P.sp,skills:[...P.skills],gold:P.gold,potions:P.potions,equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])),bag:P.bag.map(serItem)}}); }
 function loadSave(){ const s=store.get(SAVEKEY); if(!s||s.v!==2) return null; return s; }
 function restorePlayer(sv){ P=newPlayer(); Object.assign(P,{lvl:sv.lvl,xp:sv.xp,sp:sv.sp,gold:sv.gold,potions:sv.potions}); P.skills=new Set(sv.skills); for(const k in sv.equip) P.equip[k]=deItem(sv.equip[k]); P.bag=(sv.bag||[]).map(deItem).filter(Boolean); calcStats(); P.life=P.stats.life; }
 function loadLevel(idx,opt){ opt=opt||{}; lvlIdx=idx; interact=null; promptTxt=''; const def=LEVELS[idx]; const seed=(idx+1)*7919+ngp*104729+(opt.seed||0);
@@ -282,7 +282,7 @@ function bossIntro(e){ const short=seenIntro[e.kind]; seenIntro[e.kind]=1; AU.se
 function bossDefeated(e){ const B=BOSSES[e.kind]; e.dead=true; e.deadT=0; fx=fx.filter(f=>!f.haz); projs=projs.filter(p=>p.from==='p');
   for(const o of enemies) if(!o.boss&&!o.dead){ o.hp=0; o.dead=true; o.deadT=0; ash(o.x,o.y-8,8); }
   AU.roar(); AU.kill(); shake(12); impactT=.25; freeze=.3; bossSlow=2.4; AU.setTension(0);
-  gainXP(B.xp*(1+ngp*.5)); for(let i=0;i<5;i++) dropGold(e.x+rnd(-30,30),e.y-30,Math.round(ri(10,20)*(1+lvlIdx*.6)));
+  gainXP(B.xp*(1+ngp*.5)); for(let i=0;i<5;i++) dropGold(e.x+rnd(-30,30),e.y-30,Math.round(ri(10,20)*(1+dep()*.6)));
   unlockCodex(BOSS_CODEX[e.kind]); camZT=1.25; if(typeof MUS!=='undefined') MUS.setMood('calm');
   setTimeout(()=>{ showBossName('Silenced','討伐',`${e.name} will not rise again.`); },900); setTimeout(()=>{ camZT=1; caption(BOSS_FAREWELL[e.kind]||''); setTimeout(()=>caption(''),3800); },2400);
   fx.push({t:0,dur:3,upd(f){ if(f.t>=2.6&&!f.done){ f.done=true; chests.push({x:L.w*T/2,y:-30,tier:2,open:false,t:0,falling:true,vy:0}); AU.wind(); L.locked=false; L.noExit=false; if(e.kind==='count'){ L.wound=0; } } }}); }
@@ -422,7 +422,7 @@ if(matchMedia('(pointer: coarse)').matches){ const tc=$('#touch'); tc.hidden=fal
 
 /* ---------- blood arenas: the gates close, the waves come ---------- */
 function setDoors(a,on){ for(let y=a.oy+10;y<=a.oy+13;y++){ for(const x of [a.ox,a.ox+RW-1]){ if(on){ if(L.g[y][x]===0) { L.g[y][x]=1; (a.closed=a.closed||[]).push([x,y]); } } } } if(!on&&a.closed){ for(const [x,y] of a.closed) L.g[y][x]=0; a.closed=[]; } }
-function spawnWave(a){ a.wave++; const def=L.def, n=ngp===0?2+a.wave+Math.floor(lvlIdx/4):3+a.wave*2+Math.min(ngp,4)*3+Math.floor(lvlIdx/3); a.list=[]; AU.roar(); shake(4);
+function spawnWave(a){ a.wave++; const def=L.def, n=ngp===0?2+a.wave+Math.floor(dep()/4):3+a.wave*2+Math.min(ngp,4)*3+Math.floor(dep()/3); a.list=[]; AU.roar(); shake(4);
   showBossName(`Wave ${a.wave} of ${a.waves}`,['一','二','三','四'][a.wave-1]||'',a.wave===a.waves?'The last of them.':'');
   for(let i=0;i<n;i++){ const pk=def.packs?pick(def.packs).t:wpick(def.enemies); const t=(pk==='hanged'||pk==='spitter')?'ghoul':pk; const fly=EDEF[t].fly; const x=(a.ox+ri(3,RW-4))*T+8, y=fly?(a.oy+ri(5,8))*T:(a.oy+14)*T;
     const e=mkEnemy({x:x/T,y:y/T,t,pack:i>1?1:0,leader:a.wave===a.waves&&i===0?1:0}); if(!fly){ e.y=(a.oy+4)*T; e.vy=50; } e.atkCd=1+R(); a.list.push(e); enemies.push(e); ash(x,(a.oy+12)*T,10); }
@@ -431,7 +431,7 @@ function spawnWave(a){ a.wave++; const def=L.def, n=ngp===0?2+a.wave+Math.floor(
 function updArenas(dt){ if(!L.arenas) return; for(const a of L.arenas){
   if(a.state===0){ if(!a.hold&&P.x>a.x0+4*T&&P.x<a.x1-4*T&&P.y>a.y0&&P.y<a.y1&&!P.dead){ a.state=1; setDoors(a,1); AU.chain(); AU.slam(); shake(6); a.wave=0; a.next=1.2; a.list=[]; cutIn('hero','Blood Arena','血の闘技場',1.3); if(typeof MUS!=='undefined') MUS.setMood('boss'); } }
   else if(a.state===1){ const alive=a.list.filter(e=>!e.dead).length; if(alive===0){ a.next-=dt; if(a.next<=0){ if(a.wave>=a.waves){ a.state=2; setDoors(a,0); AU.door(); AU.bell();
-        chests.push({x:(a.ox+RW/2)*T,y:(a.oy+1)*T,tier:1,open:false,t:0,falling:true,vy:0,floorY:(a.oy+14)*T}); toast('The arena falls silent. Something drops from the dark.'); gainXP(40*(1+lvlIdx)); if(typeof MUS!=='undefined') MUS.setMood(moodFor(L.def)); }
+        chests.push({x:(a.ox+RW/2)*T,y:(a.oy+1)*T,tier:1,open:false,t:0,falling:true,vy:0,floorY:(a.oy+14)*T}); toast('The arena falls silent. Something drops from the dark.'); gainXP(40*(1+dep())); if(typeof MUS!=='undefined') MUS.setMood(moodFor(L.def)); }
       else spawnWave(a); } } } } }
 /* ---------- pause ---------- */
 function openPause(){ mode='pause'; $('#pause').hidden=false; hud.hidden=true; $('#pMus').value=SETTINGS.music; $('#pSfx').value=SETTINGS.sfx; const c=CODEX.filter(x=>CODEX_OPEN.has(x.id)); $('#pLore').textContent=c.length?(()=>{ const x=pick(c); return `${x.k}　${x.t}. ${x.x}`; })():'The Pit is quiet for one breath. Use it.'; $('#pResume').focus({preventScroll:true}); }

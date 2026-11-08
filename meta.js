@@ -20,7 +20,7 @@ const DIFFS=[
   {n:"Marrow's End",jp:'骨髄',lo:91,d:'Level 100. The bottom of the bottom.'}];
 const TOP_TIER=DIFFS.length-1;
 const tierNow=()=>clamp(ngp,0,TOP_TIER);
-function mlvl(i){ const li=i==null?lvlIdx:i; const L_=LEVELS[li]; if(L_&&L_.kind==='cabin') return 1; const t=tierNow(); return t===0?1+li*2:Math.min(100,DIFFS[t].lo+li); }
+function mlvl(i){ const li=i==null?lvlIdx:i; const L_=LEVELS[li]; if(L_&&L_.kind==='cabin') return 1; const t=tierNow(); return t===0?1+Math.round(dep(li)*2):Math.min(100,DIFFS[t].lo+Math.round(dep(li))); }
 const tierRange=t=>t===0?[1,21]:[DIFFS[t].lo,Math.min(100,DIFFS[t].lo+10)];
 function diffLabel(){ const t=tierNow(); return `${DIFFS[t].n} · Lv ${mlvl()}`; }
 function xpMul(){ return ngp>0?(1+mlvl()*.15)*(1+tierNow()*.3):1; }
@@ -36,7 +36,7 @@ function slotGet(id){ return slotsDB().list.find(s=>s.id===id); }
 function newSlot(){ const db=slotsDB(); if(db.list.length>=MAX_SLOTS){ db.list.sort((a,b)=>(a.updated||0)-(b.updated||0)); } const used=new Set(db.list.map(s=>s.name.split(' ')[0])); const nm=(NAMES.find(n=>!used.has(n))||pick(NAMES))+' of the Wall';
   const s={id:'s'+Date.now().toString(36)+ri(0,999),name:nm,created:Date.now(),data:null}; db.list.push(s); db.last=s.id; store.set(SLOTS_KEY,db); return s; }
 saveGame=function(){ if(!P) return; if(!curSlot){ curSlot=newSlot().id; } const db=slotsDB(); const s=db.list.find(x=>x.id===curSlot); if(!s) return;
-  s.data={v:2,lvlIdx,ngp,codex:[...CODEX_OPEN],vows:VOWS_TAKEN,seen:seenIntro,meta:META,P:{lvl:P.lvl,xp:P.xp,sp:P.sp,skills:[...P.skills],gold:P.gold,potions:P.potions,equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])),bag:P.bag.map(serItem)}};
+  s.data={v:2,camp:24,lvlIdx,ngp,codex:[...CODEX_OPEN],vows:VOWS_TAKEN,seen:seenIntro,meta:META,P:{lvl:P.lvl,xp:P.xp,sp:P.sp,skills:[...P.skills],gold:P.gold,potions:P.potions,equip:Object.fromEntries(Object.entries(P.equip).map(([k,v])=>[k,serItem(v)])),bag:P.bag.map(serItem)}};
   s.updated=Date.now(); db.last=s.id; store.set(SLOTS_KEY,db); };
 loadSave=function(){ const db=slotsDB(); const id=curSlot||db.last; const s=db.list.find(x=>x.id===id); if(!s||!s.data) return null; curSlot=s.id; return s.data; };
 (function(){ const o=newGame; newGame=function(){ curSlot=newSlot().id; META=freshMeta(); stopTitleBits(); o(); }; })();

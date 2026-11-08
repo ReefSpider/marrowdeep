@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-23';
+const NET_V='marrowdeep-24';
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,
@@ -370,7 +370,7 @@ function wipeIn(){ closeMenus(); bannerEl.hidden=true; const el=$('#death'); el.
 function arenaIn(m){ const a=L.arenas&&L.arenas[m.i]; if(!a) return;
   if(m.st>=1&&a.state===0){ setDoors(a,1); AU.chain(); AU.slam(); shake(6); cutIn('hero',a.final?'The last chamber':'Blood Arena',a.final?'最後の間':'血の闘技場',1.3); if(typeof MUS!=='undefined') MUS.setMood('boss'); }
   if(m.w>a.wave&&m.st===1){ AU.roar(); shake(4); showBossName(a.final?`The last chamber · wave ${m.w} of ${m.ws}`:`Wave ${m.w} of ${m.ws}`,['一','二','三','四'][m.w-1]||'',m.w===m.ws?'The last of them.':''); }
-  if(m.st===2&&a.state!==2){ setDoors(a,0); AU.door(); AU.bell(); gainXP(40*(1+lvlIdx)); if(a.final){ L.locked=false; toast('The last chamber falls silent. The way up opens.'); } else toast('The arena falls silent. Something drops from the dark.'); if(typeof MUS!=='undefined') MUS.setMood(moodFor(L.def)); }
+  if(m.st===2&&a.state!==2){ setDoors(a,0); AU.door(); AU.bell(); gainXP(40*(1+dep())); if(a.final){ L.locked=false; toast('The last chamber falls silent. The way up opens.'); } else toast('The arena falls silent. Something drops from the dark.'); if(typeof MUS!=='undefined') MUS.setMood(moodFor(L.def)); }
   a.state=m.st; a.wave=m.w; a.waves=m.ws; }
 bossIntroReady=function(b){ if(!COOP) return P.x>9*T; if(!NET.host) return false; const go=P.x>9*T||Object.values(NET.heroes).some(h=>heroLive(h)&&h.p.x>9*T); if(go) bcast({t:'bint',ep:NET.epoch}); return go; };
 
@@ -390,7 +390,7 @@ function hostGo(){ if(NET.going) return; NET.going=true; hideCard(); nextLevel()
 (function(){ const o=openChest; openChest=function(c){ if(!c||c.open) return; if(!COOP||NET.seats.length<2) return o(c); const ci=chests.indexOf(c);
   if(NET.host) hostChest(ci,0,P.stats.mf); else { if(c._pend&&time-c._pend<2) return; c._pend=time; toHost({t:'copen',ci,mf:P.stats.mf}); } }; })();
 function hostChest(ci,s,mf){ const c=chests[ci]; if(!c||c.open) return; if(NET.roll){ if(!NET.chq.some(q=>q[0]===ci)) NET.chq.push([ci,s,mf]); return; }
-  c.open=true; c.t=0; dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+lvlIdx*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));
+  c.open=true; c.t=0; dropGold(c.x,c.y-14,Math.round(ri(4,12)*(1+dep()*.6)*(c.tier?2:1)*(c.tier===2?3:1)*(1+P.stats.gf/100)));
   const ilvl=ilvlNow()+(c.tier?2:0)+(c.tier===2?2:0)+ri(0,2); const win=genItem(ilvl,CW[c.tier],mf); const rid=(NET.rid=(NET.rid||0)+1);
   NET.roll={rid,ci,win,ans:{},t0:performance.now(),readyAt:0,resolved:false}; const m={t:'chest',rid,ci,tier:c.tier,ilvl,it:serItem(win),by:s,debt:NET.debt};
   bcast(m); showCoopChest(m,win); }

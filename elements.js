@@ -42,7 +42,7 @@ for(const k of ELEMS) if(k!=='fire') MODS[k]=ELEM[k].mod;
 const BASE_MODS=['fast','stone','fire','vamp','blink','cursed','split'];
 
 /* ---------- the run ladder ---------- */
-function eliteChance(kind){ const D=lvlIdx;
+function eliteChance(kind){ const D=dep();
   if(kind==='champ') return ngp===0?0:Math.min(.32,.07+ngp*.04+D*.003);
   if(kind==='rare')  return ngp===0?0:Math.min(.22,.045+ngp*.03+D*.002);
   if(kind==='lead')  return ngp===0?0:Math.min(.85,.45+ngp*.15);
