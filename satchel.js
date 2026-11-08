@@ -127,7 +127,7 @@ function sortBag(){ sortGrid(GBAG,GVIEW.bag); renderInv(); }
     const pane=$('#bag')&&$('#bag').parentElement; if(!pane) return;
     let hd=pane.querySelector('.bagHead'); if(!hd){ const h3=pane.querySelector('h3'); hd=document.createElement('div'); hd.className='bagHead'; h3.replaceWith(hd); hd.appendChild(h3); const b=document.createElement('button'); b.className='btn ghost sortBtn'; b.textContent='Sort'; b.onclick=sortBag; hd.appendChild(b); }
     hd.querySelector('h3').innerHTML=`Satchel <small>${gridUsed(GBAG,GVIEW.bag)} / ${BAG_W*BAG_H}</small>`;
-    const hint=pane.querySelector('.hint'); if(hint) hint.textContent='Drag to move, swap, or send to a tab · drag onto a worn slot or click to wear · right-click: off hand · shift-click: drop';
+    const hint=pane.querySelector('.hint'); if(hint) hint.textContent='Drag to move or wear · right-click: off hand · shift-click: drop';
     renderSealPocket(pane); }; })();
 /* clicking a satchel tab re-renders only the grid; keep the header count in step */
 (function(){ const o=renderGrid; renderGrid=function(h,G,opt){ const r=o(h,G,opt); if(G===GBAG&&h.id==='bag'){ const hd=h.parentElement&&h.parentElement.querySelector('.bagHead h3'); if(hd) hd.innerHTML=`Satchel <small>${gridUsed(GBAG,GVIEW.bag)} / ${BAG_W*BAG_H}</small>`; }

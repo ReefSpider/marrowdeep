@@ -25,7 +25,7 @@ function setWay(id){ P.way=id; calcStats(); const w=WAYS[id]; toast(`${w.k} ${w.
 /* the offer comes at level 3, at the start of a level rather than mid-fight */
 (function(){ const o=goLevel; goLevel=function(i){ o(i); if(P&&!P.way&&P.lvl>=3&&LEVELS[i]&&LEVELS[i].kind!=='boss') setTimeout(()=>{ if(mode==='play'&&!P.way) chooseWay(); },1600); }; })();
 (function(){ const o=openPause; openPause=function(){ o(); const col=$('#pause .col'); let b=$('#pWay'); if(!b&&col){ b=document.createElement('button'); b.className='btn ghost'; b.id='pWay'; col.insertBefore(b,$('#pCodex').nextSibling); }
-  if(b){ const w=P.way&&WAYS[P.way]; b.innerHTML=w?`Way · ${w.k} ${w.n.split(',')[0]}`:'Choose your Way 道'; b.onclick=()=>{ $('#pause').hidden=true; chooseWay(()=>{ mode='play'; hud.hidden=false; }); }; } }; })();
+  if(b){ const w=P.way&&WAYS[P.way]; b.innerHTML=w?`Way · ${w.n.split(',')[0]}`:'Way'; b.onclick=()=>{ $('#pause').hidden=true; chooseWay(()=>{ mode='play'; hud.hidden=false; }); }; } }; })();
 
 /* ---------- hands ---------- */
 (function(){ const o=offActive; offActive=function(){ const m=P.equip.weapon, f=P.equip.off; if(!f) return false;

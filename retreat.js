@@ -17,7 +17,7 @@ function reachKey(t){ return 't'+t; }
 function abandonDescent(){ $('#pause').hidden=true; mode='card'; hud.hidden=true;
   showCard({title:'Abandon the descent?',jp:'退却',body:`Climb back to the Rope-House now, with everything you carry. Nothing breaks. You can start again from any act you've reached.`,
     buttons:[{label:'Go home',fn:()=>{ hideCard(); if(typeof ptClose==='function') ptClose('abandoned'); P.life=P.stats.life; AU.door(); goCabin(); toast('You climb back out of the dark. Everything you carried came with you.'); }},{label:'Stay',ghost:1,fn:()=>{ hideCard(); openPause(); }}]}); }
-(function(){ const o=openPause; openPause=function(){ o(); const col=$('#pause .col'); let b=$('#pAbandon'); if(!b&&col){ b=document.createElement('button'); b.className='btn ghost'; b.id='pAbandon'; b.textContent='Abandon the descent'; col.insertBefore(b,$('#pTitle')||null); }
+(function(){ const o=openPause; openPause=function(){ o(); const col=$('#pause .col'); let b=$('#pAbandon'); if(!b&&col){ b=document.createElement('button'); b.className='btn ghost'; b.id='pAbandon'; b.textContent='Abandon run'; col.insertBefore(b,$('#pTitle')||null); }
   if(b){ b.hidden=!!(typeof COOP!=='undefined'&&COOP)||!L||L.def.kind==='cabin'; b.onclick=abandonDescent; } }; })();
 
 /* ---------- the door: start at any act reached ---------- */
@@ -25,7 +25,7 @@ function abandonDescent(){ $('#pause').hidden=true; mode='card'; hud.hidden=true
   if(opts.length<2) return o();
   mode='card'; hud.hidden=true;
   showCard({title:'Where do you climb in?',jp:'入口',body:`${typeof DIFFS!=='undefined'?DIFFS[t].n+' · ':''}Every act you've reached on this tier. The maps will be new.`,
-    buttons:opts.map(i=>({label:`${LEVELS[i].act} · ${LEVELS[i].name}`,fn:()=>{ hideCard(); o(); if(i!==1){ lvlIdx=i-1; goLevel(i); } }})).concat([{label:'Not yet',ghost:1,fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])}); }; })();
+    buttons:opts.map(i=>({label:`${LEVELS[i].act} · ${LEVELS[i].name}`,fn:()=>{ hideCard(); o(); if(i!==1){ lvlIdx=i-1; goLevel(i); } }})).concat([{label:'Back',ghost:1,fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])}); }; })();
 
 /* ---------- chests land where you can reach them ---------- */
 function standAt(tx,ty){ const v=tileAt(tx,ty); return (v===1||v===2)&&tileAt(tx,ty-1)===0&&tileAt(tx,ty-2)===0; }

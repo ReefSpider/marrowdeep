@@ -145,7 +145,7 @@ function summonOni(life){ if(PW.oniLive) { PW.oniLive.t=0; PW.oniLive.dur=life||
 stoneCard=function(st){ const c=CX[st.id]; if(!c) return; unlockCodex(st.id); AU.bell(); const back=()=>{ hideCard(); mode='play'; hud.hidden=false; }; const done=RUN.stones[st.id];
   if(!c.q){ showCard({title:c.t,jp:c.k,body:c.x,buttons:[{label:'Rise',fn:back}]}); return; }
   if(done){ const pw=RUN.powers.find(p=>p.stone===st.id); showCard({title:c.t,jp:c.k,body:`${c.x}\n\n${c.q}\n\nYou answered: ${c.a.find(a=>a[1]===done)[0]}${pw?`\nIt lent you ${POWERS[pw.id].k} ${powName(pw)} until the climb ends.`:''}`,buttons:[{label:'Rise',fn:back}]}); return; }
-  const btns=c.a.map(([txt,v])=>({label:`${txt}<small>${TH[v].k}　${TH[v].n} · borrowed power of this kind, for this run</small>`,fn:()=>{ hideCard(); boonRoll(st,v); }})).concat([{label:'Not yet. Walk on.',ghost:1,fn:back}]);
+  const btns=c.a.map(([txt,v])=>({label:`${txt}<small>${TH[v].k} ${TH[v].n}</small>`,fn:()=>{ hideCard(); boonRoll(st,v); }})).concat([{label:'Not yet',ghost:1,fn:back}]);
   showCard({title:c.t,jp:c.k,body:c.x+`\n\n${c.q}`,buttons:btns}); $('#cardBtns').classList.add('koan'); };
 const powName=pw=>pw.id==='oath'?`Oath of the ${WEAPON_TYPE[pw.cls]||'Blade'}`:POWERS[pw.id].n;
 const brEl=document.createElement('div'); brEl.id='boonRoll'; brEl.hidden=true; stage.appendChild(brEl);

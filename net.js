@@ -138,7 +138,7 @@ function closeCoop(){ coopScr.hidden=true; if(!NET.running){ mode=coopPrevMode==
 function renderCoop(code){ const lobby=NET.conn;
   if(!lobby){ coopScr.innerHTML=`<h2 class="mh">Together <span>共に</span></h2><div class="sub">Up to four sellswords, one descent. The more of you there are, the more of them there are, and the harder they hit.</div>
     <div class="cpbox"><input id="cpName" maxlength="16" value="${myName().replace(/"/g,'')}" aria-label="Your name">
-    <button class="btn" id="cpHost">Host a descent</button><div class="cpor">— OR —</div>
+    <button class="btn" id="cpHost">Host</button><div class="cpor">— OR —</div>
     <input id="cpCode" class="code" maxlength="8" placeholder="CODE" value="${code||''}" aria-label="Invite code"><button class="btn" id="cpJoin">Join</button>
     <div class="cpmsg" id="cpMsg">${coopStatus}</div><button class="btn ghost" id="cpBack">Back <kbd>Esc</kbd></button>
     <div class="hint">Everyone plays this same page. The host's map table sets how deep you go.</div></div>`;
@@ -469,7 +469,7 @@ function drawCoopHud(){ const show=mode==='play'||mode==='inv'||mode==='pause'; 
   for(let i=n;i<tagsEl.children.length;i++) tagsEl.children[i].hidden=true; }
 
 /* ---------- ways in and out ---------- */
-(function(){ const o=toTitle; toTitle=function(){ if(COOP||NET.conn) netLeave(true); o(); let b=$('#coopBtn'); if(!b){ b=document.createElement('button'); b.className='btn ghost'; b.id='coopBtn'; b.textContent='Together (co-op)'; const after=$('#slotsBtn')||$('#startBtn'); after.after(b); b.onclick=()=>coopFromTitle(); } }; })();
+(function(){ const o=toTitle; toTitle=function(){ if(COOP||NET.conn) netLeave(true); o(); let b=$('#coopBtn'); if(!b){ b=document.createElement('button'); b.className='btn ghost'; b.id='coopBtn'; b.textContent='Co-op'; const after=$('#slotsBtn')||$('#startBtn'); after.after(b); b.onclick=()=>coopFromTitle(); } }; })();
 function coopFromTitle(code){ AU.init(); const db=slotsDB(); const last=db.list.find(s=>s.id===db.last&&s.data);
   if(last){ curSlot=last.id; continueGame(); if(L.def.kind!=='cabin') goCabin(); }
   else { curSlot=newSlot().id; META=freshMeta(); stopTitleBits(); ngp=0; seenIntro={}; CODEX_OPEN=new Set(); VOWS_TAKEN={}; P=newPlayer(); P.equip.weapon=mkBase('Rusted Falchion'); calcStats(); P.life=P.stats.life; $('#title').hidden=true; goCabin(); }

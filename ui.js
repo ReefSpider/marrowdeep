@@ -205,7 +205,7 @@ function showCard(o){ mode='card'; hud.hidden=true; $('#card').hidden=false; con
   $('#card').onclick=e=>{ if(typing&&!e.target.closest('button')) done(); }; }
 function hideCard(){ $('#card').hidden=true; $('#cardBtns').classList.remove('koan'); }
 function stoneCard(st){ const c=CX[st.id]; if(!c) return; const first=unlockCodex(st.id); AU.bell(); const sworn=VOWS_TAKEN[st.id]; const back=()=>{ hideCard(); mode='play'; hud.hidden=false; };
-  const btns=c.q&&!sworn?c.a.map(([txt,v])=>({label:`${txt}<small>${VOWS[v].jp}　Vow of ${VOWS[v].n} · ${VOWS[v].d}</small>`,fn:()=>{ VOWS_TAKEN[st.id]=v; calcStats(); back(); toast(`誓　You swore the Vow of ${VOWS[v].n}. ${VOWS[v].d}.`); AU.lvl(); impactT=.05; sparks(P.x,P.y-16,16,'#ffe0a0'); saveGame(); }})).concat([{label:'Not yet. Walk on.',ghost:1,fn:back}]):[{label:'Rise',fn:back}];
+  const btns=c.q&&!sworn?c.a.map(([txt,v])=>({label:`${txt}<small>${VOWS[v].jp}　Vow of ${VOWS[v].n} · ${VOWS[v].d}</small>`,fn:()=>{ VOWS_TAKEN[st.id]=v; calcStats(); back(); toast(`誓　You swore the Vow of ${VOWS[v].n}. ${VOWS[v].d}.`); AU.lvl(); impactT=.05; sparks(P.x,P.y-16,16,'#ffe0a0'); saveGame(); }})).concat([{label:'Not yet',ghost:1,fn:back}]):[{label:'Rise',fn:back}];
   showCard({title:c.t,jp:c.k,body:c.x+(c.q?`\n\n${c.q}`:'')+(sworn?`\n\nYou answered: ${c.a.find(a=>a[1]===sworn)[0]}`:''),buttons:btns}); if(c.q&&!sworn) $('#cardBtns').classList.add('koan'); }
 function merchantCard(next){ const def=LEVELS[lvlIdx]; const potC=Math.round(20+dep()*6), boxC=Math.round(70+dep()*35);
   const letter=LETTERS[def.id];

@@ -57,6 +57,7 @@
 /* ---------- the furniture, drawn into the Rope-House ---------- */
 function drawAltarRoom(){ if(!L||L.def.kind!=='cabin') return; const F=16*T, R_=(x,y,w,h,c)=>{ ctx.fillStyle=c; ctx.fillRect(Math.round(x-camR.x),Math.round(y-camR.y),w,h); };
   const E_=(x,y,w,h,c)=>{ ectx.fillStyle=c; ectx.fillRect(Math.round(x-camR.x),Math.round(y-camR.y),w,h); };
+  if(typeof cabOpen!=='function'||cabOpen('altar')){
   // the Hungry God, carved into the back wall above the altar
   const ax=CAB.altar*T+8; const near=P&&Math.abs(P.x-ax)<70; const wake=near?1:0; ALT_ROOM.wake=lerp(ALT_ROOM.wake,wake,.04);
   R_(ax-58,F-176,116,150,'#1c120d'); R_(ax-58,F-176,116,2,'#3a281c');
@@ -77,6 +78,8 @@ function drawAltarRoom(){ if(!L||L.def.kind!=='cabin') return; const F=16*T, R_=
     E_(cx,F-29-h+fl*.5,2,3,`rgba(255,${190+Math.round(fl*30)},110,.95)`); if(i%2===0) addLight(cx+1,F-30-h,34,.45,1,.6,.3); }
   for(const [bx,by] of [[-40,-3],[-44,-2],[36,-3],[42,-2],[-38,-6]]){ R_(ax+bx,F+by,5,2,'#d8ccb0'); R_(ax+bx-1,F+by-1,2,2,'#d8ccb0'); }
   addLight(ax,F-100,90,.35+ALT_ROOM.wake*.4,1,.25,.15);
+  }
+  if(typeof cabOpen!=='function'||cabOpen('slots')){
   // the Gallows Wheel: a slot machine built out of a gibbet
   const sx=CAB.slots*T+8; R_(sx-16,F-50,32,50,'#3a2414'); R_(sx-16,F-50,32,2,'#6a4a2a'); R_(sx-18,F-54,36,4,'#2a1a0e'); R_(sx-2,F-74,4,20,'#2a1a0e'); R_(sx-2,F-74,18,3,'#2a1a0e'); R_(sx+14,F-74,1,10,'#8a7a62');
   R_(sx+12,F-64,5,5,'#d8ccb0'); R_(sx+13,F-62,1,1,'#120a06'); R_(sx+15,F-62,1,1,'#120a06');
@@ -85,6 +88,7 @@ function drawAltarRoom(){ if(!L||L.def.kind!=='cabin') return; const F=16*T, R_=
   R_(sx-10,F-20,20,3,'#120a06'); E_(sx-6,F-19,12,1,`rgba(255,200,90,${(.4+.3*Math.sin(time*3)).toFixed(2)})`);
   for(let i=0;i<4;i++) E_(sx-12+i*8,F-52,2,1,Math.floor(time*4+i)%4===0?'rgba(255,210,120,.95)':'rgba(255,120,40,.35)');
   addLight(sx,F-36,46,.4,1,.75,.35);
+  }
   // the bell rope by the door: ring it to call others down with you
   const bx=CAB.bell*T+8; R_(bx,F-230,1,190,'#6a5a40'); for(let y=F-230;y<F-40;y+=6) R_(bx,y,1,2,'#4a3e2c'); const sw=Math.sin(time*1.3)*1.5;
   R_(bx-6+sw,F-44,13,10,'#8a6a2a'); R_(bx-7+sw,F-35,15,2,'#6a4e1e'); R_(bx-1+sw,F-33,2,3,'#3a2a10'); R_(bx-6+sw,F-44,13,1,'#c9a96a');
@@ -124,7 +128,7 @@ function renderAltar(){ const o=altarOdds(), it=ALTAR.prim, plain=it&&it.rarity=
       <div class="ob" style="--oc:#ff4a3d"><b>喰 Devoured</b><i><s style="width:${o.pD.toFixed(1)}%"></s></i><em>${o.pD.toFixed(1)}%</em></div>
       <div class="why">${plain?'Blessed: reforged into a Magic or better item, 3–8 item levels higher. Replaced: the gods hand back a different plain item.':'Blessed: 3–8 item levels higher and every stat rolled again, sometimes with a new one. Stripped: every stat rolled again, and any that land Low are torn off. Devoured: gone.'}
       <br>Odds: base ${o.base.toFixed(0)}% · tribute +${o.tr.toFixed(0)}% · gold +${o.gb.toFixed(1)}%</div>`:'<div class="why">Lay something on the altar first.</div>'}</div>
-    <div class="row"><button class="btn" id="alGo"${it?'':' disabled'}>Offer it up <kbd>E</kbd></button><button class="btn ghost" id="alClose">Leave <kbd>Esc</kbd></button></div></div></div>`;
+    <div class="row"><button class="btn" id="alGo"${it?'':' disabled'}>Offer <kbd>E</kbd></button><button class="btn ghost" id="alClose">Back <kbd>Esc</kbd></button></div></div></div>`;
   const mk=(e)=>{ const d=slotEl(e.it,()=>altarPick(e.it)); if(e.it===ALTAR.prim) d.classList.add('sel'); if(ALTAR.trib.includes(e.it)) d.classList.add('trib'); return d; };
   const all=ownedList(); const bag=$('#alBag'), worn=$('#alWorn');
   for(let i=0;i<Math.max(27,Math.ceil(P.bag.length/9)*9);i++){ const e=all.find(x=>x.where==='bag'&&x.i===i); bag.appendChild(e?mk(e):slotEl(null)); }
@@ -257,7 +261,7 @@ function renderSlots_(){ const bets=[10,50,250,1000];
   <div class="slgold">You carry <b id="slGold">${P.gold}</b> crowns</div>
   <div class="slbets">${bets.map((b,i)=>`<button class="btn ghost${SL.bet===b?' on':''}" data-b="${b}"${P.gold<b?' disabled':''}>${b} <kbd>${i+1}</kbd></button>`).join('')}</div>
   <div class="slpay" id="slPay"></div>
-  <div class="row" style="margin-top:.8em"><button class="btn ghost" id="slClose">Walk away <kbd>Esc</kbd></button></div>`;
+  <div class="row" style="margin-top:.8em"><button class="btn ghost" id="slClose">Back <kbd>Esc</kbd></button></div>`;
   const pay=$('#slPay'); for(const k of SLOT_SYMS){ const c=symCanvas(k,16); pay.appendChild(c); const sp=document.createElement('span'); sp.innerHTML=`${SLOT_NAME[k]} ×3 <b>${SLOT_PAY[k]}×</b>`; pay.appendChild(sp); }
   SL.cv=[0,1,2].map(i=>$('#slR'+i)); SL.cv.forEach((c,i)=>drawReel(i));
   slotScr.querySelectorAll('.slbets .btn').forEach(b=>b.onclick=()=>{ SL.bet=+b.dataset.b; AU.tone('triangle',500,400,.06,.08,.1); renderSlots_(); });

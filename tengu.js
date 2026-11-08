@@ -65,8 +65,8 @@ function renderTengu(){ const it=TENGU.sel, pr=it?insPrice(it):0;
       <div class="pr">${it.ins?'—':pr+' crowns'}</div>
       <div class="q">You pay it now. Then his reel spins: land higher and he gives part of it back.<br>${INS_TIERS.map((t,i)=>`<span style="color:${RCOL[i]}">${t.n} ${t.back}%</span>`).join(' · ')}</div>`
       :'<div class="q">Pick something from your satchel or what you wear.</div>'}
-    <div class="tgreel" id="tgReel"><div class="strip"></div><div class="ln"></div></div><div class="tgres" id="tgRes">${TENGU.last||''}</div>
-    <div class="row"><button class="btn" id="tgGo"${it&&!it.ins&&P.gold>=pr?'':' disabled'}>Insure it · ${it&&!it.ins?pr:'—'} <kbd>E</kbd></button><button class="btn ghost" id="tgClose">Leave <kbd>Esc</kbd></button></div>
+    <div class="tgreel" id="tgReel"${it?'':' hidden'}><div class="strip"></div><div class="ln"></div></div><div class="tgres" id="tgRes">${TENGU.last||''}</div>
+    <div class="row"><button class="btn" id="tgGo"${it&&!it.ins&&P.gold>=pr?'':' disabled'}>${!it?'Pick an item':it.ins?'Insured':P.gold<pr?`Insure · ${pr} (not enough)`:`Insure · ${pr}`} <kbd>E</kbd></button><button class="btn ghost" id="tgClose">Back <kbd>Esc</kbd></button></div>
     <div class="q">Carried: <b>${P.gold}</b> crowns</div></div></div>`;
   const fc=tenguScr.querySelector('canvas.tgf').getContext('2d'); fc.imageSmoothingEnabled=false; drawTenguAt(fc,18,38,1,1,0);
   const mk=e=>{ const d=slotEl(e.it,()=>{ if(TENGU.busy) return; TENGU.sel=e.it; TENGU.last=null; hideTip(); AU.tone('triangle',500,420,.06,.06,.1); renderTengu(); }); if(e.it===TENGU.sel) d.classList.add('sel'); if(e.it.ins) d.classList.add('ins'); return d; };
@@ -76,7 +76,7 @@ function renderTengu(){ const it=TENGU.sel, pr=it?insPrice(it):0;
   if(it){ const s=$('#tgSel'); s.appendChild(iconEl(it)); bindTip(s,it); }
   fillReel(); $('#tgGo').onclick=insureGo; $('#tgClose').onclick=closeTengu; }
 function fillReel(win){ const strip=tenguScr.querySelector('.tgreel .strip'); if(!strip) return; const N=40, cells=[];
-  for(let i=0;i<N;i++){ const r=i===32&&win!=null?win:rollIns(); cells.push(`<div class="c" style="--rc:${RCOL[r]}"><b>−${INS_TIERS[r].back}%</b>${INS_TIERS[r].n}</div>`); }
+  for(let i=0;i<N;i++){ const r=i===32&&win!=null?win:rollIns(); cells.push(`<div class="c" style="--rc:${RCOL[r]}"><b>${INS_TIERS[r].back}%</b>${INS_TIERS[r].n} · back</div>`); }
   strip.innerHTML=cells.join(''); strip.style.transition='none'; strip.style.transform='translateX(0px)'; return strip; }
 function rollIns(){ const tot=INS_TIERS.reduce((a,t)=>a+t.w,0); let r=Math.random()*tot; for(let i=0;i<INS_TIERS.length;i++){ r-=INS_TIERS[i].w; if(r<=0) return i; } return 0; }
 function insureGo(){ const it=TENGU.sel; if(!it||it.ins||TENGU.busy) return; const pr=insPrice(it); if(P.gold<pr){ AU.tone('square',200,150,.15,.08,.2); return; }

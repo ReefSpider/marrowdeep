@@ -105,4 +105,4 @@ function eliteRollFX(odds,won){ const D=2.6; AU.tone&&AU.tone('square',660,660,.
   const begin=i=>{ hideCard(); if(typeof runStart==='function') runStart(); ngp=META.pick||0; META.runs++; META.inCabin=false; P.life=P.stats.life; P.potions=Math.max(P.potions,2); updBelt(); AU.door(); lvlIdx=i-1; goLevel(i); };
   mode='card'; hud.hidden=true;
   showCard({title:'Where do you climb in?',jp:'入口',body:`${DIFFS[META.pick||0].n}. You've cleared the campaign, so any act is open. The maps will be new.`,
-    buttons:starts.map(i=>({label:`${LEVELS[i].act} · ${LEVELS[i].name}`,fn:()=>begin(i)})).concat([{label:'Not yet',ghost:1,fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])}); }; })();
+    buttons:starts.map(i=>({label:`${LEVELS[i].act} · ${LEVELS[i].name}`,fn:()=>begin(i)})).concat([{label:'Back',ghost:1,fn:()=>{ hideCard(); mode='play'; hud.hidden=false; }}])}); }; })();

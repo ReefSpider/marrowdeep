@@ -55,7 +55,7 @@ function merchantTrade(type){ const st=shopStock(), r=shopRun(), bc=boxPrice(), 
     buttons:[{label:`The Merchant's box · ${bc} <small>${st.box?`${st.box} left on this level · after it: ${boxPrice(r.bought+1)}`:'none left on this level'}</small>`,disabled:!st.box||P.gold<bc,fn:()=>buyBox()},
       {label:`A draught · ${pc} <small>${st.pot?`${st.pot} left`:'none left'} · your belt ${P.potions} / ${POT_MAX}</small>`,disabled:!st.pot||P.gold<pc||P.potions>=POT_MAX,fn:()=>{ if(!st.pot||P.gold<pc||P.potions>=POT_MAX) return; P.gold-=pc; st.pot--; P.potions++; AU.coin(); updBelt(); saveGame(); merchantTrade(false); }},
       {label:'Sell from your satchel <small>click an item to sell it</small>',fn:()=>openSell()},
-      {label:'Leave',ghost:1,fn:backToPlay}]});
+      {label:'Back',ghost:1,fn:backToPlay}]});
   if(!type){ if(typing){ clearInterval(typing); typing=null; } $('#lbody').textContent='He waits.'; $('#ledger').classList.add('on'); $('#cardBtns').hidden=false; }
   $('#cardBtns').classList.add('koan'); }
 function buyBox(){ const st=shopStock(), r=shopRun(), bc=boxPrice(); if(!st.box||P.gold<bc) return; P.gold-=bc; st.box--; r.bought++; saveGame(); hideCard();
