@@ -12,6 +12,8 @@ function journeyNodes(){ const N=[]; const n=LEVELS.length; for(let i=0;i<n;i++)
     else { x=420; y=26; }
     N[i]=[x,y]; } return N; }
 drawMap=function(from,to,k){ const cv_=$('#mapCv'), g=cv_.getContext('2d'); g.setTransform(2,0,0,2,0,0); g.imageSmoothingEnabled=false; const NODES_=journeyNodes();
+  /* v25: only the road you've walked shows; the rest is dark until you get there */
+  const far=(META&&META.reach&&META.reach[reachKey(tierNow())])||0, seen=Math.max(from,to,far); const actSeen=a=>LEVELS.some((d,i)=>i<=seen&&d.act===a);
   const sky=g.createLinearGradient(0,0,0,70); sky.addColorStop(0,'#1a0606'); sky.addColorStop(1,'#4a2a20'); g.fillStyle=sky; g.fillRect(0,0,480,70);
   g.fillStyle='#ff3a2a'; g.globalAlpha=.22; g.beginPath(); g.ellipse(380,14,60,7,0,0,Math.PI*2); g.fill(); g.globalAlpha=1;
   const earth=g.createLinearGradient(0,60,0,270); earth.addColorStop(0,'#2a2018'); earth.addColorStop(1,'#080506'); g.fillStyle=earth; g.fillRect(0,60,480,210);
@@ -25,10 +27,13 @@ drawMap=function(from,to,k){ const cv_=$('#mapCv'), g=cv_.getContext('2d'); g.se
   /* the Pit under the city */
   g.fillStyle='#050304'; g.beginPath(); g.moveTo(440,62); g.bezierCurveTo(470,150,450,262,380,262); g.lineTo(300,250); g.bezierCurveTo(250,220,270,140,300,62); g.lineTo(316,62); g.bezierCurveTo(290,140,300,210,340,226); g.lineTo(400,232); g.bezierCurveTo(440,226,452,150,428,62); g.fill();
   g.fillStyle='rgba(255,60,30,.12)'; g.beginPath(); g.ellipse(380,240,60,14,0,0,Math.PI*2); g.fill();
-  const ids=NODES_.map((n,i)=>i).filter(i=>NODES_[i]);
+  const ids=NODES_.map((n,i)=>i).filter(i=>NODES_[i]&&i<=seen);
+  const veil=(x,y,w,h)=>{ if(w<=0) return; g.fillStyle='rgba(5,3,4,.94)'; g.fillRect(x+4,y,w-4,h); for(let yy=y;yy<y+h;yy+=2) for(let xx=x;xx<x+4;xx+=2){ if(((xx>>1)+(yy>>1))%2===0){ g.fillStyle='#050304'; g.fillRect(xx,yy,2,2); } } };
+  const edge=NODES_[seen]?NODES_[seen][0]+14:36;
+  if(!actSeen('Act II')) veil(Math.min(edge,256),0,480-Math.min(edge,256),72); if(!actSeen('Act III')) veil(240,60,240,210);
   g.strokeStyle='rgba(216,204,176,.35)'; g.setLineDash([2,3]); g.lineWidth=1; g.beginPath(); ids.forEach((i,j)=>{ const [x,y]=NODES_[i]; if(j&&LEVELS[i].act==='Act III'&&LEVELS[ids[j-1]].act==='Act II'){ g.moveTo(x,y); } else j?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke(); g.setLineDash([]);
   /* the fall, dotted red, from the bridge to the bottom */
-  const bi=LEVELS.findIndex(d=>d.id==='gideon'), oi=LEVELS.findIndex(d=>d.id==='ossuary'); if(bi>=0&&oi>=0){ g.strokeStyle='rgba(200,40,30,.5)'; g.setLineDash([1,3]); g.beginPath(); g.moveTo(...NODES_[bi]); g.lineTo(...NODES_[oi]); g.stroke(); g.setLineDash([]); }
+  const bi=LEVELS.findIndex(d=>d.id==='gideon'), oi=LEVELS.findIndex(d=>d.id==='ossuary'); if(bi>=0&&oi>=0&&oi<=seen){ g.strokeStyle='rgba(200,40,30,.5)'; g.setLineDash([1,3]); g.beginPath(); g.moveTo(...NODES_[bi]); g.lineTo(...NODES_[oi]); g.stroke(); g.setLineDash([]); }
   g.strokeStyle='rgba(200,40,30,.9)'; g.lineWidth=1.5; g.beginPath(); for(let j=0;j<ids.length;j++){ const i=ids[j]; if(i>to) break; const [x,y]=NODES_[i]; if(i>from&&i===to&&j>0){ const [px,py]=NODES_[ids[j-1]]; g.lineTo(lerp(px,x,k),lerp(py,y,k)); break; } j?g.lineTo(x,y):g.moveTo(x,y); } g.stroke();
   g.font='7px "IM Fell English SC", Georgia, serif'; g.textBaseline='middle';
   const curI=(from===to||k>=1)?to:from;
@@ -38,7 +43,7 @@ drawMap=function(from,to,k){ const cv_=$('#mapCv'), g=cv_.getContext('2d'); g.se
   const label=(i,strong)=>{ if(!NODES_[i]) return; const [x,y]=NODES_[i], def=LEVELS[i]; const below=def.act==='Act I'||def.act==='Act II'||def.act==='Prologue'; const ly=below?y+13:y-9; g.textAlign=x>400?'right':x<60?'left':'center';
     g.fillStyle=strong?'#fff1d8':'#a89a88'; g.fillText(def.name,x,ly); g.fillStyle=def.kind==='boss'?'#c8322a':'#8a7e72'; g.fillText(`${def.act} · Lv ${mlvl(i)}`,x,ly+8); };
   label(curI,true); if(to!==from) label(to,true);
-  g.textAlign='left'; g.font='7px "IM Fell English SC", Georgia, serif'; g.fillStyle='#8d827a'; g.fillText('The March',96,74); g.fillText('Hollowmere',330,74); g.fillText('The Marrowdeep',282,262);
+  g.textAlign='left'; g.font='7px "IM Fell English SC", Georgia, serif'; g.fillStyle='#8d827a'; if(actSeen('Act I')) g.fillText('The March',96,74); if(actSeen('Act II')) g.fillText('Hollowmere',330,74); if(actSeen('Act III')) g.fillText('The Marrowdeep',282,262);
   g.font='12px "Pirata One", Georgia, serif'; g.fillStyle='#dccfb2'; g.fillText('The Road Home',14,232); g.font='7px "IM Fell English SC", Georgia, serif'; g.fillStyle='#8d827a'; g.fillText(`${DIFFS[tierNow()].jp} ${DIFFS[tierNow()].n} · monster level ${tierRange(tierNow()).join('–')}`,14,246);
   const a=NODES_[from], b=NODES_[to]||a; const [ax,ay]=from===to?b:[lerp(a[0],b[0],k),lerp(a[1],b[1],k)]; g.fillStyle='#fff1d8'; g.fillRect(ax-1,ay-9,3,6); g.fillStyle='#141012'; g.fillRect(ax-1,ay-11,3,2); };
 

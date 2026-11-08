@@ -247,7 +247,7 @@ function drawRegionHaz(){ for(const r of RG.rocks){ const sx=r.x-camR.x; if(r.t<
   else if(e.type==='vultures'){ for(let i=0;i<e.n;i++){ const a=time*.6+i*2.1, x=e.cx+Math.cos(a)*40, y=e.cy+Math.sin(a)*12; ctx.fillStyle='rgba(42,33,28,.7)'; ctx.fillRect(Math.round(x-3),Math.round(y),3,1); ctx.fillRect(Math.round(x+1),Math.round(y),3,1); ctx.fillRect(Math.round(x),Math.round(y+1),1,1); } }
   else if(e.type==='wisps'){ for(let i=0;i<e.n;i++){ const x=e.x+i*30+Math.sin(time*.7+i)*20, y=e.y+Math.sin(time+i*2)*6; const a=Math.sin(k*Math.PI); ectx.fillStyle=`rgba(169,200,108,${(.5*a).toFixed(2)})`; ectx.fillRect(Math.round(x),Math.round(y),2,2); } }
   else if(e.type==='rockfall'){ ctx.fillStyle='rgba(42,46,52,.6)'; for(let i=0;i<5;i++) ctx.fillRect(Math.round(e.x+i*3-6),Math.round(30+k*170+i*7),2,2); }
-  else if(e.type==='wound'){ const a=Math.sin(k*Math.PI)*.12; ectx.fillStyle=`rgba(176,20,26,${a.toFixed(3)})`; ectx.fillRect(0,0,W,80); } } }; })();
+  /* 'wound' is quiet now: the red band across the top of the screen read as a flicker (BT, v24 notes) */ } }; })();
 
 /* ---------- sound: each region's ambience bed ---------- */
 if(typeof AMB!=='undefined'){ const o=AMB.envNow.bind(AMB); AMB.envNow=function(){ const lk=typeof L!=='undefined'&&L&&L.def&&L.def.look; if(!lk) return o();

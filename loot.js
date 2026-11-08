@@ -68,6 +68,6 @@ addEventListener('keydown',ev=>{ const k=ev.key.length===1?ev.key.toLowerCase():
 (function(){ const o=oddsW; oddsW=function(w,mf){ const q=o(w,mf); return q.map((v,i)=>i===3?v*2.2:v); }; })();
 (function(){ const o=oddsW; oddsW=function(w,mf){ const r=o(w,ngp>0?mf:(mf||0)*.6); return ngp>0?r:r.map((v,i)=>v*[1.7,1,.5,.8,.33,.2][i]); }; })();
 const GR_BASE=GR.map(g=>g.w);
-function setGrades(){ const lean=ngp===0; GR[2].w=lean?14:GR_BASE[2]; GR[3].w=lean?2.6:GR_BASE[3]; GR[4].w=lean?.08:GR_BASE[4]; }
+function setGrades(){ const lean=ngp===0; GR[2].w=lean?18:GR_BASE[2]*1.15; GR[3].w=lean?3.8:GR_BASE[3]*1.25; GR[4].w=lean?.12:GR_BASE[4]*1.25; /* v25: a little kinder */ }
 (function(){ const o=loadLevel; loadLevel=function(){ const r=o.apply(this,arguments); setGrades(); return r; }; })();
 { const cb=$('#pFlash'); if(cb){ cb.checked=SETTINGS.flashes!==false; cb.onchange=()=>{ SETTINGS.flashes=cb.checked; store.set('marrowdeep.settings',SETTINGS); }; } }

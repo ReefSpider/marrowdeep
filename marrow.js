@@ -26,7 +26,7 @@ function unlockMarrow(quiet){ if(marrowOn()||!P) return; META.marrow={start:P.lv
   if(!quiet) setTimeout(()=>toast('The Marrow 髄 is open: an endgame tree in your satchel. Levels from here on come slower.'),2600); }
 
 /* ---------- the XP curve: no cap, and exponential once the war is over ---------- */
-(function(){ const o=xpNext; xpNext=function(l){ const b=o(l); if(!marrowOn()) return b; const over=l-META.marrow.start+1; return over>0?Math.round(b*Math.pow(MARROW_GROWTH,over)):b; }; })();
+(function(){ const o=xpNext; xpNext=function(l){ const b=o(l); if(!marrowOn()||!(META.cleared&&META.cleared.length)) return b; /* v25: the steeper curve only after a campaign clear */ const over=l-(META.mxs||META.marrow.start)+1; return over>0?Math.round(b*Math.pow(MARROW_GROWTH,over)):b; }; })();
 
 /* ---------- the boosts ---------- */
 (function(){ const o=calcStats; calcStats=function(){ o(); if(!P||P._remote||!marrowOn()) return; const s=P.stats, a=mAlloc(), v=k=>{ const d=MARROW.find(x=>x.k===k); return Math.min(a[k]||0,d.cap)*d.per; };
@@ -34,7 +34,7 @@ function unlockMarrow(quiet){ if(marrowOn()||!P) return; META.marrow={start:P.lv
   P.life=Math.min(P.life,s.life); }; })();
 
 /* ---------- unlocking ---------- */
-(function(){ const o=campaignCleared; campaignCleared=function(a){ const was=marrowOn(); unlockMarrow(); if(!was) calcStats(); return o(a); }; })();
+(function(){ const o=campaignCleared; campaignCleared=function(a){ const was=marrowOn(); unlockMarrow(); if(META&&!META.mxs&&P) META.mxs=P.lvl; if(!was) calcStats(); return o(a); }; })();
 /* characters who finished the campaign before the Marrow existed get it the next time they're loaded */
 (function(){ const o=continueGame; continueGame=function(){ const r=o(); if(META&&META.cleared&&META.cleared.length&&!marrowOn()){ unlockMarrow(true); calcStats(); setTimeout(()=>toast('The Marrow 髄 is open: an endgame tree in your satchel.'),1500); } showMarrowTab(); return r; }; })();
 (function(){ const o=newGame; newGame=function(){ const r=o(); showMarrowTab(); return r; }; })();

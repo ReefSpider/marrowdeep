@@ -76,10 +76,10 @@ function showCase(tier,ilvl,win,onClose){
   const reelW=$('#reel').clientWidth; const cw=els[1].offsetLeft-els[0].offsetLeft; const cardW=els[0].offsetWidth;
   const i0=Math.max(2,Math.round((reelW/2-cardW/2)/cw)); const ab=mkFixed(pick(ABYSSAL),5); ab.ilvl=ilvl; fin(ab); const ne=cardEl(ab); strip.replaceChild(ne,els[i0]); els[i0]=ne;
   const x0=i0*cw+cardW/2-reelW/2; strip.style.transform=`translateX(${-x0}px)`; ne.classList.add('tease'); AU.tease();
-  const target=WI*cw+rnd(.12,.88)*cardW-reelW/2; const dur=RM?1200:6400;
+  const target=WI*cw+rnd(.12,.88)*cardW-reelW/2; const dur=(RM||tier===0)?1100:6400; /* v25: a plain coffer doesn't make you wait */
   caseState={win,landed:false,ready:false,el:els[WI],onClose};
   setTimeout(()=>{ ne.classList.remove('tease'); const t0=performance.now(); let lastI=-1, lastTk=0;
-    const step=now=>{ const p=Math.min(1,(now-t0)/dur); const e=1-Math.pow(1-p,4); const x=x0+(target-x0)*e; strip.style.transform=`translateX(${-x}px)`;
+    const step=now=>{ const p=caseState&&caseState.skip?1:Math.min(1,(now-t0)/dur); const e=1-Math.pow(1-p,4); const x=x0+(target-x0)*e; strip.style.transform=`translateX(${-x}px)`;
       const idx=Math.floor((x+reelW/2)/cw); if(idx!==lastI){ lastI=idx; if(now-lastTk>70){ AU.tick(); lastTk=now; } } if(p<1) requestAnimationFrame(step); else land(); };
     requestAnimationFrame(step); },RM?250:1100); }
 function land(){ const cs=caseState; cs.landed=true; cs.el.classList.add('won'); AU.reveal(cs.win.rarity); noteBest(cs.win);
@@ -135,7 +135,7 @@ function closeCase(take){ const cs=caseState; if(!cs||!cs.ready) return; caseSta
 /* the close-up glows in the chest's own colour; the item's rarity stays hidden until the reel lands */
 const CHEST_GLOW=['#f0e6d0','#ffd27a','#ff7a4a','#d8c8ff','#bfeaff'];
 function playChestCine(tier,rar,done){ const el=$('#cine'), cvs=$('#cineCv'), g=cvs.getContext('2d'); g.imageSmoothingEnabled=false; el.hidden=false;
-  const dur=RM?500:[1500,2200,3400,1500][tier]; const t0=performance.now(); const col=hex(CHEST_GLOW[tier]||CHEST_GLOW[0]); const sn=new Set(); const cps=[];
+  const dur=(RM||tier===0)?450:[1500,2200,3400,1500][tier]; const t0=performance.now(); const col=hex(CHEST_GLOW[tier]||CHEST_GLOW[0]); const sn=new Set(); const cps=[];
   const step=now=>{ const k=Math.min(1,(now-t0)/dur); const openAt=tier===2?.66:.6, open=k>openAt;
     const cue=(n,f)=>{ if(!sn.has(n)&&k>=f){ sn.add(n); return true; } return false; };
     if(tier>=1&&cue('c1',.3)){ AU.chain(); for(let i=0;i<14;i++) cps.push({x:120-14,y:68,vx:rnd(-60,60),vy:rnd(-80,20),l:.6}); }
@@ -296,6 +296,7 @@ function uiKey(k,e){ const m0=mode; /* a key that closes a screen must not also 
   if(mode==='play'&&(k==='i'||k==='Tab'||k==='t'||k==='c')){ e.preventDefault(); toggleInv(true,k==='t'?'tree':k==='c'?'codex':'bag'); return; }
   if(mode==='play'&&k==='Escape'){ e.preventDefault(); openPause(); return; }
   if(mode==='pause'&&(k==='Escape'||k==='Enter')){ e.preventDefault(); closePause(); return; }
+  if(mode==='case'&&caseState&&!caseState.landed&&(k==='e'||k==='Enter'||k==='space'||k==='Escape')){ e.preventDefault(); caseState.skip=true; return; } /* v25: skip the spin */
   if(mode==='case'&&caseState&&caseState.landed){ if(reveal){ if(k==='e'||k==='Enter'||k==='space'||k==='Escape'){ e.preventDefault(); reveal.finish(); } return; }
     if(caseState.ready){ if(k==='e'||k==='Enter'){ e.preventDefault(); closeCase(true); } else if(k==='Escape') closeCase(false); } }
   if(m0==='play'&&mode==='play'&&k==='e'&&interact){ interact.act(); }

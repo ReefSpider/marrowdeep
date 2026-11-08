@@ -113,7 +113,7 @@ const SETP=[
   {name:"Hound's Tooth",slot:'ring',base:'Iron Ring',aff:[['ls',3,5],['fire',4,7]],set:'hound'}
 ];
 /* stat grades */
-const GR=[{n:'Low',c:'#8a8078',w:40},{n:'Fair',c:'#8484ff',w:34},{n:'High',c:'#f2e46e',w:19},{n:'Max',c:'#ffcf6a',w:6.6},{n:'Abyssal',c:'#ff4a3d',w:.4}];
+const GR=[{n:'Low',c:'#8a8078',w:35},{n:'Fair',c:'#8484ff',w:34},{n:'High',c:'#f2e46e',w:19},{n:'Max',c:'#ffcf6a',w:6.6},{n:'Abyssal',c:'#ff4a3d',w:.4}];
 const AFX={water:['+','','Water Damage'],blood:['+','','Blood Damage'],wind:['+','','Wind Damage'],bone:['+','','Bone Damage'],cold:['+','','Cold Damage'],shock:['+','','Lightning Damage'],poison:['+','','Poison Damage'],holy:['+','','Holy Damage'],shadow:['+','','Shadow Damage'],ed:['+','%','Enhanced Damage'],edef:['+','%','Enhanced Defense'],ls:['','%','Life Stolen'],fire:['+','','Fire Damage'],life:['+','','to Life'],crit:['+','%','Critical Strike'],ms:['+','%','Run Speed'],as:['+','%','Attack Speed'],gf:['+','%','Gold Find'],mf:['+','%','Magic Find'],regen:['+','/s','Life Regen'],thorns:['','','Thorns']};
 
 /* ===== combat moves. t: arc | spin | slam | thrust | plunge | shoot | block ===== */
