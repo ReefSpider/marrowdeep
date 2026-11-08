@@ -170,6 +170,68 @@
         "insult",
         "coarse-pixel"
       ]
+    },
+    {
+      "id": "ref-hungry-one",
+      "file": "ref-hungry-one.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "hungry-one",
+        "seven-eyes",
+        "wound",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-08-crypt",
+      "file": "pr-08-crypt.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "4:5",
+      "caption": "Under the palace there is an older door.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "crypt",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-09-altar",
+      "file": "pr-09-altar.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Something down there was hungry.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "hungry-one",
+        "altar",
+        "seven-eyes",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-10-price",
+      "file": "pr-10-price.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "His soul. And the soul of every man who swears to him.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "hungry-one",
+        "pact",
+        "coarse-pixel"
+      ]
     }
   ]
 }
