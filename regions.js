@@ -155,7 +155,7 @@ function bakeRegion(Lv,pl,lk){
 function regionDecor(Lv,g,lk){ const look=Lv.def.look; const P_=(x,y,w,h,col)=>{ g.fillStyle=col; g.fillRect(Math.round(x),Math.round(y),w,h); };
   const ground=(x,y)=>Lv.g[y][x]===1&&Lv.g[y-1]&&Lv.g[y-1][x]===0&&Lv.g[y-2]&&Lv.g[y-2][x]===0;
   Lv.props=[]; let last=-9;
-  for(let x=5;x<Lv.w-5;x++) for(let y=3;y<Lv.h;y++){ if(!ground(x,y)||!ground(x+1,y)||x-last<4) continue; const r=hsh(x*17,y*3); if(r<.72) continue; last=x; const px=x*T, py=y*T;
+  for(let x=5;x<Lv.w-5;x++) for(let y=3;y<Lv.h;y++){ if(!ground(x,y)||!ground(x+1,y)||x-last<4) continue; const r=hsh(x*17,y*3); if(r<.6) continue; last=x; const px=x*T, py=y*T;
     if(look==='meadow'){ if(r>.92){ P_(px+4,py-18,7,18,'#55614f'); P_(px+5,py-19,5,1,'#55614f'); P_(px+10,py-16,1,16,'#2b302b'); } else if(r>.84){ P_(px,py-4,9,4,'#f3eee2'); P_(px+8,py-4,3,3,'#55614f'); } else { for(let k=0;k<5;k++) P_(px+k*3,py-ri(8,14),1,14,'#d2bd82'); } }
     else if(look==='fen'){ if(r>.9){ P_(px+6,py-40,3,40,'#0b0d0a'); P_(px-6,py-38,20,2,'#0b0d0a'); for(let k=-5;k<14;k+=2) P_(px+k,py-37,1,ri(6,18),k%3?'#3e5a2c':'#6f8a3a'); } else { for(let k=0;k<6;k++) P_(px+k*2,py-ri(6,14),1,14,k%2?'#3e5a2c':'#2a1c30'); } }
     else if(look==='ashes'){ if(r>.9){ g.strokeStyle='#2a211c'; g.lineWidth=2; for(let k=0;k<4;k++){ g.beginPath(); g.arc(px+k*7,py,14-k,Math.PI,Math.PI*1.45); g.stroke(); } } else if(r>.82){ P_(px,py-2,16,2,'#86a8a0'); P_(px+4,py-2,2,1,'#ebe4d2'); } else { P_(px+2,py-4,5,4,'#ebe4d2'); P_(px+3,py-3,1,1,'#2a211c'); P_(px+5,py-3,1,1,'#2a211c'); P_(px+8,py-1,7,1,'#ebe4d2'); } }
