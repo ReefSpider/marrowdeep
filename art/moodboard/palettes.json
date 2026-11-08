@@ -1,0 +1,112 @@
+{
+ "i1-grasslands": {
+  "mist": "#e6e3d4",
+  "bone": "#f3eee2",
+  "sky2": "#d5d0b9",
+  "gold": "#d2bd82",
+  "straw": "#a69357",
+  "gg": "#7f8b6f",
+  "gg2": "#55614f",
+  "shadow": "#2b302b",
+  "red": "#b0141a",
+  "dred": "#d9b8a8"
+ },
+ "i2-swamp": {
+  "b2": "#2a1c30",
+  "bruise": "#4a2f4f",
+  "moss": "#3e5a2c",
+  "sick": "#6f8a3a",
+  "pale": "#a9b46c",
+  "water": "#141a16",
+  "black": "#0b0d0a",
+  "red": "#b0141a",
+  "dred": "#5a2034"
+ },
+ "i3-desert": {
+  "salt": "#ebe4d2",
+  "haze": "#d8cdb0",
+  "sand": "#c4ad80",
+  "ochre": "#957548",
+  "ash": "#6b6460",
+  "glass": "#86a8a0",
+  "char": "#2a211c",
+  "red": "#b0141a",
+  "dred": "#cfa58e"
+ },
+ "i4-mountains": {
+  "dslate": "#454d55",
+  "slate": "#7b848b",
+  "fog": "#b8bdc0",
+  "snow": "#e7e9e7",
+  "rock": "#2a2e34",
+  "black": "#121418",
+  "flag": "#b08a4a",
+  "red": "#b0141a",
+  "dred": "#7a4048"
+ },
+ "i5-fort": {
+  "night": "#1f232c",
+  "night2": "#2c3240",
+  "stone": "#8a8580",
+  "dstone": "#4a4642",
+  "snow": "#eceae4",
+  "ember": "#d0782a",
+  "black": "#0e0a0a",
+  "red": "#b0141a",
+  "dred": "#5a0a0e"
+ },
+ "ii1-villages": {
+  "night": "#1a141c",
+  "plum": "#4a2c38",
+  "dusk2": "#b8704a",
+  "dusk": "#e2a65c",
+  "straw": "#d4b25a",
+  "wheat": "#8a6a32",
+  "cloth": "#ebdfc4",
+  "black": "#0e0a0a",
+  "red": "#b0141a",
+  "dred": "#6a1a22"
+ },
+ "ii2-slums": {
+  "black": "#100e0c",
+  "sewer": "#2e3424",
+  "mud": "#4a3a28",
+  "brown": "#5a4636",
+  "rot": "#6a6a32",
+  "grey": "#a8a294",
+  "cream": "#d8cfae",
+  "red": "#b0141a",
+  "dred": "#4a1214"
+ },
+ "ii3-oldcity": {
+  "black": "#0e0e12",
+  "sky": "#1a1e2a",
+  "sky2": "#2a3040",
+  "slate": "#3e4450",
+  "stone": "#9a9488",
+  "plaster": "#cfc6b2",
+  "torch": "#e0b060",
+  "red": "#b0141a",
+  "dred": "#3a1418"
+ },
+ "ii4-royal": {
+  "black": "#0a0606",
+  "wine": "#5a1420",
+  "dgold": "#6e5420",
+  "gold": "#b8913a",
+  "candle": "#e8d4a0",
+  "white": "#ece6d8",
+  "red": "#b0141a",
+  "dred": "#6a0a10"
+ },
+ "ii5-bridge": {
+  "black": "#0e0a0a",
+  "dstone": "#3a3a40",
+  "stone": "#6e6a68",
+  "sky2": "#5a0a0e",
+  "red": "#b0141a",
+  "torch": "#e09040",
+  "paper": "#ece6d8",
+  "dred": "#8a1016"
+ }
+}
