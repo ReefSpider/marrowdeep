@@ -107,6 +107,69 @@
         "fire",
         "coarse-pixel"
       ]
+    },
+    {
+      "id": "ref-aldous",
+      "file": "ref-aldous.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "aldous",
+        "living-king",
+        "dead-king",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-05-triumph",
+      "file": "pr-05-triumph.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "They chanted one name.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "hollowmere",
+        "halden",
+        "cassian",
+        "triumph",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-06-heir",
+      "file": "pr-06-heir.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"My heir.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "court",
+        "aldous",
+        "halden",
+        "cassian",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-07-insult",
+      "file": "pr-07-insult.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "\"I'll find a use for you, brother.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "halden",
+        "insult",
+        "coarse-pixel"
+      ]
     }
   ]
 }
