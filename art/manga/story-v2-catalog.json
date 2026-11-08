@@ -59,6 +59,54 @@
         "cassian",
         "coarse-pixel"
       ]
+    },
+    {
+      "id": "pr-02-backs",
+      "file": "pr-02-backs.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "Side by side. As always.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "kesh",
+        "cassian",
+        "halden",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-03-order",
+      "file": "pr-03-order.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "The King's order: burn the granaries.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "kesh",
+        "cassian",
+        "halden",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-04-granary",
+      "file": "pr-04-granary.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Cassian did it. No one sang about it.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "kesh",
+        "cassian",
+        "fire",
+        "coarse-pixel"
+      ]
     }
   ]
 }
