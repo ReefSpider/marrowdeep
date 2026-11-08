@@ -1,0 +1,64 @@
+{
+  "storyboard": "Story Bible & Storyboard v2",
+  "style_reference": "ref-halden",
+  "assets": [
+    {
+      "id": "ref-halden",
+      "file": "ref-halden.png",
+      "type": "character-reference",
+      "status": "user-approved",
+      "tags": [
+        "story-v2",
+        "reference",
+        "halden",
+        "prince",
+        "exile",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "ref-cassian",
+      "file": "ref-cassian.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "cassian",
+        "prince",
+        "king",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "ref-ilse",
+      "file": "ref-ilse.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "ilse",
+        "adult",
+        "candle",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-01-kesh",
+      "file": "pr-01-kesh.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Kesh fell in a single night.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "kesh",
+        "halden",
+        "cassian",
+        "coarse-pixel"
+      ]
+    }
+  ]
+}
