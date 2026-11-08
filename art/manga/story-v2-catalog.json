@@ -232,6 +232,55 @@
         "pact",
         "coarse-pixel"
       ]
+    },
+    {
+      "id": "pr-11-letters",
+      "file": "pr-11-letters.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "Letters to Kesh, in your hand.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "forgery",
+        "letters",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-12-wine",
+      "file": "pr-12-wine.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "\"Drink with me, brother.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "halden",
+        "wine",
+        "betrayal",
+        "coarse-pixel"
+      ]
+    },
+    {
+      "id": "pr-13-wake",
+      "file": "pr-13-wake.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "You woke with your sword in your hand.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "halden",
+        "aldous",
+        "frame",
+        "bedchamber",
+        "coarse-pixel"
+      ]
     }
   ]
 }
