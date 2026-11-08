@@ -59,3 +59,7 @@ EAI.zealot=function(e,dt,c){ e.walk+=dt*Math.abs(e.vx)*.13;
   for(const g of (typeof ringsNow==='function'?ringsNow():[])){ const gx=g.x-ox, gy=g.y-oy, gd=Math.hypot(gx,gy); if(gd>200||gd<20) continue; const ang=Math.acos(clamp((gx*dx+gy*dy)/gd,-1,1)); if(ang<bd){ bd=ang; best=g; } }
   if(best){ const gx=best.x-ox, gy=best.y-oy, gd=Math.hypot(gx,gy); dx=gx/gd; dy=gy/gd; }
   t.dx=dx; t.dy=dy; if(Math.abs(dx)>.05) P.face=Math.sign(dx); }; })();
+
+/* ---------- the Marrow opens when the Brand tree is full ---------- */
+(function(){ const o=calcStats; calcStats=function(){ o(); if(!P||P._remote||typeof marrowOn!=='function'||marrowOn()||!P.skills) return;
+  if(SKILLS.every(s=>P.skills.has(s.id))){ unlockMarrow(true); o(); setTimeout(()=>toast('Every brand burned in. The Marrow 髄 opens in your satchel.'),400); } }; })();
