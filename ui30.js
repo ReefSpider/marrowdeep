@@ -193,7 +193,7 @@ function closeSettings() {
 }
 
 /* ---------- title: controls move to Settings, a version number, Settings on the title ---------- */
-const GAME_VERSION = 'v41';
+const GAME_VERSION = 'v42';
 (function () {
   const t = $('#title'); const keys = t.querySelector('.keys'); if (keys) keys.hidden = true;
   const row = t.querySelector('.row');

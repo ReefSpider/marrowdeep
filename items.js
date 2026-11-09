@@ -160,8 +160,8 @@ function getIcon(it){ if(it._ic) return it._ic; const c=document.createElement('
 function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=32; c.getContext('2d').drawImage(getIcon(it),0,0); return c; }
 
 /* ---------- serialise for save/continue ---------- */
-const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set,v34:1},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v34: every item saved from now on carries v34, so the one-time rebudget skips it */ /* v23: rc = times offered at the altar, ins = insured */
-const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; if(!o.v34&&typeof rebudget==='function'&&rebudget(it)) fin(it); } return it; };
+const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set,v34:1,v44:1},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v34: every item saved from now on carries v34, so the one-time rebudget skips it */ /* v23: rc = times offered at the altar, ins = insured */
+const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; if(!o.v34&&typeof rebudget==='function'&&rebudget(it)) fin(it); if(!o.v44&&typeof rebudget44==='function'&&rebudget44(it)) fin(it); } return it; };
 
 /* ---------- grids (v21): the satchel and the stash, items take up room by size ----------
    Each grid is 16 × 10 cells per tab. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon
