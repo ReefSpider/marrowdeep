@@ -281,6 +281,284 @@
         "bedchamber",
         "coarse-pixel"
       ]
+    },
+    {
+      "id": "ref-children",
+      "file": "ref-children.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "children",
+        "tomas",
+        "wren",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "ref-ilse"
+      ]
+    },
+    {
+      "id": "ref-generals",
+      "file": "ref-generals.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "rook",
+        "piet",
+        "gideon",
+        "brann",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "ref-act1-foes",
+      "file": "ref-act1-foes.png",
+      "type": "character-reference",
+      "status": "generated",
+      "tags": [
+        "story-v2",
+        "reference",
+        "fen-sisters",
+        "odo",
+        "merrow",
+        "preacher",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "pr-14-doorway",
+      "file": "pr-14-doorway.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "4:5",
+      "caption": "\"Brother… what have you done?\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "frame",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "pr-15-trial",
+      "file": "pr-15-trial.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "The generals spoke, one by one.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "trial",
+        "halden",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "ref-generals"
+      ]
+    },
+    {
+      "id": "pr-16-rook",
+      "file": "pr-16-rook.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "Rook said nothing.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "rook",
+        "silence",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals"
+      ]
+    },
+    {
+      "id": "pr-17-mercy",
+      "file": "pr-17-mercy.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"Not death. Exile. He is still my brother.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "mercy",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "pr-18-hostage",
+      "file": "pr-18-hostage.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"Your family will stay. Under the crown's protection.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "ilse",
+        "children",
+        "hostages",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-ilse",
+        "ref-children"
+      ]
+    },
+    {
+      "id": "pr-19-window",
+      "file": "pr-19-window.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "One window still lit.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "ilse",
+        "window",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-ilse",
+        "old-op-2-window"
+      ]
+    },
+    {
+      "id": "pr-20-candle",
+      "file": "pr-20-candle.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"Bring it back lit.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "candle",
+        "farewell",
+        "coarse-pixel"
+      ],
+      "references": [
+        "old-op-3-candle",
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "pr-21-horse",
+      "file": "pr-21-horse.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "\"So you're not alone.\"",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "tomas",
+        "toy-horse",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-children"
+      ]
+    },
+    {
+      "id": "pr-22-hood",
+      "file": "pr-22-hood.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "They took your colours.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "halden",
+        "exile",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "pr-23-ride",
+      "file": "pr-23-ride.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "You rode out with a candle and a wooden horse.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "halden",
+        "exile",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "ref-children"
+      ]
+    },
+    {
+      "id": "pr-24-crowned",
+      "file": "pr-24-crowned.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "They crowned him in a week.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "coronation",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "pr-25-eye",
+      "file": "pr-25-eye.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "That night the sky opened an eye.",
+      "tags": [
+        "story-v2",
+        "prologue",
+        "cassian",
+        "wound",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian",
+        "ref-hungry-one"
+      ]
     }
   ]
 }
