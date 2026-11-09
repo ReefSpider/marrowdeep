@@ -813,6 +813,267 @@
       "references": [
         "pr-19-window"
       ]
+    },
+    {
+      "id": "a2-01-sealed",
+      "file": "a2-01-sealed.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Hollowmere had shut its gates.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "hollowmere",
+        "gates",
+        "wound",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-hungry-one"
+      ]
+    },
+    {
+      "id": "a2-02-curfew",
+      "file": "a2-02-curfew.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "One bell for curfew. One for the tithe.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "curfew",
+        "bellman",
+        "coarse-pixel"
+      ],
+      "references": [
+        "a1-05-tithe"
+      ]
+    },
+    {
+      "id": "b06-2-brann",
+      "file": "b06-2-brann.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"He'd have my daughters if I opened that gate.\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "brann",
+        "siege",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals"
+      ]
+    },
+    {
+      "id": "b07-3-names",
+      "file": "b07-3-names.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Your household. Two names already paid.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "ledger",
+        "household",
+        "coarse-pixel"
+      ],
+      "references": [
+        "old-a3-4-ilse"
+      ]
+    },
+    {
+      "id": "b09-2-rook",
+      "file": "b09-2-rook.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"I saw him leave the King's chamber.\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "rook",
+        "confession",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals",
+        "pr-16-rook"
+      ]
+    },
+    {
+      "id": "b09-3-hostages",
+      "file": "b09-3-hostages.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"He has my children too.\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "rook",
+        "cassian",
+        "hostages",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "b09-4-under",
+      "file": "b09-4-under.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "\"He swore us all to something under the palace.\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "rook",
+        "pact",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals",
+        "pr-16-rook"
+      ]
+    },
+    {
+      "id": "a2-03-gate",
+      "file": "a2-03-gate.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "The palace gate. Something hung above it.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "palace",
+        "bridge",
+        "coarse-pixel"
+      ],
+      "references": [
+        "a2-01-sealed"
+      ]
+    },
+    {
+      "id": "a2-04-horse",
+      "file": "a2-04-horse.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "Tomas's horse.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "toy-horse",
+        "candle",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-children",
+        "pr-21-horse"
+      ]
+    },
+    {
+      "id": "a2-05-eyes",
+      "file": "a2-05-eyes.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "",
+      "tags": [
+        "story-v2",
+        "act2",
+        "halden",
+        "rage",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "old-op-4-eyes"
+      ]
+    },
+    {
+      "id": "a2-06-charge",
+      "file": "a2-06-charge.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "",
+      "tags": [
+        "story-v2",
+        "act2",
+        "halden",
+        "bridge",
+        "charge",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "a2-03-gate"
+      ]
+    },
+    {
+      "id": "b10-2-torch",
+      "file": "b10-2-torch.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"The King sends his regards.\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "gideon",
+        "torch",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals"
+      ]
+    },
+    {
+      "id": "b10-3-balcony",
+      "file": "b10-3-balcony.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "4:5",
+      "caption": "He watched from the balcony.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "cassian",
+        "balcony",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-cassian"
+      ]
+    },
+    {
+      "id": "b10-4-blast",
+      "file": "b10-4-blast.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "",
+      "tags": [
+        "story-v2",
+        "act2",
+        "bridge",
+        "fall",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "a2-03-gate"
+      ]
     }
   ]
 }
