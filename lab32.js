@@ -12,7 +12,8 @@
      abyss  · abyssal weapon (the rest unique / legendary)
    The player is two levels above the monster level, with no Marrow, Ways, vows or borrowed power. */
 const BAL={};
-const BAL_SLOTS=['weapon','armor','helm','ring','amulet'];
+const BAL_SLOTS=['weapon','armor','helm','gloves','boots','ring','ring2','amulet']; /* v39: gloves, boots, second ring */
+const balW=(w,s)=>w[s]!=null?w[s]:s==='ring2'?w.ring:(s==='gloves'||s==='boots')?w.helm:1;
 const BAL_FOES=['ghoul','husk','brute'];
 function balFixed(list,r,slot,il){ const ds=list.filter(d=>d.slot===slot&&(slot!=='weapon'||baseByName(d.base).max>0)); if(!ds.length) return null; const it=mkFixed(pick(ds),r); it.ilvl=il; empower(it,il); return fin(it); }
 function balItem(r,slot,il){ il=Math.max(1,il);
@@ -28,8 +29,8 @@ BAL.row=function(tier,m,K,plvlOff){ K=K||40; const pl=Math.max(1,m+(plvlOff==nul
     const foes={}; for(const t of BAL_FOES){ let hp=0,dmg=0; for(let i=0;i<6;i++){ const e=mkEnemy({x:0,y:0,t}); hp+=e.maxhp; dmg+=e.dmg; } foes[t]={hp:Math.round(hp/6),hit:Math.round(dmg/6)}; }
     const row={tier,m,pl,il,foes,prof:{}};
     for(const [name,pr] of Object.entries(BAL_PROF)){ const dps=[],eff=[],main=[],dv=[],lf=[];
-      for(let k=0;k<K;k++){ P.lvl=pl; P.equip={weapon:null,off:null,armor:null,helm:null,ring:null,amulet:null}; P.way=null;
-        for(const s of BAL_SLOTS) P.equip[s]=balItem(pr.w[s],s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); dv.push(P.stats.def); lf.push(P.stats.life); }
+      for(let k=0;k<K;k++){ P.lvl=pl; P.equip={weapon:null,off:null,armor:null,helm:null,gloves:null,boots:null,ring:null,ring2:null,amulet:null}; P.way=null;
+        for(const s of BAL_SLOTS) P.equip[s]=balItem(balW(pr.w,s),s==='ring2'?'ring':s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); dv.push(P.stats.def); lf.push(P.stats.life); }
       const g=foes.ghoul, b=foes.brute; const P50=balPct(dps,.5), E50=balPct(eff,.5);
       row.prof[name]={dps:[balPct(dps,.1),P50,balPct(dps,.9)].map(Math.round),eff:[balPct(eff,.1),E50,balPct(eff,.9)].map(Math.round),
         ttkGhoul:+(g.hp/P50).toFixed(2),ttkBrute:+(b.hp/P50).toFixed(2),ttkGhoulP90:+(g.hp/balPct(dps,.9)).toFixed(2),def:Math.round(balPct(dv,.5)),life:Math.round(balPct(lf,.5)),htdGhoul:+(E50/Math.max(1,g.hit)).toFixed(1),htdBrute:+(E50/Math.max(1,b.hit)).toFixed(1)}; }
@@ -60,3 +61,25 @@ BAL.bosses=function(opt){ opt=opt||{}; const tiers=opt.tiers||[0,1,2,4,6,8,10], 
       const row=BAL.row(t,m,K); const sec={}; for(const p of ['rare','leg','uniq','abyss']) sec[p]=Math.round(hp/row.prof[p].dps[1]);
       out.push({tier:t,boss:d.boss,m,hp:Math.round(hp),hit:Math.round(dmg),sec,htd:+(row.prof.rare.eff[1]/Math.max(1,dmg)).toFixed(1)}); } } }
   finally{ P=svP; ngp=svN; lvlIdx=svI; if(P) calcStats(); } return out; };
+/* v40–42: role kits. Each is a rare kit a player committed to a role would wear: the role's armour family, the role's
+   weapon, and of four candidate rares per slot the one with the most of the role's attribute. Compared with a plain rare
+   kit (random families, random weapon). */
+const BAL_ROLES={
+  balanced:{wpn:{cls:'sword',h:2}},
+  tank:{fam:'H',attr:'fort',wpn:{cls:'mace',h:1}},
+  killerM:{fam:'M',attr:'mig',wpn:{cls:'hammer',h:2}},
+  killerF:{fam:'L',attr:'fin',wpn:{cls:'katana',h:1}},
+  marksman:{fam:'L',attr:'fin',wpn:{cls:'xbow',h:0},way:'xbows'}};
+function balRoleItem(role,slot,il){ const R_=BAL_ROLES[role]; const w=[0,0,1,0,0,0]; if(!R_.attr&&!(R_.wpn&&slot==='weapon')) return balItem(2,slot==='ring2'?'ring':slot,il);
+  const want=it=>{ if(slot==='weapon'||slot==='off') return it.base.cls===R_.wpn.cls&&it.base.h===R_.wpn.h&&it.base.max>0; if(GEAR_SLOTS.includes(slot)) return it.base.fam===R_.fam; return true; };
+  const cands=[]; for(let n=0;n<400&&cands.length<4;n++){ const it=genItem(il,w,0,slot==='ring2'?'ring':slot==='off'?'weapon':slot); if(want(it)) cands.push(it); }
+  if(!cands.length) return balItem(2,slot==='ring2'?'ring':slot==='off'?'weapon':slot,il);
+  if(!R_.attr) return cands[0]; const av=it=>(it.aff.find(a=>a.k===R_.attr)||{v:0}).v+((slot==='weapon'||slot==='off')?(it.aff.find(a=>a.k==='ed')||{v:0}).v/4:0); /* weapons: damage first */ return cands.sort((a,b)=>av(b)-av(a))[0]; }
+BAL.roles=function(opt){ opt=opt||{}; const tiers=opt.tiers||[0,4,10], K=opt.K||20, out=[]; const svP=P, svN=ngp;
+  try{ for(const t of tiers){ ngp=t; const ms=t===0?[11,21]:t===4?[50]:[96]; for(const m of ms){ const sv=mlvl; mlvl=()=>m; try{ const row={tier:t,m,roles:{}}; const il=m+1, pl=m+2;
+      for(const role in BAL_ROLES){ const dps=[],eff=[],at={}; for(let k=0;k<K;k++){ P=newPlayer(); P.skills=new Set(['off']); P.lvl=pl; P.way=BAL_ROLES[role].way||null;
+          for(const s of ['weapon','armor','helm','gloves','boots','ring','ring2','amulet']) P.equip[s]=balRoleItem(role,s,il);
+          if(role==='marksman'||role==='killerF') P.equip.off=balRoleItem(role,'off',il); calcStats(); dps.push(sheetDps().total); eff.push(effLife(P.stats)); for(const a of ['mig','fin','fort']) at[a]=(at[a]||0)+P.stats[a]/K; }
+        row.roles[role]={dps:Math.round(balPct(dps,.5)),eff:Math.round(balPct(eff,.5)),attr:Object.fromEntries(Object.entries(at).map(([k,v])=>[k,Math.round(v)]))}; }
+      out.push(row); } finally{ mlvl=sv; } } } }
+  finally{ P=svP; ngp=svN; if(P) calcStats(); } return out; };

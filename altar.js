@@ -105,7 +105,7 @@ const ALT_ROOM={wake:0};
 /* ---------- the Hungry Altar ---------- */
 const ALTAR={prim:null,trib:[],gold:0,busy:false};
 const altarScr=document.createElement('div'); altarScr.className='screen'; altarScr.id='altarScr'; altarScr.hidden=true; stage.appendChild(altarScr);
-function ownedList(){ const out=[]; for(const k of ['weapon','off','helm','armor','amulet','ring']) if(P.equip[k]) out.push({it:P.equip[k],where:'equip',k}); P.bag.forEach((it,i)=>out.push({it,where:'bag',i})); return out; }
+function ownedList(){ const out=[]; for(const k of ['weapon','off','helm','armor','gloves','boots','amulet','ring','ring2']) if(P.equip[k]) out.push({it:P.equip[k],where:'equip',k}); P.bag.forEach((it,i)=>out.push({it,where:'bag',i})); return out; }
 function locOf(it){ for(const k in P.equip) if(P.equip[k]===it) return {where:'equip',k}; const i=P.bag.indexOf(it); return i>=0?{where:'bag',i}:null; }
 function takeOut(it){ const l=locOf(it); if(!l) return; if(l.where==='equip') P.equip[l.k]=null; else P.bag.splice(l.i,1); }
 function putIn(old,nit){ const l=locOf(old); if(!l){ if(!bagAdd(nit)) dropItem(nit,P.x,P.y-10,true); return; } if(l.where==='equip') P.equip[l.k]=nit; else { nit.bx=old.bx; nit.by=old.by; P.bag[l.i]=nit; bagEnsure(); } }

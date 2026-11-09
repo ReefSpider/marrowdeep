@@ -85,7 +85,7 @@ function bagTargetAt(e){ const D=BAGDRAG; const under=document.elementsFromPoint
   const eq=under.find(x=>x.dataset&&x.dataset.slot&&x.closest&&x.closest('#equip'));
   if(eq&&D.G===GBAG){ const s=eq.dataset.slot; return {kind:'equip',el:eq,slot:s,how:fitsSlot(D.it,s)?'ok':'bad'}; }
   return null; }
-function fitsSlot(it,s){ if(s==='weapon') return it.slot==='weapon'&&it.base.h!==0; if(s==='off') return it.slot==='weapon'&&has('off')&&(it.base.h!==2||P.way==='giant')||(it.slot==='weapon'&&it.base.cls==='xbow'&&P.way==='xbows'); return it.slot===s; }
+function fitsSlot(it,s){ if(s==='weapon') return it.slot==='weapon'&&it.base.h!==0; if(s==='off') return it.slot==='weapon'&&has('off')&&(it.base.h!==2||P.way==='giant')||(it.slot==='weapon'&&it.base.cls==='xbow'&&P.way==='xbows'); return it.slot===s||(s==='ring2'&&it.slot==='ring'); }
 /* lists: take an item out of whichever grid holds it; put it in a grid at a cell */
 function detach(it){ for(const G of [GBAG,GSTASH]){ const l=G.list(), i=l.indexOf(it); if(i>=0){ l.splice(i,1); return G; } } return null; }
 function attach(G,it,t,x,y){ it.bt=t; it.bx=x; it.by=y; if(!G.list().includes(it)) G.list().push(it); }
@@ -94,7 +94,7 @@ function bagDragUp(e){ const D=BAGDRAG; if(!D) return; unbindDrag(); BAGDRAG=nul
   const t=D.target; if(!t||t.how==='bad'){ if(t){ AU.tone&&AU.tone('square',200,150,.08,.06,.15); if(t.kind==='tab'&&t.el.classList.contains('locked')) say(t.G===GBAG?'That pocket opens when this character finishes the campaign.':'That stash tab opens when any character finishes the campaign.'); } return; }
   const done=()=>{ AU.tone&&AU.tone('triangle',420,300,.08,.12,.1); hideTip(); if(typeof saveStash==='function'&&(D.G===GSTASH||t.G===GSTASH)) saveStash(); if(!D.G) calcStats();
     if(opt.after) opt.after(); else if(mode==='inv'&&typeof renderInv==='function') renderInv(); if(!D.G&&typeof saveGame==='function') saveGame(); };
-  if(t.kind==='equip'){ const i=P.bag.indexOf(D.it); if(i>=0) equipFromBag(i,t.slot==='off'); return; }
+  if(t.kind==='equip'){ const i=P.bag.indexOf(D.it); if(i>=0){ EQ_TARGET=t.slot; try{ equipFromBag(i,t.slot==='off'); } finally{ EQ_TARGET=null; } } return; }
   /* where it came from, so a swapped item can take its place */
   const src=D.G?{G:D.G,t:D.it.bt|0,x:D.it.bx,y:D.it.by}:{slot:D.slot};
   const unSource=()=>{ if(D.G) detach(D.it); else P.equip[D.slot]=null; };
@@ -112,7 +112,7 @@ function bagDragUp(e){ const D=BAGDRAG; if(!D) return; unbindDrag(); BAGDRAG=nul
   detach(D.it); attach(src.G,D.it,...aOld); attach(t.G,B,...bPos); say('No room to swap those two.'); }
 
 /* ---------- Sort: the tab you're looking at, by kind, best first, packed in columns ---------- */
-function bagGroup(it){ if(it.slot==='weapon'){ const c=it.base.cls; if(c==='shield'||c==='xbow') return 2; return it.base.h===2?0:1; } return {armor:3,helm:4,amulet:5,ring:6}[it.slot]??7; }
+function bagGroup(it){ if(it.slot==='weapon'){ const c=it.base.cls; if(c==='shield'||c==='xbow') return 2; return it.base.h===2?0:1; } return {armor:3,helm:4,gloves:5,boots:6,amulet:7,ring:8}[it.slot]??7; }
 function sortGrid(G,t){ const mine=G.list().filter(it=>(it.bt|0)===t), rest=G.list().filter(it=>(it.bt|0)!==t);
   const items=mine.slice().sort((a,b)=>bagGroup(a)-bagGroup(b)||b.rarity-a.rarity||(b.ilvl|0)-(a.ilvl|0)||a.name.localeCompare(b.name));
   const old=mine.map(it=>[it,it.bx,it.by]); G.set(rest); let ok=true;

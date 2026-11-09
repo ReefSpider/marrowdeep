@@ -36,7 +36,7 @@ function cmpBlock(head,rows,note){ const body=rows.length?rows.map(([up,n,v])=>`
 compareHTML=function(it){ if(!P||!it) return ''; for(const k in P.equip) if(P.equip[k]===it) return '';
   const slot=targetSlot(it); if(slot==='off'&&!has('off')) return `<div class="cmp"><div class="ch">Off hand only · learn Second Hand to use it</div></div>`;
   const nm=c=>`<span style="color:${RCOL[c.rarity]}">${c.name}</span>`;
-  const m=compareFor(it,slot); let h=cmpBlock(m.cur?`${slot==='off'?'In your off hand · c':'C'}ompared with ${nm(m.cur)}`:`Your ${slot==='off'?'off hand':slot} slot is empty`,m.rows);
+  const m=compareFor(it,slot); let h=cmpBlock(m.cur?`${slot==='off'?'In your off hand · c':'C'}ompared with ${nm(m.cur)}`:`Your ${typeof SLOT_WORD!=='undefined'&&SLOT_WORD[slot]||slot} slot is empty`,m.rows);
   if(slot==='weapon'&&offCandidate(it)){ const o=compareFor(it,'off',OFF_ROWS); const note='<div class="cr eq">Other stats count in either hand</div>';
     h+=cmpBlock(o.cur?`In your off hand · compared with ${nm(o.cur)}`:'In your off hand · it is empty',o.rows,note); }
   return h; };

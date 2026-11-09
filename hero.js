@@ -1,7 +1,7 @@
 'use strict';
 /* ===== hero: drawn at 2x detail so armour, helms and weapons read clearly ===== */
 const ARM_COL=[['#3e3024','#6b5640','#8a7458'],['#34373d','#5d626b','#8a909a'],['#2a201c','#45372d','#6a564a'],['#454b55','#7a828e','#b8bec8'],['#141217','#28242c','#5a4e58']];
-function tierIn(list,b){ let i=list.indexOf(b); if(i<0) i=list.findIndex(x=>x.name===b.name); if(i<0) i=clamp(Math.floor((b.lvl||0)/5),0,list.length-1); return clamp(i,0,4); }
+function tierIn(list,b){ if(b&&b.look!=null) return b.look; let i=list.indexOf(b); if(i<0) i=list.findIndex(x=>x.name===b.name); if(i<0) i=clamp(Math.floor((b.lvl||0)/5),0,list.length-1); return clamp(i,0,4); }
 function tint(cols,r){ if(r===5) return ['#0e0606','#221010','#ff4a3d']; if(r===4) return [cols[0],cols[1],'#e2c88a']; if(r===3) return [cols[0],mixc(cols[1],'#3a6a44',.35),'#9ad0a2']; return cols; }
 function metalOf(r){ return r===5?['#120808','#2a1416','#ff6a50']:r===4?['#3e3424','#6a6250','#e2c88a']:r===3?['#2e3e32','#5a6a5e','#a9dcae']:['#3e4249','#5f646d','#c9c2b2']; }
 function drawWeapon(c,it){ if(proofWeapon(it)){ drawCraftWeapon(c,it); return; } const b=it.base, cl=b.cls, r=it.rarity, L=b.len, hw=b.wid/2, M=metalOf(r); const wood='#4a3020', R_=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
@@ -41,8 +41,10 @@ function drawHero(c){
   const flow=p.cloak; const flap=Math.sin(time*8+ph)*(st==='run'?1.5:.6);
   const ar=E.armor; let at=ar?tierIn(BASES.armor,ar.base):-1; let AC=ar?tint(ARM_COL[at],ar.rarity):null;
   const hm=E.helm; let ht=hm?tierIn(BASES.helm,hm.base):-1;
-  let HM=hm?metalOf(hm.rarity):null;
-  if(hound){ at=4; AC=['#050405','#121014','#4a1c1c']; ht=4; HM=['#050405','#141216','#5a1a1a']; }
+  let HM=hm?(hm.base.fam==='L'?['#241a14','#594632','#9a8460']:metalOf(hm.rarity)):null;
+  const fc=it=>it?(it.base.fam==='L'?['#2e2218','#5a4632','#8a7458']:metalOf(it.rarity)):null;
+  let GC=fc(E.gloves), BC=fc(E.boots);
+  if(hound){ at=4; AC=['#050405','#121014','#4a1c1c']; ht=4; HM=['#050405','#141216','#5a1a1a']; GC=BC=null; }
   const armored=!!(ar||hound);
   // cloak with tattered hem and folds
   const k0=hound?'#070607':armored?'#1a1418':'#2a2224', k1=hound?'#0e0c0e':armored?'#2e2228':'#3a2e2e';
@@ -61,7 +63,8 @@ function drawHero(c){
     R_(x,-10,3,10-lift,c0); R_(x+(front?2:0),-10,1,10-lift,c1);
     if(at>=3){ R_(x-.3,-6.5-lift*.5,3.6,1.5,AC[1]); R_(x,-6.5-lift*.5,2.4,.5,AC[2]); R_(x,-10,3,.5,AC[2]); }
     else if(at>=0&&at<3){ R_(x,-9,3,.5,'rgba(0,0,0,.35)'); }
-    R_(x,-3.5-lift,3.6,1.6,at>=3?AC[0]:'#1a1214'); R_(x,-2-lift,4,2,at>=3?AC[1]:'#0e0a0b'); R_(x,-4-lift,3,.5,at>=3?AC[2]:'#3a2a20'); };
+    if(BC){ R_(x,-4.5-lift,3.6,2.6,BC[0]); R_(x,-2-lift,4.2,2,BC[1]); R_(x,-4.5-lift,3.6,.5,BC[2]); R_(x+3.4,-1.6-lift,.8,.6,BC[2]); }
+    else { R_(x,-3.5-lift,3.6,1.6,at>=3?AC[0]:'#1a1214'); R_(x,-2-lift,4,2,at>=3?AC[1]:'#0e0a0b'); R_(x,-4-lift,3,.5,at>=3?AC[2]:'#3a2a20'); } };
   leg(Math.round(-3+b),Math.round(lb),false);
   // torso
   if(!armored){ R_(-4,-19+br,8,10,'#5e5446'); R_(-4,-19+br,2.5,10,'#463e34'); R_(1.5,-19+br,1,9,'#6e6452'); R_(1,-16+br,2,3,'#b48a6a'); R_(1.5,-15.5+br,1,.5,'#8a6550');
@@ -85,7 +88,9 @@ function drawHero(c){
   if(!fullHelm){ R_(1.5,-24.5+br,1.5,1,'#e8dcc8'); R_(2.4,-24.5+br,.6,1,'#1a1214'); R_(1,-25.5+br,2.5,.5,'#2a1a14'); R_(0,-25.5+br,.5,3,'#d6a88a'); R_(.5,-23+br,.5,.5,'#d6a88a'); R_(1.5,-22.5+br,1.5,.5,'#6a4038'); R_(-1,-24.5+br,1,1.5,'#9a7258'); }
   if(ht<=0){ c.fillStyle='#151012'; R_(-3,-28.5+br,6,3,'#151012'); c.beginPath(); c.moveTo(-3,-28+br); c.lineTo(-6.5,-27+br); c.lineTo(-3,-26+br); c.fill(); c.beginPath(); c.moveTo(-3,-26.5+br); c.lineTo(-5.5,-23.5+br); c.lineTo(-2,-25+br); c.fill(); c.beginPath(); c.moveTo(-1.5,-28.5+br); c.lineTo(-.5,-30.8+br); c.lineTo(1.5,-28.5+br); c.fill(); R_(1,-26.6+br,2.5,1,'#151012'); R_(-2,-28+br,.5,2,'#3a3034'); R_(0,-28.5+br,.5,1.5,'#3a3034'); }
   if(HM){ const [h0,h1,h2]=HM;
-    if(ht===0){ const KM=metalOf(hm.rarity); artPoly(c,KM[0],[[-4,-28+br],[-3,-31+br],[-1,-32+br],[2,-32+br],[4,-30+br],[4,-28+br]]); R_(-2,-31+br,4,3,KM[1]); R_(-1,-31+br,1,2,KM[2]); artPoly(c,KM[1],[[-6,-28+br],[-3,-29+br],[4,-29+br],[7,-27+br],[4,-26.5+br],[-6,-27+br]]); R_(-6,-28+br,5,.5,KM[2]); R_(0,-27+br,6,.5,KM[2]); R_(-2,-27+br,.5,5,'#56402b'); }
+    if(ht===-1){ /* v39: hoods and cowls */ R_(-3,-27.6+br,6.4,2.2,h1); R_(-3.6,-26.5+br,2,5.5,h1); R_(-3.6,-26.5+br,.6,5.5,h0); R_(-3,-27.6+br,6.4,.5,h2); c.fillStyle=h1; c.beginPath(); c.moveTo(-3.5,-27+br); c.lineTo(-7+flow*.5,-23+br+flap*.4); c.lineTo(-3.5,-23+br); c.fill(); R_(2.6,-26+br,.6,3,h0); }
+    else if(hm.base.name==='Leather Cap'){ R_(-3,-28+br,7,3,h1); R_(-3,-28+br,1,5,h0); R_(-2,-28+br,5,1,h2); R_(0,-28+br,1,3,h0); }
+    else if(ht===0){ const KM=metalOf(hm.rarity); artPoly(c,KM[0],[[-4,-28+br],[-3,-31+br],[-1,-32+br],[2,-32+br],[4,-30+br],[4,-28+br]]); R_(-2,-31+br,4,3,KM[1]); R_(-1,-31+br,1,2,KM[2]); artPoly(c,KM[1],[[-6,-28+br],[-3,-29+br],[4,-29+br],[7,-27+br],[4,-26.5+br],[-6,-27+br]]); R_(-6,-28+br,5,.5,KM[2]); R_(0,-27+br,6,.5,KM[2]); R_(-2,-27+br,.5,5,'#56402b'); }
     else if(ht===1){ R_(-3,-29+br,7,8,h1); R_(-3,-29+br,2,8,h0); R_(-2,-29+br,5,.6,h2); R_(1,-26+br,3,1,'#060304'); R_(2,-26+br,1,3,'#060304'); for(let y=-28;y<-22;y+=1.5) R_(-1.5,y+br,.5,.5,h2); R_(4,-29+br,.5,8,h0); }
     else if(ht===2){ R_(-3,-29+br,6,8,h1); R_(-3,-29+br,2,8,h0); R_(-2,-30+br,3,1,h1); c.fillStyle=h1; c.beginPath(); c.moveTo(2,-27+br); c.lineTo(7.5,-24+br); c.lineTo(2,-21+br); c.fill(); R_(3,-25+br,3.5,.8,'#060304'); for(let i=0;i<3;i++) R_(3+i*1.2,-23+br,.5,.5,'#060304'); R_(-1,-30+br,2,.6,h2); R_(2,-27+br,4,.4,h2); }
     else if(ht===3){ R_(-3,-30+br,7,10,h1); R_(-3,-30+br,2,10,h0); R_(-3,-30+br,7,.6,h2); R_(0,-26+br,4,1,'#060304'); R_(2,-29+br,1,9,h0); R_(2.2,-29+br,.4,9,h2); R_(1,-24+br,.5,.5,'#060304'); R_(3,-24+br,.5,.5,'#060304'); R_(1,-22.5+br,.5,.5,'#060304'); R_(3,-22.5+br,.5,.5,'#060304'); }
@@ -98,7 +103,8 @@ function drawHero(c){
   if(armored&&at>=3){ R_(0,-1.6,6,3.2,AC[1]); R_(0,-1.6,6,.6,AC[2]); R_(3,-1.6,.5,3.2,AC[0]); }
   else if(armored){ R_(0,-1.5,6,3,AC[0]); R_(0,-1.5,6,.5,AC[1]); }
   else { R_(0,-1.5,6,3,'#b48a6a'); R_(1,-1.5,.5,3,'#d8ccb4'); R_(2.5,-1.5,.5,3,'#d8ccb4'); R_(4,-1.5,.5,3,'#d8ccb4'); R_(0,.8,6,.7,'#9a7258'); }
-  if(!main){ R_(5,-2,3,4,armored&&at>=3?AC[0]:'#9a7258'); R_(7,-2,1,4,'#6a4a38'); if(E.ring) R_(6,-2,1,1,RCOL[E.ring.rarity]); }
+  if(GC){ R_(3.5,-1.9,3,3.8,GC[1]); R_(3.5,-1.9,3,.6,GC[2]); R_(3.5,-1.9,.6,3.8,GC[0]); }
+  if(!main){ R_(5,-2,3,4,GC?GC[1]:armored&&at>=3?AC[0]:'#9a7258'); R_(7,-2,1,4,'#6a4a38'); if(E.ring) R_(6,-2,1,1,RCOL[E.ring.rarity]); }
   else drawWeapon(c,main);
   c.restore();
   // pauldron

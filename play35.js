@@ -60,7 +60,7 @@ const pc=f=>Math.round((f||0)*100)+'%';
 (function(){ const o=ptSummary; ptSummary=function(){ const s=o(), d=ptLoad(), vis=d.ev.filter(e=>e.k==='visit');
   s.exportedOn=GAME_VERSION; s.builds={}; for(const v of vis){ const k=v.b||'before v35'; s.builds[k]=(s.builds[k]||0)+1; }
   const byAt=new Map(vis.filter(v=>v.in).map(v=>[v.at,v]));
-  if(s.bal){ const vs=vis.filter(v=>v.in); s.bal.forEach((b,i)=>{ const v=vs[i]; if(!v) return; Object.assign(b,{b:v.b||null,coop:v.coop||1,minL:v.minL,close:v.close,downs:v.downs,wpn:v.wpn||null,src:v.src||null,stun:v.nearT?+(v.stunT/v.nearT).toFixed(2):null,nearT:v.nearT,wu:v.wu,blows:v.blows,hitBig:v.hitBig||0}); }); }
+  if(s.bal){ const vs=vis.filter(v=>v.in); s.bal.forEach((b,i)=>{ const v=vs[i]; if(!v) return; Object.assign(b,{role:v.role||null,attrs:v.attrs||null,b:v.b||null,coop:v.coop||1,minL:v.minL,close:v.close,downs:v.downs,wpn:v.wpn||null,src:v.src||null,stun:v.nearT?+(v.stunT/v.nearT).toFixed(2):null,nearT:v.nearT,wu:v.wu,blows:v.blows,hitBig:v.hitBig||0}); }); }
   const dv=vis.filter(v=>v.minL!=null);
   s.danger=dv.length?{visits:dv.length,lowest:Math.min(...dv.map(v=>v.minL)),where:(()=>{ const v=dv.reduce((a,x)=>x.minL<a.minL?x:a); return v.lvl+'@'+v.tier; })(),close:dv.reduce((a,v)=>a+v.close,0),downs:dv.reduce((a,v)=>a+v.downs,0),
     coop:Math.max(...dv.map(v=>v.coop||1)),stun:(()=>{ const n=dv.reduce((a,v)=>a+v.nearT,0); return n?+(dv.reduce((a,v)=>a+v.stunT,0)/n).toFixed(2):null; })(),wu:dv.reduce((a,v)=>a+v.wu,0),blows:dv.reduce((a,v)=>a+v.blows,0)}:null;
@@ -80,7 +80,7 @@ const srcTxt=src=>{ if(!src) return ''; const t=Object.values(src).reduce((a,x)=
   else L_.push('  nothing recorded yet (needs a run on v35 or later)');
   const rows=(s.bal||[]).filter(b=>b.minL!=null).slice(-40);
   if(rows.length){ L_.push('','Per level visit (build · co-op · lowest life · below 30% · weapons · foes stunned · attacks started → landed · real hit · damage taken from):');
-    for(const b of rows) L_.push(`  ${ptName(b.lvl)} [${ptTier(b.tier)}] ${b.b||''}${b.coop>1?' · co-op '+b.coop:' · solo'} · low ${pc(b.minL)} · <30% ${b.close}×${b.downs?' · downed '+b.downs+'×':''} · ${wTxt(b.wpn)} · stunned ${b.stun==null?'–':pc(b.stun)} · ${b.wu}→${b.blows} · hit ${b.foeHit||'–'} (big ${b.hitBig||'–'}) · ${srcTxt(b.src)||'no damage'}`); }
+    for(const b of rows) L_.push(`  ${ptName(b.lvl)} [${ptTier(b.tier)}] ${b.b||''}${b.coop>1?' · co-op '+b.coop:' · solo'}${b.role?` · ${b.role} (力${b.attrs.mig} 技${b.attrs.fin} 耐${b.attrs.fort})`:''} · low ${pc(b.minL)} · <30% ${b.close}×${b.downs?' · downed '+b.downs+'×':''} · ${wTxt(b.wpn)} · stunned ${b.stun==null?'–':pc(b.stun)} · ${b.wu}→${b.blows} · hit ${b.foeHit||'–'} (big ${b.hitBig||'–'}) · ${srcTxt(b.src)||'no damage'}`); }
   const bf=(s.bossFights||[]).filter(x=>x.minL!=null);
   if(bf.length){ L_.push('','Boss fights (build · co-op · seconds · your level · boss life · life it lost per second, whole team in co-op · lowest life · hits taken · damage taken · weapons):');
     for(const x of bf) L_.push(`  ${ptName(x.boss)} [${ptTier(x.tier)}] ${x.b||''}${x.coop>1?' · co-op '+x.coop:' · solo'} · ${x.secs}s · lv ${x.pl} · ${fmtN(x.hp)} · ${x.secs?fmtN(x.hp/x.secs):'–'}/s · low ${pc(x.minL)} · ${x.hits} hits · ${fmtN(x.taken)} · ${wTxt(x.wpn)}${x.deaths?' · died '+x.deaths+'×':''}`); }

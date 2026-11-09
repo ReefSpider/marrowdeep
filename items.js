@@ -45,7 +45,7 @@ function pickWeaponBase(ilvl){ const ok=BASES.weapon.filter(b=>b.lvl<=ilvl+1); c
 function uniqueFloor(it){ const b=it.base; if(!(b.max>0)) return 1; const il=it.ilvl||1; let best=null;
   for(const x of BASES.weapon) if(x.h===b.h&&x.cls===b.cls&&x.max>0&&x.lvl<=il+1&&(!best||x.min+x.max>best.min+best.max)) best=x;
   return (best?(best.min+best.max)/(b.min+b.max):1)*(it.rarity===5?BUD.aFloor:BUD.uFloor); }
-function defFloor(it){ const b=it.base; if(!b.def||!BASES[it.slot]) return 1; const il=it.ilvl||1; let best=null; for(const x of BASES[it.slot]) if(x.def&&x.lvl<=il+1&&(!best||x.def>best.def)) best=x; return best?best.def/b.def:1; }
+function defFloor(it){ const b=it.base; if(!b.def||!BASES[it.slot]) return 1; const il=it.ilvl||1; let best=null; for(const x of BASES[it.slot]) if(x.def&&x.lvl<=il+1&&(!b.fam||x.fam===b.fam)&&(!best||x.def>best.def)) best=x; /* v39: within the base's own family */ return best?best.def/b.def:1; }
 /* v16: damage types are what make a unique (and an abyssal) unique. Lesser items never roll them; every unique carries
    one, its own, at the strongest tier, rolled 20% higher (abyssal 50%) and growing with item level like any flat stat. */
 const SIG_EL={"Widow's Promise":'blood','Grave Mother':'bone','The Mourning Hatchet':'shadow',"Sister's Needle":'poison','Gravedigger':'cold','Last Wall of Hollowmere':'holy','Ironheart':'fire','Hollow Crown':'shadow',"The Debtor's Chain":'water',
@@ -75,7 +75,7 @@ function genItem(ilvl,w,mf,forceSlot){
   if(r===5){const it=mkFixed(pick(ABYSSAL),5);it.ilvl=ilvl;empower(it,ilvl);return fin(it);}
   if(r===4){const it=mkFixed(pick(UNIQUES),4);it.ilvl=ilvl;empower(it,ilvl);return fin(it);}
   const slot=forceSlot||wpick(SLOTW); if((slot==='ring'||slot==='amulet')&&r===0) r=1;
-  const bs=BASES[slot].filter(b=>b.lvl<=ilvl+1).sort((a,b)=>a.lvl-b.lvl); const base=slot==='weapon'?pickWeaponBase(ilvl):bs[Math.max(0,bs.length-1-ri(0,2))]||BASES[slot][0];
+  const bs=BASES[slot].filter(b=>b.lvl<=ilvl+1).sort((a,b)=>a.lvl-b.lvl); const base=slot==='weapon'?pickWeaponBase(ilvl):(typeof pickGearBase==='function'&&GEAR_SLOTS.includes(slot))?pickGearBase(slot,ilvl):bs[Math.max(0,bs.length-1-ri(0,2))]||BASES[slot][0];
   const it={id:++IID,slot,base,rarity:r,ilvl,dq:ri(90,110),aff:[]}; const used=new Set(ELEM_KEYS); /* damage types belong to uniques and abyssals only (v16) */ const as=affSlot(it);
   if(r===1){ const n=R()<.5?2:1; for(let i=0;i<n;i++){ const a=rollAff(i?SUF:PRE,as,ilvl,used); if(a) it.aff.push(a); }
     const p=it.aff.find(a=>a.pre), s=it.aff.find(a=>!a.pre); it.name=[p&&p.nm,base.name,s&&s.nm].filter(Boolean).join(' '); }
@@ -140,14 +140,15 @@ function getIcon(it){ if(it._ic) return it._ic; const c=document.createElement('
     else if(cl==='flail'){ diag(3,30,11,1,wood); for(let i=0;i<6;i++) px(14+i*2,18-i*2+(i%2),2,2,i%2?'#6a6470':'#3e3a44'); const hr=b.name==='Morning Star'?6:5; g.fillStyle=M[1]; g.beginPath(); g.arc(25,8,hr,0,Math.PI*2); g.fill(); for(let i=0;i<8;i++){ const a=i/8*Math.PI*2; px(25+Math.cos(a)*(hr+1)-1,8+Math.sin(a)*(hr+1)-1,2,2,M[2]); } px(23,6,2,2,M[2]); if(it.rarity) px(24,8,2,2,rc); }
     else if(cl==='hammer'){ const big=b.h===2; diag(4,30,big?18:15,1,wood); const hx=big?18:16, hy=big?2:5, hs=big?12:9; g.save(); g.translate(hx+hs/2,hy+hs/2); g.rotate(Math.PI/4); g.fillStyle=M[1]; g.fillRect(-hs/2,-hs/3,hs,hs*.66); g.fillStyle=M[2]; g.fillRect(-hs/2,-hs/3,hs,1); g.fillStyle=M[0]; g.fillRect(hs/2-2,-hs/3,2,hs*.66); g.restore(); if(!big){ g.fillStyle=M[0]; g.beginPath(); g.moveTo(13,8); g.lineTo(8,4); g.lineTo(12,11); g.fill(); } if(it.rarity) px(hx+hs/2-1,hy+hs/2-1,2,2,rc); }
     else if(cl==='shield'){ if(b.name==='Buckler'||b.name==='Pavise'&&false){} if(b.name==='Pavise'){ px(8,3,16,26,M[1]); px(8,3,16,1,M[2]); px(8,3,2,26,M[0]); px(15,6,2,20,'#5a1414'); px(11,13,10,2,'#5a1414'); } else { g.fillStyle=M[1]; g.beginPath(); g.arc(16,16,11,0,Math.PI*2); g.fill(); g.strokeStyle=M[2]; g.lineWidth=1; g.beginPath(); g.arc(16,16,11,0,Math.PI*2); g.stroke(); px(13,13,6,6,M[0]); px(15,15,2,2,M[2]); } if(it.rarity) px(15,9,2,2,rc); }
-  } else if(it.slot==='armor'){ const tier=Math.max(0,BASES.armor.indexOf(b)); const cl=tier===0?['#3e3024','#6b5640','#8f7a5c']:M;
+  } else if(it.slot==='armor'){ const tier=b.look!=null?b.look:Math.max(0,BASES.armor.indexOf(b)); const cl=tier===0?['#3e3024','#6b5640','#8f7a5c']:M;
     px(9,8,14,17,cl[1]); px(5,7,6,6,cl[1]); px(21,7,6,6,cl[1]); px(9,8,3,17,cl[0]); px(20,9,2,15,cl[2]); px(5,7,6,1,cl[2]); px(21,7,6,1,cl[2]);
     g.clearRect(13,7,6,3); px(10,25,12,3,cl[0]); px(9,20,14,2,'#3a2618'); px(15,20,2,2,'#a08a50');
     if(tier===1) for(let y=10;y<20;y+=2)for(let x=11;x<21;x+=2)px(x+(y%4?1:0),y,1,1,cl[0]);
     if(tier>=3) for(let y=12;y<20;y+=3)px(9,y,14,1,cl[0]);
     if(tier===4) px(9,8,14,17,'rgba(10,8,10,.45)');
     if(it.rarity) px(15,13,2,2,rc);
-  } else if(it.slot==='helm'){ const tier=Math.max(0,BASES.helm.indexOf(b)); g.fillStyle=M[1]; g.beginPath(); g.arc(16,16,9,Math.PI,0); g.fill(); px(7,16,18,9,M[1]); px(7,16,4,9,M[0]); px(10,9,6,2,M[2]);
+  } else if(it.slot==='helm'&&b.look===-1){ /* v39: hoods and cowls */ g.fillStyle=M[1]; g.beginPath(); g.moveTo(8,26); g.lineTo(9,10); g.quadraticCurveTo(16,2,23,10); g.lineTo(24,26); g.closePath(); g.fill(); g.fillStyle='#0d0a0a'; g.beginPath(); g.ellipse(16,18,5,6,0,0,Math.PI*2); g.fill(); px(9,10,3,16,M[0]); px(12,7,8,1,M[2]); if(it.rarity) px(15,9,2,2,rc);
+  } else if(it.slot==='helm'){ const tier=b.look!=null?Math.max(0,b.look):Math.max(0,BASES.helm.indexOf(b)); g.fillStyle=M[1]; g.beginPath(); g.arc(16,16,9,Math.PI,0); g.fill(); px(7,16,18,9,M[1]); px(7,16,4,9,M[0]); px(10,9,6,2,M[2]);
     px(9,18,14,2,'#0d0a0a'); if(tier>=2) for(let x=12;x<21;x+=3) px(x,21,1,3,'#0d0a0a');
     if(tier>=3) px(15,3,2,5,'#7a1517'); if(tier===4){px(6,10,2,6,M[2]);px(24,10,2,6,M[2]);}
     if(it.rarity) px(15,12,2,2,rc);
@@ -171,7 +172,7 @@ const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByNa
 const BAG_W=16, BAG_H=10, BAG_TABS_MAX=4, STASH_TABS_MAX=6;
 function itemSize(it){ if(!it) return [1,1]; const b=it.base||{};
   if(it.slot==='ring'||it.slot==='amulet') return [1,1];
-  if(it.slot==='helm') return [2,2];
+  if(it.slot==='helm'||it.slot==='gloves'||it.slot==='boots') return [2,2];
   if(it.slot==='armor') return [2,3];
   if(b.cls==='shield') return b.name==='Pavise'?[2,3]:[2,2];
   if(b.cls==='xbow') return [2,2];

@@ -69,7 +69,49 @@ function artWeapon(c,it,animated=true){
 drawWeapon=artWeapon;
 function artShield(c,it,raised){const M=metalOf(it.rarity),x=raised?5:3,y=raised?-27:-20,pav=it.base.name==='Pavise';pxPoly(c,'#493d31',pav?[[x,y],[x+5,y-1],[x+6,y+20],[x,y+20]]:[[x+1,y],[x+4,y+1],[x+6,y+7],[x+4,y+13],[x+1,y+14],[x-1,y+7]]);pxLine(c,M[2],x,y,x,y+(pav?20:14));pxRect(c,M[1],x+1,y+6,3,4);pxRect(c,artTrim(it),x+2,y+7,1,2);if(pav){pxRect(c,'#803a36',x+2,y+3,1,13);pxRect(c,'#803a36',x+1,y+7,3,1);}}
 drawShield=artShield;
+function artFamilyIcon(c,it){
+ const n=it.base.name,f=it.base.fam,shadow=/Shadow|Wraith|Black/.test(n),M=f==='L'?(shadow?['#252832','#464351','#80778c']:['#352b25','#71543b','#ae9063']):metalOf(it.rarity),trim=artTrim(it);
+ const p=(col,a)=>pxPoly(c,col,a),r=(col,x,y,w,h)=>pxRect(c,col,x,y,w,h),line=(col,x,y,X,Y)=>pxLine(c,col,x,y,X,Y);
+ const mail=(x0,y0,x1,y1)=>{for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2)r((x+y)%4?M[2]:M[0],x,y,1,1);};
+ const scales=(x0,y0,x1,y1)=>{for(let y=y0;y<y1;y+=3)for(let x=x0;x<x1;x+=4){p(M[0],[[x,y],[x+4,y],[x+3,y+3],[x+1,y+3]]);line(M[2],x+1,y,x+3,y);}};
+ if(it.slot==='gloves'){
+  const bracer=n.includes('Bracers'),plate=f==='H',scale=n.includes('Scale');
+  p(M[0],[[8,24],[9,16],[7,12],[8,10],[11,12],[11,6],[13,5],[15,6],[16,4],[18,4],[19,6],[21,5],[23,7],[24,13],[26,14],[25,20],[22,24],[23,29],[8,29]]);
+  p(M[1],[[10,24],[11,16],[9,12],[12,14],[13,7],[15,7],[16,6],[18,6],[19,8],[21,7],[22,9],[22,16],[24,15],[23,21],[20,24],[21,27],[10,27]]);
+  for(let x=14;x<=20;x+=3){line(M[0],x,9,x,17);r(M[2],x-1,8,1,3);}
+  line(M[0],12,18,16,21);line(M[2],23,16,22,20);
+  if(plate){for(let y=12;y<24;y+=4){line(M[0],12,y,21,y);line(M[2],13,y+1,20,y+1);}p(M[1],[[7,24],[23,24],[25,29],[6,29]]);line(M[2],8,25,22,25);if(n==='Plate Gauntlets'){r(trim,16,17,2,3);r(M[2],9,27,1,1);r(M[2],22,27,1,1);}}
+  else if(scale)scales(12,16,21,24);
+  else if(f==='M')mail(12,16,22,24);
+  else{r(M[0],10,23,12,2);r(trim,16,23,3,2);line(M[2],11,19,11,22);if(bracer){r(M[1],8,22,16,7);line(M[0],10,23,21,27);r(trim,17,24,3,2);}if(shadow){line('#92869f',13,18,17,21);line('#92869f',18,18,17,21);}}
+ }else if(it.slot==='boots'){
+  const plate=f==='H';p(M[0],[[10,3],[22,3],[21,19],[25,21],[29,23],[29,28],[8,28],[7,24],[10,19]]);
+  p(M[1],[[12,5],[20,5],[19,20],[24,23],[27,24],[27,26],[10,26],[10,23],[12,19]]);line(M[2],12,5,19,5);line(M[2],19,7,18,19);r(M[0],9,26,19,2);
+  if(plate){for(let y=8;y<20;y+=4){line(M[0],11,y,20,y);line(M[2],12,y+1,19,y+1);}for(let x=18;x<27;x+=3)line(M[0],x,22,x+1,25);line(M[2],21,22,26,24);if(n==='Plate Sabatons'){p(M[1],[[9,4],[12,2],[20,2],[23,5],[20,8],[11,8]]);line(M[2],12,3,20,3);r(trim,16,12,2,3);}}
+  else if(n.includes('Scale'))scales(12,8,20,20);
+  else if(f==='M')mail(12,8,19,21);
+  else{for(let y=9;y<19;y+=4){line(M[0],12,y,19,y+2);line(M[2],13,y+1,17,y+2);}if(n==='Running Boots'){r('#9f8c68',10,5,11,3);line('#c1aa7f',12,23,24,24);}if(shadow){r('#82768b',12,7,6,2);line('#82768b',11,24,23,24);}}
+ }else if(it.slot==='helm'&&f==='L'){
+  if(n==='Leather Cap'){p(M[0],[[6,14],[8,8],[12,5],[20,5],[25,10],[26,20],[22,23],[21,15],[9,15],[9,24],[6,22]]);p(M[1],[[8,13],[10,8],[14,7],[19,7],[23,11],[24,14]]);line(M[2],11,9,18,7);line(M[0],16,7,17,14);r(M[2],8,14,15,1);}
+  else{p(M[0],[[4,28],[7,21],[6,14],[10,6],[16,3],[23,7],[26,15],[24,24],[28,29],[20,28],[14,26],[8,29]]);p(M[1],[[8,24],[9,14],[12,8],[16,5],[21,9],[23,15],[21,24],[24,27],[17,24],[12,25]]);p('#171c23',[[11,15],[13,11],[18,10],[21,15],[20,23],[14,24],[11,21]]);line(M[2],11,13,15,8);line(M[2],9,23,11,17);if(n.includes('Ranger')){line('#70805d',21,9,25,22);r('#a99d6d',22,24,2,2);}if(n.includes('Wraith')){line('#9896a1',12,8,16,5);line('#9896a1',7,25,6,28);}if(shadow)r('#9b86a6',18,26,2,1);}
+ }else if(it.slot==='helm'){
+  const sallet=n.includes('Sallet'),pot=n==='Iron Pot';p(M[0],sallet?[[4,18],[7,10],[13,5],[21,6],[25,12],[27,24],[18,24],[8,21],[4,23]]:[[7,7],[13,4],[22,6],[25,12],[24,26],[9,27],[6,20]]);
+  p(M[1],[[9,11],[14,7],[20,8],[23,12],[23,22],[11,23],[9,20]]);line(M[2],11,9,17,7);
+  if(sallet){line(M[2],6,18,23,15);r('#172029',14,16,11,2);p(M[1],[[6,18],[10,21],[6,24],[3,24]]);if(n.includes('Visored')){p(M[1],[[16,19],[25,18],[27,22],[21,25],[16,23]]);for(let x=19;x<25;x+=2)r(M[0],x,22,1,1);}}
+  else{r('#172029',12,14,12,2);if(pot){r(M[0],15,16,3,9);line(M[2],8,8,22,7);}else{line(trim,17,8,17,25);for(let y=19;y<25;y+=2)for(let x=19;x<24;x+=2)r(M[0],x,y,1,1);}}
+ }else if(it.slot==='armor'){
+  p(M[0],[[10,5],[6,7],[2,12],[6,18],[9,16],[8,26],[12,29],[23,28],[24,17],[27,18],[30,12],[25,7],[21,5],[20,9],[13,9]]);
+  p(M[1],[[10,8],[13,11],[20,11],[23,8],[27,12],[24,15],[22,14],[22,25],[12,26],[11,14],[7,15],[5,12]]);line(M[2],12,12,20,12);line(M[2],22,16,22,23);
+  if(n.includes('Scale'))scales(12,14,22,25);
+  else if(f==='M'){r('#302c30',11,13,11,12);for(let y=14;y<25;y+=3)for(let x=12;x<22;x+=3)r('#a99979',x,y,1,1);}
+  else if(f==='H'){line(M[2],17,13,17,22);p(M[0],[[12,21],[17,23],[22,21],[20,25],[14,25]]);if(n==='Half Plate'){for(let y=25;y<29;y+=2)line(M[2],10,y,23,y);r(M[2],4,12,5,1);r(M[2],25,12,4,1);}}
+  else{line(M[0],16,12,16,24);line(M[2],13,14,13,22);if(n==='Studded Leathers'){for(let y=14;y<23;y+=3)for(let x=12;x<23;x+=4)r('#b9aa8d',x,y,1,1);}if(n.includes('Hunter')){p('#63715a',[[8,8],[12,10],[10,21],[6,27],[4,25],[7,15]]);line('#9d9b72',8,12,6,23);}if(shadow){line('#96829d',18,13,20,20);r('#25212b',9,25,15,3);}}
+  r('#302a26',10,23,14,2);r(trim,16,23,3,2);
+ }else return false;
+ return true;
+}
 function artEquipmentIcon(c,it){const n=it.base.name,M=metalOf(it.rarity),p=(col,a)=>pxPoly(c,col,a),r=(col,x,y,w,h)=>pxRect(c,col,x,y,w,h),line=(col,x,y,X,Y)=>pxLine(c,col,x,y,X,Y),trim=artTrim(it);
+ if((it.slot==='gloves'||it.slot==='boots'||(['armor','helm'].includes(it.slot)&&!['Quilted Gambeson','Ring Mail','Brigandine','Plate Cuirass','Blackened Plate','Kettle Hat','Barbute','Bascinet','Great Helm','Hound Visor'].includes(n)))&&artFamilyIcon(c,it))return;
  if(it.slot==='helm'){
   if(n==='Kettle Hat'){drawKettle(c,it.rarity);return;}
   const great=n==='Great Helm',hound=n==='Hound Visor',basc=n==='Bascinet';
