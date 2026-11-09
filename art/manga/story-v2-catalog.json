@@ -559,6 +559,260 @@
         "ref-cassian",
         "ref-hungry-one"
       ]
+    },
+    {
+      "id": "a1-01-exile",
+      "file": "a1-01-exile.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Far away. Months later.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "halden",
+        "exile",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "a1-04-road",
+      "file": "a1-04-road.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "Home.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "halden",
+        "road",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden",
+        "ref-hungry-one"
+      ]
+    },
+    {
+      "id": "b01-2-sisters",
+      "file": "b01-2-sisters.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "21:9",
+      "caption": "\"You'll come home to a gate of pikes.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "fen-sisters",
+        "swamp",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-act1-foes"
+      ]
+    },
+    {
+      "id": "b01-3-sink",
+      "file": "b01-3-sink.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "The fen took them back.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "fen-sisters",
+        "swamp",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-act1-foes"
+      ]
+    },
+    {
+      "id": "b02-2-warrant",
+      "file": "b02-2-warrant.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"The Kingslayer. Alive or dead.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "warrant",
+        "gallows",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "b02-3-hounds",
+      "file": "b02-3-hounds.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "His hounds wouldn't leave him.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "odo",
+        "hounds",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "b03-2-eyes",
+      "file": "b03-2-eyes.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "\"You trained me, Captain.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "merrow",
+        "hollowed",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-act1-foes"
+      ]
+    },
+    {
+      "id": "b03-3-still",
+      "file": "b03-3-still.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "His men didn't even blink.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "merrow",
+        "hollowed",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-act1-foes"
+      ]
+    },
+    {
+      "id": "a1-05-tithe",
+      "file": "a1-05-tithe.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"They took the tithe in our street. One in ten.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "tithe",
+        "street",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "b04-2-preacher",
+      "file": "b04-2-preacher.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "4:5",
+      "caption": "\"The new King hears every prayer.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "preacher",
+        "chapel",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-act1-foes"
+      ]
+    },
+    {
+      "id": "b04-3-lantern",
+      "file": "b04-3-lantern.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "He heard nothing.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "lantern",
+        "chapel",
+        "coarse-pixel"
+      ],
+      "references": [
+        "b04-2-preacher"
+      ]
+    },
+    {
+      "id": "a1-06-crow",
+      "file": "a1-06-crow.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "1:1",
+      "caption": "The third crow brought no letter.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "crow",
+        "coarse-pixel"
+      ],
+      "references": [
+        "old-op-5-crow"
+      ]
+    },
+    {
+      "id": "b05-2-piet",
+      "file": "b05-2-piet.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"The King took your wife into the palace.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "piet",
+        "halden",
+        "fort",
+        "coarse-pixel"
+      ],
+      "references": [
+        "ref-generals",
+        "ref-halden"
+      ]
+    },
+    {
+      "id": "b05-3-window",
+      "file": "b05-3-window.png",
+      "type": "story-panel",
+      "status": "generated",
+      "ratio": "16:9",
+      "caption": "\"She doesn't come to the window any more.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "window",
+        "palace",
+        "coarse-pixel"
+      ],
+      "references": [
+        "pr-19-window"
+      ]
     }
   ]
 }
