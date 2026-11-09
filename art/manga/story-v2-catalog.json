@@ -446,7 +446,7 @@
       ],
       "references": [
         "ref-ilse",
-        "old-op-2-window"
+        "op-2-window"
       ]
     },
     {
@@ -464,7 +464,7 @@
         "coarse-pixel"
       ],
       "references": [
-        "old-op-3-candle",
+        "op-3-candle",
         "ref-halden"
       ]
     },
@@ -773,7 +773,7 @@
         "coarse-pixel"
       ],
       "references": [
-        "old-op-5-crow"
+        "op-5-crow"
       ]
     },
     {
@@ -884,7 +884,7 @@
         "coarse-pixel"
       ],
       "references": [
-        "old-a3-4-ilse"
+        "a3-4-ilse"
       ]
     },
     {
@@ -997,7 +997,7 @@
       ],
       "references": [
         "ref-halden",
-        "old-op-4-eyes"
+        "op-4-eyes"
       ],
       "soundEffect": "怒"
     },

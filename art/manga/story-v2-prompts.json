@@ -108,10 +108,10 @@
     ],
     "pr-19-window.png": [
       "art/manga/ref-ilse.png",
-      "art/manga/old-op-2-window.png"
+      "art/manga/op-2-window.png"
     ],
     "pr-20-candle.png": [
-      "art/manga/old-op-3-candle.png",
+      "art/manga/op-3-candle.png",
       "art/manga/ref-halden.png"
     ],
     "pr-21-horse.png": [
@@ -166,7 +166,7 @@
       "art/manga/b04-2-preacher.png"
     ],
     "a1-06-crow.png": [
-      "art/manga/old-op-5-crow.png"
+      "art/manga/op-5-crow.png"
     ],
     "b05-2-piet.png": [
       "art/manga/ref-generals.png",
@@ -185,7 +185,7 @@
       "art/manga/ref-generals.png"
     ],
     "b07-3-names.png": [
-      "art/manga/old-a3-4-ilse.png"
+      "art/manga/a3-4-ilse.png"
     ],
     "b09-2-rook.png": [
       "art/manga/ref-generals.png",
@@ -207,7 +207,7 @@
     ],
     "a2-05-eyes.png": [
       "art/manga/ref-halden.png",
-      "art/manga/old-op-4-eyes.png"
+      "art/manga/op-4-eyes.png"
     ],
     "a2-06-charge.png": [
       "art/manga/ref-halden.png",
