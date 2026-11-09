@@ -41,4 +41,4 @@ function pilRamp(){ if(typeof tierNow==='function'?tierNow()!==0:ngp!==0) return
 (function(){ const o=mkEnemy; mkEnemy=function(s){ const e=o(s); if(!e||e.type==='anchor'||e.type==='relicx') return e; const k=pilRamp(); if(k>0){ const h=1+E44.pilHp*k; e.hp*=h; e.maxhp*=h; e.dmg*=1+E44.pilDmg*k; } return e; }; })();
 (function(){ const o=spawnBoss; spawnBoss=function(key){ const e=o(key); if(!e) return e; const k=pilRamp(); if(k>0){ const h=1+E44.pilHp*k; e.hp=Math.round(e.hp*h); e.maxhp=Math.round(e.maxhp*h); e.dmg*=1+E44.pilDmg*k; } return e; }; })();
 (function(){ const o=defMul; defMul=def=>{ const k=pilRamp(); if(!(k>0)) return o(def); const m=typeof mlvl==='function'?Math.max(1,mlvl()):1; def=Math.max(0,def||0);
-  return 1-Math.min(B34.defCap,def/(def+B34.defK*m+B34.defC+E44.pilDef*m*k)); }; })();
+  return 1-Math.min(defCapNow(),def/(def+B34.defK*m+B34.defC+E44.pilDef*m*k)); }; })();
