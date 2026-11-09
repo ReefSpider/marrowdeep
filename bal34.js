@@ -15,7 +15,7 @@ const B34={
   xpFree:2, xpStep:.375, xpFloor:.02,         /* v36: full XP up to 2 levels above the monsters, then 62% / 25% / 2% (was −20% a level, floor 5%: deep tiers ran 5–6 above) */
   defK:1.15, defC:43, defCap:.8,              /* blow taken ×(1 − def ÷ (def + 1.15 × monster level + 43)), at most 80% off */
   tierHp:t=>t>0?1.22+.01*t:1, tierDmg:t=>1+.02*t, /* ordinary foes: Ashen ×1.23 … Marrow's End ×1.32 life, ×1.02 … ×1.2 damage */
-  wpers:{hammer:.92,hammer2:.92,mace2:.95,spear:.95,spear2:.95} /* slams stun and spears reach: they give a little damage for it */
+  wpers:{hammer:.92,hammer2:.92,mace2:.95,spear:.95,spear2:.95,axe2:.9,scythe2:.92} /* slams stun and spears reach: they give a little damage for it. v45: great axes ran +15% and scythes +11% over the median two-hander by sheet DPS (outside ±9%) */
 };
 
 /* ---------- 1. XP falls off above the monster level ---------- */
@@ -39,7 +39,9 @@ function wNorm(it){ const b=it&&it.base; if(!b||!(b.max>0)||b.h===0||typeof wcla
 (function(){ const o=fin; fin=function(it){ const r=o(it); if(r&&r.slot==='weapon'&&r.base&&r.base.max>0){ const m=wNorm(r); if(m!==1){ r.min=Math.max(1,Math.round(r.min*m)); r.max=Math.max(r.min+1,Math.round(r.max*m)); } } return r; }; })();
 
 /* ---------- 3. defense against the monster level ---------- */
-defMul=def=>{ const m=typeof mlvl==='function'?Math.max(1,mlvl()):1; def=Math.max(0,def||0); return 1-Math.min(B34.defCap,def/(def+B34.defK*m+B34.defC)); };
+defMul=def=>{ const m=typeof mlvl==='function'?Math.max(1,mlvl()):1; def=Math.max(0,def||0); return 1-Math.min(defCapNow(),def/(def+B34.defK*m+B34.defC)); };
+/* v45: the cap is the hero's own: heavy pieces raise it (sets41.js sets P.stats.defCap). By tier 4 a plain rare kit sat at 80%, so a tank's armour stopped counting. */
+function defCapNow(){ return (typeof P!=='undefined'&&P&&P.stats&&P.stats.defCap)||B34.defCap; }
 
 /* ---------- 4. deeper tiers are harder at the same monster level ---------- */
 (function(){ const o=mkEnemy; mkEnemy=function(s){ const e=o(s); if(ngp>0&&e.type!=='anchor'&&e.type!=='relicx'){ const t=tierNow(); e.hp*=B34.tierHp(t); e.maxhp*=B34.tierHp(t); e.dmg*=B34.tierDmg(t); } return e; }; })();

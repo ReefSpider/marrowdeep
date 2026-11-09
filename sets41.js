@@ -6,7 +6,7 @@
      enhanced defense, life, thorns.
    Sets (armour, helm, gloves, boots of one family):
      Light 2 Hunter: +15% run speed, rolls 20% further · 4 Shadow: the first swing after a roll always crits
-     Medium 2 Soldier: +10% damage, +5% attack speed · 4 Veteran: draughts heal 35% more and harden you (−25% damage taken, 3 s)
+     Medium 2 Soldier: +5% damage, +5% attack speed (v45, was +10%) · 4 Veteran: draughts heal 35% more and harden you (−25% damage taken, 3 s)
      Heavy 2 Bastion: −10% damage taken, threat ×2 · 4 Juggernaut: no knockback; once a minute a killing blow leaves 1 life
    Milestones, by attribute total:
      Might 25 Heavy Hand (light blows always flinch) · 50 Breaker (crits stagger bosses twice as hard) · 100 Earthsplitter
@@ -32,22 +32,24 @@ let ROLL_FAM=null;
 
 /* ---------- sets and milestones in the stats ---------- */
 const SETS41={L:[{n:'Hunter',d:'+15% run speed · rolls carry 20% further'},{n:'Shadow',d:'the first swing after a roll always crits'}],
-  M:[{n:'Soldier',d:'+10% damage · +5% attack speed'},{n:'Veteran',d:'draughts heal 35% more and harden you: −25% damage taken for 3 s'}],
-  H:[{n:'Bastion',d:'−10% damage taken · threat ×2'},{n:'Juggernaut',d:'no knockback · once a minute a killing blow leaves you at 1 life'}]};
+  M:[{n:'Soldier',d:'+5% damage · +5% attack speed'},{n:'Veteran',d:'draughts heal 35% more and harden you: −25% damage taken for 3 s'}],
+  H:[{n:'Bastion',d:'−10% damage taken · threat ×2 · each heavy piece raises your armour cap'},{n:'Juggernaut',d:'no knockback · once a minute a killing blow leaves you at 1 life'}]};
 const MILES={mig:[[25,'Heavy Hand','light blows always flinch ordinary foes'],[50,'Breaker','crits stagger bosses twice as hard'],[100,'Earthsplitter','two-handed slams send a ground wave']],
   fin:[[25,'Light Feet','rolls cost 30% less grit'],[50,'Quickstep','rolling through a blow gives +20% attack speed for 2 s'],[100,'Flurry','every 5th hit strikes twice']],
   fort:[[25,'Iron Skin','the first hit after 5 s untouched is halved'],[50,'Stand Firm','no knockback or flinch while attacking'],[100,'Bulwark','allies within 120 px take 10% less']]};
+/* set and twin-blade numbers in one place (v45) */
+const SETK={soldierDmg:1.05,soldierAs:5,bastion:.9,twinDmg:1.55,twinAs:20,heavyCap:.0125}; /* v45: Soldier +10% → +5% damage; twin blades ×1.5 → ×1.55; each heavy piece raises the 80% defense cap by 1.25 points (86% in full plate) */
 function famCount(){ const n={L:0,M:0,H:0}; if(P&&P.equip) for(const k of GEAR_SLOTS){ const it=P.equip[k]; if(it&&it.base&&it.base.fam&&!(P.inactive&&P.inactive.includes(k))) n[it.base.fam]++; } return n; }
 (function(){ const o=calcStats; calcStats=function(){ const r=o(); const s=P&&P.stats; if(!s) return r;
-  const n=famCount(); s.fams=n; s.takenMul=1; s.healMul=1; s.rollMul=1; s.rollCost=1;
+  const n=famCount(); s.fams=n; s.defCap=B34.defCap+n.H*SETK.heavyCap; s.takenMul=1; s.healMul=1; s.rollMul=1; s.rollCost=1;
   if(n.L>=2){ s.ms+=15; s.rollMul=1.2; s.hunter=true; } if(n.L>=4) s.shadowSet=true;
-  if(n.M>=2&&s.max>0){ s.min=Math.round(s.min*1.1); s.max=Math.round(s.max*1.1); s.omin=Math.round(s.omin*1.1); s.omax=Math.round(s.omax*1.1); s.as=Math.round((s.as+5)*10)/10; }
+  if(n.M>=2&&s.max>0){ const f=SETK.soldierDmg; s.min=Math.round(s.min*f); s.max=Math.round(s.max*f); s.omin=Math.round(s.omin*f); s.omax=Math.round(s.omax*f); s.as=Math.round((s.as+SETK.soldierAs)*10)/10; }
   if(n.M>=4){ s.healMul=1.35; s.vetSet=true; }
-  if(n.H>=2){ s.takenMul*=.9; s.threat=(s.threat||1)*2; s.bastion=true; } if(n.H>=4){ s.noKnock=true; s.jugg=true; }
+  if(n.H>=2){ s.takenMul*=SETK.bastion; s.threat=(s.threat||1)*2; s.bastion=true; } if(n.H>=4){ s.noKnock=true; s.jugg=true; }
   /* Twin blades: two one-handed melee weapons were barely better than one (holding alternates hands), and a one-hander
      hits ~60% as hard as a two-hander, so a Finesse killer with two blades fell far behind a hammer. Two blades now
-     hit 50% harder and swing 20% faster. */
-  if(typeof dualMelee==='function'&&dualMelee()&&P.equip.weapon&&P.equip.weapon.base.h===1&&P.equip.off&&P.equip.off.base.h===1){ s.twin=true; for(const k of ['min','max','omin','omax']) s[k]=Math.round(s[k]*1.5); s.as=Math.round((s.as+20)*10)/10; }
+     hit 55% harder (v45, was 50%) and swing 20% faster. */
+  if(typeof dualMelee==='function'&&dualMelee()&&P.equip.weapon&&P.equip.weapon.base.h===1&&P.equip.off&&P.equip.off.base.h===1){ s.twin=true; for(const k of ['min','max','omin','omax']) s[k]=Math.round(s[k]*SETK.twinDmg); s.as=Math.round((s.as+SETK.twinAs)*10)/10; }
   if(s.mig>=25) s.heavyHand=true; if(s.mig>=50) s.breaker=true; if(s.mig>=100) s.earth=true;
   if(s.fin>=25) s.rollCost*=.7; if(s.fin>=50) s.quickstep=true; if(s.fin>=100) s.flurry=true;
   if(s.fort>=25) s.ironSkin=true; if(s.fort>=50) s.standFirm=true; if(s.fort>=100) s.bulwark=true;

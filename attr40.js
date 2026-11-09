@@ -13,7 +13,7 @@
 const ATTR={mig:{n:'Might',kj:'力',col:'#e07a52',d:'Hit harder with heavy weapons; carry heavy armour without slowing'},
   fin:{n:'Finesse',kj:'技',col:'#7ad0a8',d:'Swing and move faster; light weapons and crossbows hit harder and crit more'},
   fort:{n:'Fortitude',kj:'耐',col:'#8aa8e0',d:'Take more punishment; foes come for you and stay'}};
-const A_PER={dmg:.8, finAs:.2, finMs:.2, finCrit:.08, fortLife:1, fortDef:.8, fortThreat:2, migStag:.5, carryBase:2, carryPer:8, wMs:2.5, wAs:2};
+const A_PER={dmg:.8, migDmg:.55, /* v45: Might .8 → .55 per point (Might killers ran ×1.6–1.9 a balanced kit; target ×1.4) */ finAs:.2, finMs:.2, finCrit:.08, fortLife:1, fortDef:.8, fortThreat:2, migStag:.5, carryBase:2, carryPer:8, wMs:2.5, wAs:2};
 const GRADE_F={S:1,A:.75,B:.5,C:.25,'-':0};
 const WGRADE={hammer:['A','-'],mace:['A','C'],axe:['A','C'],cleaver:['A','C'],flail:['A','C'],scythe:['B','B'],spear:['B','B'],sword:['B','B'],
   dagger:['-','S'],rapier:['-','S'],sickle:['C','A'],katana:['B','A'],xbow:['-','S'],shield:['B','-'],fist:['B','B']};
@@ -39,7 +39,7 @@ function armourWeight(){ let w=0; for(const k of GEAR_SLOTS){ const it=P.equip[k
   s.mig=Math.max(0,s.mig||0); s.fin=Math.max(0,s.fin||0); s.fort=Math.max(0,s.fort||0);
   if(s.setMig) s.mig+=s.setMig; if(s.setFin) s.fin+=s.setFin; if(s.setFort) s.fort+=s.setFort;
   /* damage by grade, each hand by its own weapon */
-  const gm=(it)=>{ const g=wGrades(it); return 1+(s.mig*GRADE_F[g[0]]+s.fin*GRADE_F[g[1]])*A_PER.dmg/100; };
+  const gm=(it)=>{ const g=wGrades(it); return 1+(s.mig*GRADE_F[g[0]]*A_PER.migDmg+s.fin*GRADE_F[g[1]]*A_PER.dmg)/100; }; /* v45: Might has its own rate (migDmg) */
   s.gMain=gm(P.equip.weapon); s.gOff=gm(P.equip.off);
   if(s.max>0){ s.min=Math.max(1,Math.round(s.min*s.gMain)); s.max=Math.max(s.min+1,Math.round(s.max*s.gMain)); }
   if(s.omax>0){ s.omin=Math.max(1,Math.round(s.omin*s.gOff)); s.omax=Math.max(s.omin+1,Math.round(s.omax*s.gOff)); }
