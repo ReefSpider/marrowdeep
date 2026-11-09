@@ -403,14 +403,32 @@ function updEnemy(e,dt){
 }
 
 /* ---------- enemy sprites ---------- */
-function drawGhoul(c,e){ const sk=e.champ?'#8b93a8':'#7b856f', sd=e.champ?'#5d6478':'#566050', dk='#373d33'; const wk=Math.round(Math.sin(e.walk)*2); const ha=e.state==='wind'?-2:0;
-  rect(c,-3+Math.round(wk*.5),-7,2,7,sd);
-  c.fillStyle=sk; c.beginPath(); c.moveTo(-6,-6); c.lineTo(-5,-14); c.lineTo(-1,-17); c.lineTo(4,-15); c.lineTo(5,-8); c.lineTo(1,-5); c.closePath(); c.fill();
-  c.fillStyle=sd; c.beginPath(); c.moveTo(-6,-6); c.lineTo(-5,-14); c.lineTo(-2,-16); c.lineTo(-3,-7); c.closePath(); c.fill();
-  for(let i=0;i<3;i++) rect(c,0,-13+i*2,3,1,dk); rect(c,1-Math.round(wk*.5),-7,2,7,sk);
-  rect(c,3,-18+ha,6,5,sk); rect(c,3,-14+ha,6,1,sd); if(e.state==='lunge'||e.state==='wind') rect(c,6,-14+ha,3,2,'#2a0c0c');
-  rect(c,2,-19+ha,4,2,'#22201e'); rect(c,1,-18+ha,1,5,'#22201e');
-  const aa=e.state==='wind'?-2.3:e.state==='lunge'?.15:.95+Math.sin(e.walk)*.2; c.save(); c.translate(3,-14); c.rotate(aa); rect(c,0,-1,9,2,sk); rect(c,9,-2,3,1,'#d8ccb0'); rect(c,9,0,3,1,'#d8ccb0'); c.restore(); }
+function drawGhoul(c,e){
+  const wind=e.state==='wind', bite=e.state==='lunge', wk=Math.round(Math.sin(e.walk||0)*2);
+  const skin=e.champ?'#929ba6':'#a2a17b', mid=e.champ?'#626d81':'#747b5b', dark='#414c42';
+  const p=(col,pts)=>artPoly(c,col,pts),r=(x,y,w,h,col)=>rect(c,x,y,w,h,col);
+  c.save(); c.translate(bite?2:0,wind?1:0);
+  // Bent knees, a trailing foot, and a collapsed abdomen under a hunched ribcage.
+  p(dark,[[-4,-9],[-1,-8],[-2+wk,-4],[-4+wk,-1],[-2+wk,0],[-6+wk,0],[-5+wk,-4]]);
+  p(mid,[[0,-9],[3,-8],[4-wk,-5],[2-wk,-2],[5-wk,-1],[5-wk,0],[0-wk,0],[1-wk,-5]]);
+  r(1-wk,-6,2,1,skin);
+  p('#3c3430',[[-6,-11],[-1,-12],[4,-9],[3,-5],[1,-7],[-1,-5],[-2,-8],[-5,-7]]);
+  p(dark,[[-6,-10],[-7,-15],[-4,-20],[0,-21],[4,-18],[3,-12],[0,-9]]);
+  p(mid,[[-5,-15],[-4,-19],[0,-20],[4,-17],[3,-12],[-1,-11]]);
+  p(skin,[[-4,-18],[-2,-20],[1,-20],[3,-18],[0,-17],[-3,-15]]);
+  r(-1,-16,4,1,dark);r(-2,-14,4,1,dark);r(-1,-12,3,1,dark);
+  // Far arm hangs from the shoulder; front arm recoils before the lunge.
+  p(dark,[[-5,-18],[-7,-16],[-8,-11],[-6,-7],[-5,-8],[-6,-12],[-3,-16]]);
+  const hx=wind?0:bite?6:3,hy=wind?-20:-21;
+  p(mid,[[hx-2,hy],[hx,hy-3],[hx+4,hy-3],[hx+6,hy],[hx+5,hy+4],[hx+2,hy+5],[hx,hy+3]]);
+  p(skin,[[hx,hy-2],[hx+3,hy-2],[hx+5,hy],[hx+3,hy+1],[hx,hy]]);
+  r(hx+3,hy,2,1,'#24282a');r(hx+4,hy,1,.5,'#d8cb9c');
+  r(hx+3,hy+2,3,bite?2:1,'#39282b');r(hx+3,hy+2,2,.5,'#ded2ae');
+  r(hx-1,hy-3,2,2,'#373a32');
+  c.save();c.translate(1,-17);c.rotate(wind?-1.4:bite?-.12:.8+Math.sin(e.walk||0)*.15);
+  p(mid,[[0,-1],[4,-2],[6,0],[8,1],[10,0],[10,2],[7,3],[4,1],[0,2]]);
+  r(1,-1,4,1,skin);r(8,0,3,.5,'#ded2ae');r(9,2,3,.5,'#ded2ae');c.restore();c.restore();
+}
 function drawWraith(c,e){ const fl=Math.sin(time*6+e.seed);
   c.fillStyle='#29252f'; c.beginPath(); c.moveTo(-6,-18); c.lineTo(6,-18); c.lineTo(8,-6); for(let i=0;i<=8;i++){ const x=8-i*2; c.lineTo(x,-2+((i%2)?3:0)+Math.round(Math.sin(time*7+i+e.seed)*1.5)); } c.lineTo(-8,-6); c.closePath(); c.fill();
   c.fillStyle='#3d374a'; c.beginPath(); c.moveTo(-4,-17); c.lineTo(2,-17); c.lineTo(1,-4); c.lineTo(-5,-4); c.closePath(); c.fill();

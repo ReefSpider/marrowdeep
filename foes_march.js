@@ -225,8 +225,26 @@ function dDrowner(c,e){ if(e.state==='sunk'){ rect(c,-4,-2,8,2,'#1e2a1c'); retur
   const cl=e.state==='claw'||e.state==='grab'; rect(c,4,cl?-18:-14,cl?8:3,1.5,'#8a9a6a'); for(let i=0;i<3;i++) rect(c,cl?11:6,(cl?-20:-13)+i,2,1,'#d8ccb0'); }
 function dLantern(c,e){ rect(c,-2,-4,4,5,'#2a2a20'); rect(c,-3,-5,6,1,'#2a2a20'); }
 function dLeech(c,e){ const s=Math.sin(e.walk)*1; rect(c,-4,-3,8,3+s*.5,'#2a1c22'); rect(c,-4,-3,8,1,'#4a2f3f'); rect(c,3,-2,2,1,'#6a0e10'); }
-function dSaltWraith(c,e){ c.globalAlpha=(e.alpha==null?1:e.alpha)*.9; c.fillStyle='#ebe4d2'; c.beginPath(); c.moveTo(-6,-4); c.quadraticCurveTo(-7,-16,0,-19); c.quadraticCurveTo(7,-16,6,-4); for(let i=0;i<5;i++) c.lineTo(5-i*2.6,-(i%2?0:3)+Math.sin(time*6+i)*1.5); c.fill();
-  rect(c,-3,-15,2,2,'#2a211c'); rect(c,1,-15,2,2,'#2a211c'); rect(c,-1,-11,2,3,'#2a211c'); c.globalAlpha=1; }
+function dSaltWraith(c,e){
+  const wind=e.state==='wind',dash=e.state==='dash',fl=Math.round(Math.sin(time*5+(e.seed||0)));
+  const p=(col,pts)=>artPoly(c,col,pts),r=(x,y,w,h,col)=>rect(c,x,y,w,h,col);
+  c.save();c.globalAlpha*=(e.alpha==null?1:e.alpha)*.9;
+  // A salt-encrusted remnant: broken shroud, exposed ribs, eroded profile.
+  p('#777e7c',[[-4,-16],[-6,-12],[-5,-7],[-7+fl,-2],[-3,-5],[-3,0],[0,-4],[2,-2],[3,-7],[5,-12],[3,-17]]);
+  p('#b5b7a2',[[-4,-15],[-5,-12],[-3,-8],[-4+fl,-3],[-1,-7],[1,-5],[2,-9],[4,-13],[2,-16]]);
+  p('#e0dbc0',[[-3,-16],[-4,-13],[-2,-10],[-1,-5],[0,-8],[0,-13],[2,-16]]);
+  r(-2,-12,4,1,'#606b68');r(-1,-10,3,1,'#606b68');r(-2,-8,2,1,'#606b68');
+  p('#d5d0b5',[[-2,-17],[-1,-20],[2,-21],[4,-19],[3,-17],[4,-16],[2,-14],[-1,-15]]);
+  p('#f0e8ce',[[-1,-19],[0,-20],[2,-20],[2,-18],[0,-17],[-1,-17]]);
+  r(1,-18,2,1,'#343f40');r(2,-16,1,2,'#535d57');
+  // One reaching arm and one trailing shred; anticipation opens the silhouette.
+  p('#919c94',[[2,-14],[4,-15],[wind?7:6,wind?-18:-12],[dash?9:7,-9],[dash?8:5,-10],[3,-12]]);
+  r(wind?6:5,wind?-19:-11,1,2,'#ece3c8');
+  p('#c7c9b3',[[-4,-14],[-6,-12],[-7,wind?-16:-8],[-6,wind?-18:-9],[-5,-11]]);
+  r(-5+fl,-3,1,1,'#c7c9b3');r(1-fl,1,1,1,'#a5b3a9');
+  if(wind)r(1,-18,1,1,'#fff1ce');
+  c.restore();
+}
 function dBuried(c,e){ if(e.state==='buried'){ rect(c,-4,-3,8,3,'#6b6460'); rect(c,-3,-4,6,1,'#8a8478'); rect(c,4,-6,1,4,'#cdbf9e'); return; } const wk=Math.round(Math.sin(e.walk)*2), rise=e.state==='rise'?Math.round(e.st/.7*18):0; c.save(); c.translate(0,rise);
   rect(c,-3+wk,-9,2,9,'#6a5e4a'); rect(c,1-wk,-9,2,9,'#6a5e4a'); rect(c,-5,-21,10,12,'#8a7a5a'); rect(c,-5,-21,10,1,'#f2ecd8'); rect(c,-5,-17,10,1,'#b0141a'); rect(c,-5,-13,10,1,'#f2ecd8');
   rect(c,-3,-26,6,5,'#cdbf9e'); rect(c,-4,-28,8,3,'#6b6460'); rect(c,-1,-24,1,1,'#2a211c'); rect(c,2,-24,1,1,'#2a211c');
