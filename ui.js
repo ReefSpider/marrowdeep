@@ -45,7 +45,7 @@ function updLabels(){ let n=0;
 function findInteract(){
   let best=null,bd=1e9; const consider=(o,dist,txt,act)=>{ if(dist<bd){bd=dist;best={o,txt,act};} };
   const CN=['Iron-Bound Coffer','Bone Reliquary','Tithe Hoard'];
-  for(const c of chests){ if(c.open||c.falling) continue; const dx=Math.abs(c.x-P.x), dy=Math.abs(c.y-P.y); if(dx<26&&dy<22) consider(c,dx,`<kbd>E</kbd> Open ${CN[c.tier]}`,()=>openChest(c)); }
+  for(const c of chests){ if(c.open||c.falling) continue; const dx=Math.abs(c.x-P.x), dy=Math.abs(c.y-P.y); if(dx<26&&dy<22) consider(c,dx,`<kbd>E</kbd> Open ${typeof chestLabel==='function'?chestLabel(c):CN[c.tier]}`,()=>openChest(c)); }
   for(const d of drops){ if(d.kind!=='item') continue; const dx=Math.abs(d.x-P.x), dy=Math.abs(d.y-P.y); if(dx<20&&dy<22) consider(d,dx-4,`<kbd>E</kbd> Take <span style="color:${RCOL[d.item.rarity]}">${d.item.name}</span>`,()=>takeDrop(d)); }
   for(const st of L.stones||[]){ const dx=Math.abs(st.x-P.x), dy=Math.abs(st.y-P.y); if(dx<22&&dy<24){ const done=CODEX_OPEN.has(st.id)&&(!CX[st.id].q||VOWS_TAKEN[st.id]); consider(st,dx,done?'<kbd>E</kbd> Read the stone again':'<kbd>E</kbd> Kneel at the remembrance stone',()=>stoneCard(st)); } }
   if(L.relic&&!L.relic.taken&&Math.abs(L.relic.x+12-P.x)<22&&Math.abs(L.relic.y-P.y)<20) consider(L.relic,0,'<kbd>E</kbd> Pull the blade from the dead man',takeRelic);
