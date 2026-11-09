@@ -13,3 +13,5 @@ Terrain and background detail is baked during level loading. Coordinate hashes a
 Validation: load/render coverage for all 28 levels, before/after comparisons of collision grids, moving platforms, spawns, decorative props and post-bake RNG state. Visual comparisons cover 13 environments. This is not a full campaign playthrough.
 
 Implementation: `artworld.js` wraps the existing baking functions; `world.js` routes platform surfaces to the shared timber renderer. Cache versions change only for these two scripts.
+
+Integrated with v44.1 (379a33f) after the detail pass. Preserves its new boss and unique-item scripts; level rendering was checked again on the combined build.
