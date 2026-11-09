@@ -1,6 +1,6 @@
 # Gameplay art pass
 
-Branch: `codex/gameplay-art-proof`, integrated with v40 main at `9e6bd02`.
+Branch: `codex/gameplay-art-proof`, integrated with v41 main at `78a4e06` (including all v40 equipment).
 
 The gameplay palette retains region colour and material shading. Pixel contours use integer scanlines and stepped strokes. Detail is concentrated in joints, faces, cloth seams, weapon fittings and small material highlights. Small creatures retain simpler readable shapes.
 
@@ -37,3 +37,5 @@ These checks are rendering and short simulation checks, not a full campaign play
 ## v40 integration
 
 Preserves upstream attributes, weapon grades, armour weight, family sets, milestones, chest categories, second ring, and mobile worn-panel layout. The hero merge retains glove/boot rendering and hood support. All 31 newly added equipment bases receive family-aware pixel icons; Leather Cap keeps its own worn silhouette.
+
+The subsequent v41 late-game balance update (hard43.js) is merged unchanged. The workshop and 31 weapon/shield simulation checks were repeated on that combined build.
