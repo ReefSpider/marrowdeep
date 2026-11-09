@@ -12,7 +12,7 @@
       easier than the Count's (they had lost 28% of their life at the step), and 2% more damage a tier.
    5. Items from older saves are brought to the new budget once, on load. */
 const B34={
-  xpFree:2, xpStep:.2, xpFloor:.05,           /* full XP up to 2 levels above the monsters, −20% per level after, never below 5% */
+  xpFree:2, xpStep:.375, xpFloor:.02,         /* v36: full XP up to 2 levels above the monsters, then 62% / 25% / 2% (was −20% a level, floor 5%: deep tiers ran 5–6 above) */
   defK:1.15, defC:43, defCap:.8,              /* blow taken ×(1 − def ÷ (def + 1.15 × monster level + 43)), at most 80% off */
   tierHp:t=>t>0?1.22+.01*t:1, tierDmg:t=>1+.02*t, /* ordinary foes: Ashen ×1.23 … Marrow's End ×1.32 life, ×1.02 … ×1.2 damage */
   wpers:{hammer:.92,hammer2:.92,mace2:.95,spear:.95,spear2:.95} /* slams stun and spears reach: they give a little damage for it */

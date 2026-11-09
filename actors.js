@@ -27,7 +27,9 @@ function newPlayer(){ return {x:0,y:0,w:10,h:26,vx:0,vy:0,face:1,onGround:false,
   lvl:1,xp:0,sp:0,skills:new Set(),rage:0,airJ:0,wallDir:0,wallT:0,wallLock:0,clarT:0,clarCd:0,houndT:0,exhaustT:0,lastUsed:false,shade:null,teth:null,iai:null,block:false,blockT:-9,cd:{hem:0,teth:0,bell:0},plat:null,auraT:0}; }
 const has=id=>P&&P.skills.has(id);
 function offActive(){ const m=P.equip.weapon, o=P.equip.off; return !!(has('off')&&o&&!(m&&m.base.h===2)); }
-function xpNext(l){ return Math.round(30+22*Math.pow(l-1,1.45)); }
+/* v36: was 30 + 22 × (l−1)^1.45 — level 2 after 3 kills and level 3 after 5. Now the first level-up takes ~11 ordinary
+   kills, level 3 ~23, level 4 ~37; the falloff in bal34.js keeps you 2–3 above the monsters on Pilgrim. */
+function xpNext(l){ return Math.round(260+50*Math.pow(l-1,1.45)); }
 function gearPower(){ let p=0; for(const k in P.equip){ const it=P.equip[k]; if(!it||(k==='off'&&!offActive())) continue; p+=[0,1,2,3,4,8][it.rarity]; p+=it.aff.filter(a=>varies(a)&&a.g===4).length*2; } return p; }
 function calcStats(){ const s={min:1+Math.floor(P.lvl/2),max:3+P.lvl,spd:1.1,omin:0,omax:0,ospd:1,def:0,life:60+(P.lvl-1)*7,as:0,ms:0,ls:0,fire:0,cold:0,shock:0,poison:0,holy:0,shadow:0,water:0,blood:0,wind:0,bone:0,crit:5,mf:0,gf:0,regen:0,thorns:0}; const sets={};
   for(const k in P.equip){ const it=P.equip[k]; if(!it||(k==='off'&&!offActive())) continue; for(const a of it.aff){ if(a.k==='ed'||a.k==='edef') continue; s[a.k]+=a.v; } if(it.def) s.def+=it.def; if(it.set) sets[it.set]=(sets[it.set]||0)+1; }
