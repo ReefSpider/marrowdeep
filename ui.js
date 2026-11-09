@@ -161,14 +161,14 @@ const showTip=(it,el)=>showTipHTML(tipHTML(it)+(typeof compareHTML==='function'?
 const hideTip=()=>{tip.hidden=true;};
 function bindTip(el,it){ el.addEventListener('pointerenter',()=>showTip(it,el)); el.addEventListener('pointerleave',hideTip); }
 function invMsg(t){ const h=$('#invMsg'); h.textContent=t; h.classList.remove('on'); void h.offsetWidth; h.classList.add('on'); }
-function equipFromBag(i,wantOff){ const it=P.bag[i]; let slot=it.slot;
+function equipFromBag(i,wantOff){ const it=P.bag[i]; let slot=it.slot==='ring'&&typeof ringSlot==='function'?ringSlot(it):it.slot;
   if(slot==='weapon'){ const b=it.base; if(b.h===0||wantOff){ if(!has('off')){ invMsg('Learn Second Hand (Steel) to use your off hand.'); return; } if(b.h===2){ invMsg('Two-handed. It needs both hands.'); return; } slot='off'; } }
   const old=P.equip[slot]; P.equip[slot]=it; bagSwapOut(i,old);
   if(slot==='weapon'&&it.base.h===2&&P.equip.off) invMsg('Two-handed weapon: your off hand rests.');
   calcStats(); AU.tone('triangle',420,300,.08,.12,.1); hideTip(); renderInv(); }
 function renderInv(){
   const eq=$('#equip'); eq.innerHTML='';
-  [['weapon','Main hand','1 / 1 / 3 / 2'],['helm','Helm','1 / 2 / 2 / 3'],['armor','Armour','2 / 2 / 3 / 3'],['off','Off hand','1 / 3 / 3 / 4'],['amulet','Amulet','1 / 4 / 2 / 5'],['ring','Ring','2 / 4 / 3 / 5']].forEach(([s,lab,area])=>{
+  [['weapon','Main hand','1 / 1 / 4 / 2'],['helm','Helm','1 / 2 / 2 / 3'],['armor','Armour','2 / 2 / 3 / 3'],['boots','Boots','3 / 2 / 4 / 3'],['off','Off hand','1 / 3 / 3 / 4'],['gloves','Gloves','3 / 3 / 4 / 4'],['amulet','Amulet','1 / 4 / 2 / 5'],['ring','Ring','2 / 4 / 3 / 5'],['ring2','Ring','3 / 4 / 4 / 5']].forEach(([s,lab,area])=>{
     const d=document.createElement('div'); d.className='slot'; d.dataset.slot=s; d.style.gridArea=area; const it=P.equip[s];
     if(s==='off'&&!has('off')){ d.classList.add('lockd'); d.innerHTML='<span class="kj">双</span><span class="lab">Second Hand</span>'; d.onpointerenter=()=>showTipHTML('<div class="w">Off hand</div><div class="g">Learn Second Hand in the Steel brand.</div>',d); d.onpointerleave=hideTip; eq.appendChild(d); return; }
     if(it){ d.appendChild(iconEl(it)); d.classList.add('r'+it.rarity); if(s==='off'&&!offActive()) d.classList.add('idle'); bindTip(d,it); d.onclick=()=>{ if(bagAdd(it,typeof GVIEW!=='undefined'?GVIEW.bag:0)){ P.equip[s]=null; calcStats(); hideTip(); renderInv(); } else invMsg('No room in the satchel for that.'); }; }

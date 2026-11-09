@@ -23,7 +23,7 @@ function drawParts(){ for(const p of parts){ const sx=Math.round(p.x-camR.x), sy
 
 /* ---------- player ---------- */
 function newPlayer(){ return {x:0,y:0,w:10,h:26,vx:0,vy:0,face:1,onGround:false,coyote:0,drop:0,runPh:0,swordA:1.35,offA:1.1,attack:null,dash:0,dashAge:9,dashCd:0,inv:0,hurtT:0,life:60,grit:100,gold:0,potions:2,healT:0,
-  equip:{weapon:null,off:null,armor:null,helm:null,ring:null,amulet:null},bag:[],stats:null,kills:0,safe:{x:0,y:0},dead:false,deadT:0,best:null,ghostT:0,sy:1,cloak:0,combo:0,comboWin:0,offCombo:0,offWin:0,hits:0,hitT:0,lastMv:'',power:0,
+  equip:{weapon:null,off:null,armor:null,helm:null,gloves:null,boots:null,ring:null,ring2:null,amulet:null},bag:[],stats:null,kills:0,safe:{x:0,y:0},dead:false,deadT:0,best:null,ghostT:0,sy:1,cloak:0,combo:0,comboWin:0,offCombo:0,offWin:0,hits:0,hitT:0,lastMv:'',power:0,
   lvl:1,xp:0,sp:0,skills:new Set(),rage:0,airJ:0,wallDir:0,wallT:0,wallLock:0,clarT:0,clarCd:0,houndT:0,exhaustT:0,lastUsed:false,shade:null,teth:null,iai:null,block:false,blockT:-9,cd:{hem:0,teth:0,bell:0},plat:null,auraT:0}; }
 const has=id=>P&&P.skills.has(id);
 function offActive(){ const m=P.equip.weapon, o=P.equip.off; return !!(has('off')&&o&&!(m&&m.base.h===2)); }

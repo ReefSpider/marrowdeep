@@ -12,7 +12,8 @@
      abyss  · abyssal weapon (the rest unique / legendary)
    The player is two levels above the monster level, with no Marrow, Ways, vows or borrowed power. */
 const BAL={};
-const BAL_SLOTS=['weapon','armor','helm','ring','amulet'];
+const BAL_SLOTS=['weapon','armor','helm','gloves','boots','ring','ring2','amulet']; /* v39: gloves, boots, second ring */
+const balW=(w,s)=>w[s]!=null?w[s]:s==='ring2'?w.ring:(s==='gloves'||s==='boots')?w.helm:1;
 const BAL_FOES=['ghoul','husk','brute'];
 function balFixed(list,r,slot,il){ const ds=list.filter(d=>d.slot===slot&&(slot!=='weapon'||baseByName(d.base).max>0)); if(!ds.length) return null; const it=mkFixed(pick(ds),r); it.ilvl=il; empower(it,il); return fin(it); }
 function balItem(r,slot,il){ il=Math.max(1,il);
@@ -28,8 +29,8 @@ BAL.row=function(tier,m,K,plvlOff){ K=K||40; const pl=Math.max(1,m+(plvlOff==nul
     const foes={}; for(const t of BAL_FOES){ let hp=0,dmg=0; for(let i=0;i<6;i++){ const e=mkEnemy({x:0,y:0,t}); hp+=e.maxhp; dmg+=e.dmg; } foes[t]={hp:Math.round(hp/6),hit:Math.round(dmg/6)}; }
     const row={tier,m,pl,il,foes,prof:{}};
     for(const [name,pr] of Object.entries(BAL_PROF)){ const dps=[],eff=[],main=[],dv=[],lf=[];
-      for(let k=0;k<K;k++){ P.lvl=pl; P.equip={weapon:null,off:null,armor:null,helm:null,ring:null,amulet:null}; P.way=null;
-        for(const s of BAL_SLOTS) P.equip[s]=balItem(pr.w[s],s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); dv.push(P.stats.def); lf.push(P.stats.life); }
+      for(let k=0;k<K;k++){ P.lvl=pl; P.equip={weapon:null,off:null,armor:null,helm:null,gloves:null,boots:null,ring:null,ring2:null,amulet:null}; P.way=null;
+        for(const s of BAL_SLOTS) P.equip[s]=balItem(balW(pr.w,s),s==='ring2'?'ring':s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); dv.push(P.stats.def); lf.push(P.stats.life); }
       const g=foes.ghoul, b=foes.brute; const P50=balPct(dps,.5), E50=balPct(eff,.5);
       row.prof[name]={dps:[balPct(dps,.1),P50,balPct(dps,.9)].map(Math.round),eff:[balPct(eff,.1),E50,balPct(eff,.9)].map(Math.round),
         ttkGhoul:+(g.hp/P50).toFixed(2),ttkBrute:+(b.hp/P50).toFixed(2),ttkGhoulP90:+(g.hp/balPct(dps,.9)).toFixed(2),def:Math.round(balPct(dv,.5)),life:Math.round(balPct(lf,.5)),htdGhoul:+(E50/Math.max(1,g.hit)).toFixed(1),htdBrute:+(E50/Math.max(1,b.hit)).toFixed(1)}; }
