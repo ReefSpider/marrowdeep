@@ -2,7 +2,8 @@
 /* ===== the new story in pages (v24) =====
    Storyboard from Story Bible & Storyboard v2 (claude/story/): the prologue (the last war, the pact, the frame, the
    trial, the farewell, the coronation), Act I (the road home) and Act II (Hollowmere in darkness, to the fall).
-   Panel ids are the bible's, so a still dropped in art/manga/<id>.png replaces the drawing (see manifest.json).
+   Panel ids are the bible's, so a still dropped in art/manga/<id>.webp (or .png/.jpg) replaces the drawing (see manifest.json).
+   v45: the panels are WebP at quality 82 (77 MB of PNG became 5 MB). Convert new stills the same way before adding them.
    Panels the bible marks "keep" use the old still's id so the existing art shows. Drawings here are placeholders in
    the same 1-bit pipeline until the stills are generated.
    Act III (the old story) keeps its pages for now: the old Act I opening ("You fell") opens Act III; the Kiln and the
