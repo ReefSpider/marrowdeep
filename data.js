@@ -98,10 +98,10 @@ const UNIQUES=[
   {name:"The Debtor's Chain",slot:'amulet',base:'Bone Amulet',aff:[['gf',60,100],['mf',20,35],['life',-10,-10]],fl:'Every link a promissory note.'}
 ];
 const ABYSSAL=[
-  {name:'The Unpaid Debt',slot:'weapon',base:'Iron Slab',aff:[['ed',380,500],['ls',10,15],['crit',28,40],['life',60,100],['as',20,30]],fl:'Everything you ever owed, swung all at once.'},
+  {name:'The Unpaid Debt',slot:'weapon',base:'Iron Slab',aff:[['ed',100,140],['ls',8,12],['crit',12,18],['life',60,100],['as',10,16]],fl:'Everything you ever owed, swung all at once.'},
   {name:"Ilse's Candle",slot:'amulet',base:'Bone Amulet',aff:[['life',100,150],['regen',8,12],['mf',150,220],['gf',200,260]],fl:'It never went out. Not once. Not even after.'},
   {name:"Rope's End",slot:'armor',base:'Blackened Plate',aff:[['edef',300,400],['life',110,150],['thorns',40,60],['ms',18,25]],fl:'The last thing anyone holds on the way down.'},
-  {name:'Mujō',slot:'weapon',base:'Nodachi',aff:[['ed',360,480],['shock',30,55],['ls',8,12],['crit',25,35],['as',20,30]],fl:'Nothing stays. Not even the wound it leaves.'},
+  {name:'Mujō',slot:'weapon',base:'Nodachi',aff:[['ed',95,130],['shock',14,24],['ls',6,10],['crit',12,18],['as',10,16]],fl:'Nothing stays. Not even the wound it leaves.'},
   {name:"The Hound's Jaw",slot:'helm',base:'Hound Visor',aff:[['crit',30,45],['ls',8,12],['as',20,30],['life',60,90]],fl:'It was never a helmet. It was always teeth.'}
 ];
 /* legendaries replaced set items (v13): a random base, five or six strong stats, a name from LEG1 */

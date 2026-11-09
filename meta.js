@@ -24,7 +24,7 @@ function mlvl(i){ const li=i==null?lvlIdx:i; const L_=LEVELS[li]; if(L_&&L_.kind
 const tierRange=t=>t===0?[1,21]:[DIFFS[t].lo,Math.min(100,DIFFS[t].lo+10)];
 function diffLabel(){ const t=tierNow(); return `${DIFFS[t].n} · Lv ${mlvl()}`; }
 function xpMul(){ return ngp>0?(1+mlvl()*.15)*(1+tierNow()*.3):1; }
-(function(){ const o=spawnBoss; spawnBoss=function(key){ const g=ngp; ngp=0; const e=o(key); ngp=g; if(g>0){ const D=diff(), D0=lvlIdx; const hs=x=>(1+.3*x)*(1+x*x*.002), ds=x=>(1+.17*x)*(1+x*x*.0006); e.hp=e.maxhp=Math.round(e.hp*hs(D)/hs(D0)*1.3); e.dmg*=ds(D)/ds(D0)*1.15; } return e; }; })();
+(function(){ const o=spawnBoss; spawnBoss=function(key){ const g=ngp; ngp=0; const e=o(key); ngp=g; if(g>0){ const D=diff(), D0=dep(lvlIdx); /* v34: was lvlIdx — after the 3-act reorder that divided late bosses by a depth of 22–26 instead of ~8–10 */ const hs=x=>(1+.3*x)*(1+x*x*.002), ds=x=>(1+.17*x)*(1+x*x*.0006); e.hp=e.maxhp=Math.round(e.hp*hs(D)/hs(D0)*1.3); e.dmg*=ds(D)/ds(D0)*1.15; } return e; }; })();
 
 /* ---------- save slots ---------- */
 const SLOTS_KEY='marrowdeep.slots', STASH_KEY='marrowdeep.stash', MAX_SLOTS=8;

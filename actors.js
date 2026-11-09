@@ -240,11 +240,13 @@ function updPlayer(dt){
   if(p.lava&&!p.dead){ for(let i=0;i<20;i++) part({x:p.x+rnd(-6,6),y:p.y-4,vx:rnd(-60,60),vy:rnd(-160,-40),g:300,life:rnd(.3,.7),em:true,col:pick(['#ff9a3c','#ffcf7a','#ff4a1a'])}); AU.noise(.5,2000,200,1,.4,'lowpass',.2); }
   if(p.spiked||p.y>L.h*T+30){ bleed(p.x,p.y-6,14,1,1.2); const ff=Math.round(s.life*.25); p.inv=0; p.dash=0; p.attack=null; p.teth=null; hurtPlayer(ff,{x:p.x,hp:0,dead:true}); if(!p.dead){ if(typeof beamRespawn==='function') beamRespawn(p.safe.x,p.safe.y); else { p.x=p.safe.x; p.y=p.safe.y; p.vx=p.vy=0; p.inv=1; } } }
 }
+/* share of a blow that gets through your defense (v34 replaces this in bal34.js: defense measured against the monster level) */
+let defMul=def=>100/(100+def*2);
 function hurtPlayer(d,src){
   if(P.dead||P.ghostT>0||mode!=='play') return;
   if(P.dash>0){ if(has('clar')&&P.dashAge<.2&&P.clarCd<=0) triggerClarity(); return; }
   if(P.inv>0) return;
-  const s=P.stats; let dmg=d*(1+diff()*.0)*100/(100+s.def*2)*(P.houndT>0?.6:1);
+  const s=P.stats; let dmg=d*defMul(s.def)*(P.houndT>0?.6:1);
   if(P.block&&src&&Math.sign((src.x==null?P.x:src.x)-P.x)===P.face){ if(time-P.blockT<.2){ parry(src); P.inv=.3; return; } dmg*=.2; P.grit=Math.max(0,P.grit-10); AU.clang(); sparks(P.x+P.face*7,P.y-16,6,'#fff1c8'); P.vx=-P.face*90; P.inv=.25; }
   dmg=Math.max(1,Math.round(dmg));
   P.life-=dmg; P.rage=Math.min(100,P.rage+dmg*1.5);
@@ -293,7 +295,7 @@ function killEnemy(e,dir,crit){
   for(let i=0;i<10;i++){ const gx=e.x+rnd(-10,10), ty=Math.floor((e.y+1)/T); if(tileAt(Math.floor(gx/T),ty)===1) decal(gx,ty*T,pick(BLOOD),ri(1,3)); }
   AU.kill(); if(AU.gore&&(e.type==='brute'||e.unique||e.champ||e.rare)) AU.gore(); const hordeK=e.pack&&!e.champ; shake(e.type==='brute'||e.unique?7:hordeK?2.5:4); freeze=Math.max(freeze,e.type==='brute'||e.champ||e.rare||e.unique?.12:hordeK?.035:.07);
   if(e.type==='bloat') explodeBloat(e);
-  gainXP(e.xp*(1+lvlIdx*.12)*(typeof xpMul==='function'?xpMul():1));
+  gainXP(e.xp*(1+dep()*.12)* /* v34: was lvlIdx (×4.2 by Act III) */(typeof xpMul==='function'?xpMul():1));
   const gf=1+P.stats.gf/100;
   if(e.type==='debtor'){ for(let i=0;i<10;i++) dropGold(e.x+rnd(-10,10),e.y-8,Math.round(ri(8,16)*(1+lvlIdx*.6)*gf)); dropChest(e,1); toast('The Gilded Debtor\'s debts come loose: a reliquary falls out of his coat.'); }
   if(e.rare||e.unique){ if(R()<(e.unique?CHEST_DROP.unique:CHEST_DROP.rare)) dropChest(e,1); if(e.unique){ AU.roar(); showBossName(e.name,'討','Struck down.'); } }

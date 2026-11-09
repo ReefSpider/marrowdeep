@@ -8,14 +8,19 @@ const varies=a=>a.lo!=null&&a.lo!==a.hi;
 const isShield=it=>it&&it.base.cls==='shield';
 const affSlot=it=>it.base.cls==='shield'?'shield':it.slot;
 const valTxt=(k,v)=>AFX[k][0]+v+AFX[k][1];
-function gradeRange(lo,hi,g){ const sp=hi-lo; if(g===4) return [hi+Math.max(1,Math.ceil(hi*.5)),hi+Math.max(2,Math.ceil(hi))]; if(g===3) return [hi,hi];
+/* v34 rarity budget (see v34 notes): what uniques and abyssals get over a rare, in one place */
+const BUD={uFloor:1.05,aFloor:1.1,uEmp:1.1,sigU:1.2,sigA:1.3,g4:[.1,.25],edU:.55,edA:.55};
+/* v34: a unique's or abyssal's enhanced damage/defense grows into its full size by item level 12, the way a rare's ED tier does
+   (a level-2 unique with +150% was three times a level-2 rare) */
+const edScale=il=>clamp(((il||1)+4)/16,.35,1);
+function gradeRange(lo,hi,g){ const sp=hi-lo; if(g===4) return [hi+Math.max(1,Math.ceil(hi*BUD.g4[0])),hi+Math.max(2,Math.ceil(hi*BUD.g4[1]))]; /* v34: Abyssal grade +10–25% over the top (was +50–100%) */ if(g===3) return [hi,hi];
   const b1=lo+Math.floor(sp*.4), b2=lo+Math.floor(sp*.75); if(g===0) return [lo,b1]; if(g===1) return [b1+1,b2]; return [b2+1,hi-1]; }
 function valueFor(lo,hi,g){ while(g>0){ const r=gradeRange(lo,hi,g); if(r[0]<=r[1]) return ri(r[0],r[1]); g--; } return ri(lo,gradeRange(lo,hi,0)[1]); }
 function rollStat(lo,hi){ if(lo===hi) return {v:lo,g:3}; let r=R()*GR.reduce((a,b)=>a+b.w,0), g=0; for(let i=0;i<GR.length;i++){ r-=GR[i].w; if(r<=0){g=i;break;} }
   while(g>0&&g<3){ const rg=gradeRange(lo,hi,g); if(rg[0]<=rg[1]) break; g--; } return {v:valueFor(lo,hi,g),g}; }
 function fin(it){ const ed=sumAff(it,'ed'),edef=sumAff(it,'edef');
   if(it.slot==='weapon'&&it.base.max>0){const sc=(1+Math.max(0,(it.ilvl||1)-1)*.075)*(it.rarity>=4?uniqueFloor(it):1);it.min=Math.max(1,Math.round(it.base.min*sc*(1+ed/100)));it.max=Math.max(it.min+1,Math.round(it.base.max*sc*(1+ed/100)));}
-  if(it.base.def!=null) it.def=Math.round(it.base.def*(it.rarity>=4&&it.slot!=='weapon'?defFloor(it)*(it.rarity===5?1.2:1.05):1)*(it.dq||100)/100*(1+edef/100)*(1+Math.max(0,(it.ilvl||1)-1)*.05));
+  if(it.base.def!=null) it.def=Math.round(it.base.def*(it.rarity>=4&&it.slot!=='weapon'?defFloor(it)*(it.rarity===5?BUD.aFloor:BUD.uFloor):1)*(it.dq||100)/100*(1+edef/100)*(1+Math.max(0,(it.ilvl||1)-1)*.05));
   return it; }
 /* every stat category that can appear on this slot, each counted once, so all are equally likely */
 function catPool(slot){ const ks=[]; for(const a of PRE.concat(SUF)) if(a.s.includes(slot)&&!ks.includes(a.k)) ks.push(a.k); return ks; }
@@ -35,17 +40,22 @@ function flatScale(k,lo,hi,ilvl){ const m=flatMul(k,ilvl); if(m===1) return [lo,
 function pickWeaponBase(ilvl){ const ok=BASES.weapon.filter(b=>b.lvl<=ilvl+1); const cls=[...new Set(ok.map(b=>b.cls))]; const c=pick(cls);
   const inC=ok.filter(b=>b.cls===c), hs=[...new Set(inC.map(b=>b.h))], h=pick(hs); const pool=inC.filter(b=>b.h===h).sort((a,b)=>b.lvl-a.lvl);
   return pool[pool.length>1&&R()<.3?1:0]; }
-function uniqueFloor(it){ const b=it.base; if(!(b.max>0)) return 1; const il=it.ilvl||1; let best=b;
-  for(const x of BASES.weapon) if(x.h===b.h&&x.cls===b.cls&&x.max>0&&x.lvl<=il+1&&x.min+x.max>best.min+best.max) best=x;
-  return Math.max(1,(best.min+best.max)/(b.min+b.max)*(it.rarity===5?1.2:1.05)); }
-function defFloor(it){ const b=it.base; if(!b.def||!BASES[it.slot]) return 1; const il=it.ilvl||1; let best=b; for(const x of BASES[it.slot]) if(x.def&&x.lvl<=il+1&&x.def>best.def) best=x; return best.def/b.def; }
+/* v34: this cuts both ways now. A unique on a base above its item level (Bellbreaker's Great Hammer at item level 2) used to
+   keep the big base's damage; it now hits like the best base of its kind that the item level reaches. */
+function uniqueFloor(it){ const b=it.base; if(!(b.max>0)) return 1; const il=it.ilvl||1; let best=null;
+  for(const x of BASES.weapon) if(x.h===b.h&&x.cls===b.cls&&x.max>0&&x.lvl<=il+1&&(!best||x.min+x.max>best.min+best.max)) best=x;
+  return (best?(best.min+best.max)/(b.min+b.max):1)*(it.rarity===5?BUD.aFloor:BUD.uFloor); }
+function defFloor(it){ const b=it.base; if(!b.def||!BASES[it.slot]) return 1; const il=it.ilvl||1; let best=null; for(const x of BASES[it.slot]) if(x.def&&x.lvl<=il+1&&(!best||x.def>best.def)) best=x; return best?best.def/b.def:1; }
 /* v16: damage types are what make a unique (and an abyssal) unique. Lesser items never roll them; every unique carries
    one, its own, at the strongest tier, rolled 20% higher (abyssal 50%) and growing with item level like any flat stat. */
 const SIG_EL={"Widow's Promise":'blood','Grave Mother':'bone','The Mourning Hatchet':'shadow',"Sister's Needle":'poison','Gravedigger':'cold','Last Wall of Hollowmere':'holy','Ironheart':'fire','Hollow Crown':'shadow',"The Debtor's Chain":'water',
   'The Unpaid Debt':'blood',"Ilse's Candle":'holy',"Rope's End":'wind',"The Hound's Jaw":'blood'};
-function signatureElem(it,ilvl){ const k=SIG_EL[it.name]||ELEM_KEYS[(it.name||'').length%ELEM_KEYS.length]; const d=PRE.find(x=>x.k===k); if(!d) return null; const t=d.v.length-1;
-  const m=(it.rarity===5?1.5:1.2)*flatMul(k,ilvl); const lo=Math.round(d.v[t][0]*m), hi=Math.max(lo+1,Math.round(d.v[t][1]*m)); const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:d.n[t],pre:true}; }
-function empower(it,ilvl){ for(const a of it.aff){ if(a.hi<=0) continue; const m=(it.rarity===4?1.2:1)*flatMul(a.k,ilvl); if(m===1) continue; a.lo=Math.round(a.lo*m); a.hi=Math.max(a.lo,Math.round(a.hi*m)); const rs=rollStat(a.lo,a.hi); a.v=rs.v; a.g=rs.g; }
+/* v34: the signature type rolls at the tier the item level reaches (like any stat), not always the top tier — the top tier
+   on an item level 1 unique was three times the weapon's own damage */
+function sigTier(d,ilvl){ return Math.min(d.v.length-1,Math.floor((ilvl||1)/4)); }
+function signatureElem(it,ilvl){ const k=SIG_EL[it.name]||ELEM_KEYS[(it.name||'').length%ELEM_KEYS.length]; const d=PRE.find(x=>x.k===k); if(!d) return null; const t=sigTier(d,ilvl);
+  const m=(it.rarity===5?BUD.sigA:BUD.sigU)*flatMul(k,ilvl); const lo=Math.round(d.v[t][0]*m), hi=Math.max(lo+1,Math.round(d.v[t][1]*m)); const rs=rollStat(lo,hi); return {k,v:rs.v,g:rs.g,lo,hi,nm:d.n[t],pre:true}; }
+function empower(it,ilvl){ for(const a of it.aff){ if(a.hi<=0) continue; const m=(it.rarity===4?BUD.uEmp:1)*flatMul(a.k,ilvl)*(a.k==='ed'?(it.rarity===4?BUD.edU:it.rarity===5?BUD.edA:1):1)*((a.k==='ed'||a.k==='edef')&&it.rarity>=4?edScale(ilvl):1); if(m===1) continue; a.lo=Math.round(a.lo*m); a.hi=Math.max(a.lo,Math.round(a.hi*m)); const rs=rollStat(a.lo,a.hi); a.v=rs.v; a.g=rs.g; }
   if(!it.aff.some(a=>ELEM_KEYS.includes(a.k))){ const a=signatureElem(it,ilvl); if(a) it.aff.push(a); }
   if(it.rarity!==4) return it; const used=new Set(it.aff.map(a=>a.k)); const as=affSlot(it);
   for(let i=0;i<2;i++){ const a=rollAff(i?SUF:PRE,as,ilvl+6,used)||rollAff(i?PRE:SUF,as,ilvl+6,used); if(a){ a.x=1; it.aff.push(a); } }
@@ -147,8 +157,8 @@ function getIcon(it){ if(it._ic) return it._ic; const c=document.createElement('
 function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=32; c.getContext('2d').drawImage(getIcon(it),0,0); return c; }
 
 /* ---------- serialise for save/continue ---------- */
-const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v23: rc = times offered at the altar, ins = insured */
-const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; } return it; };
+const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set,v34:1},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v34: every item saved from now on carries v34, so the one-time rebudget skips it */ /* v23: rc = times offered at the altar, ins = insured */
+const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; if(!o.v34&&typeof rebudget==='function'&&rebudget(it)) fin(it); } return it; };
 
 /* ---------- grids (v21): the satchel and the stash, items take up room by size ----------
    Each grid is 16 × 10 cells per tab. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon

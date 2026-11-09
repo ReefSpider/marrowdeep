@@ -184,9 +184,9 @@ function runPat2(e,dt,p,n,t,F){
   if(n==='hymn'){ const k=e.phase>2?4:3; if(p.walls<k&&t>=.6+p.walls*1.15){ const dir=p.walls%2?-1:1, x=dir>0?1.2*T:(L.w-1.2)*T; const gap=pick([F-26,F-90,F-150]); p.walls++; AU.scream();
       for(let y=24;y<F;y+=14){ if(Math.abs(y-gap)<26) continue; eProj({type:'note',x,y,vx:dir*(e.phase>2?150:125),vy:0,dmg:e.dmg*.6,r:5,life:5.5,ghost:true}); } }
     if(t>=.6+k*1.15+1.2) endPat(e,1.2); return true; }
-  if(n==='anchors'){ if(!p.done&&t>=.6){ p.done=1; e.anchorsUp=1; for(const x of [3*T,L.w*T/2,(L.w-3)*T]){ const a=mkEnemyAt('anchor',x,F-(x===L.w*T/2?150:30)); a.hy=a.y; a.hp=a.maxhp=50+lvlIdx*10+ngp*60; enemies.push(a); ash(a.x,a.y-8,16); } toast('Break the debt anchors. Each one feeds him.'); shake(5); }
+  if(n==='anchors'){ if(!p.done&&t>=.6){ p.done=1; e.anchorsUp=1; for(const x of [3*T,L.w*T/2,(L.w-3)*T]){ const a=mkEnemyAt('anchor',x,F-(x===L.w*T/2?150:30)); a.hy=a.y; a.hp=a.maxhp=50+dep()*10+ngp*60; enemies.push(a); ash(a.x,a.y-8,16); } toast('Break the debt anchors. Each one feeds him.'); shake(5); }
     if(t>=1.4) endPat(e,1); return true; }
-  if(n==='martyr'){ if(!p.done&&t>=.5){ p.done=1; e.shield=1; e.shieldT=e.phase>2?8:10; for(const [x,y] of [[4*T,F-40],[L.w*T/2,F-150],[(L.w-4)*T,F-40]]){ const r=mkEnemyAt('relicx',x,y); r.hy=r.y; r.hp=r.maxhp=40+lvlIdx*8+ngp*50; enemies.push(r); sparks(x,y-8,12,'#ffe0a0'); } toast('She is sealed. Break her reliquaries before the seal bursts.'); }
+  if(n==='martyr'){ if(!p.done&&t>=.5){ p.done=1; e.shield=1; e.shieldT=e.phase>2?8:10; for(const [x,y] of [[4*T,F-40],[L.w*T/2,F-150],[(L.w-4)*T,F-40]]){ const r=mkEnemyAt('relicx',x,y); r.hy=r.y; r.hp=r.maxhp=40+dep()*8+ngp*50; enemies.push(r); sparks(x,y-8,12,'#ffe0a0'); } toast('She is sealed. Break her reliquaries before the seal bursts.'); }
     if(t>=1.2) endPat(e,.8); return true; }
   if(n==='challenge'){ const g=p.delay; if(t<g){ e.vx=0; if(R()<.2) ash(e.x,e.y-20,1); }
     else if(!p.glint){ p.glint=t; AU.ting(); U.uWhite.value=.25; sparks(e.x+e.face*8,e.y-24,10,'#fff6d8'); }

@@ -29,7 +29,7 @@ function sheetDps(){ const m=handSheet('main'), o=handSheet('off'), dual=!!(o&&t
   const total=!m?0:dual?(m.dmg+o.dmg)/(m.t+o.t):m.dps; return {total,main:m?m.dps:0,off:o?o.dps:0,dual}; }
 function sheetWith(slot,it){ const sv=P.equip[slot], life=P.life, pow=P.power; P.equip[slot]=it; calcStats(); const d=sheetDps(); P.equip[slot]=sv; calcStats(); P.life=life; P.power=pow; return d; }
 /* effective life: how much raw foe damage it takes to empty your life (defense counted, everything else left out) */
-const effLife=s=>Math.round(((s||P.stats).life)*(100+2*(s||P.stats).def)/100);
+const effLife=s=>Math.round(((s||P.stats).life)/defMul((s||P.stats).def));
 
 /* ---------- the meter: damage read from foes' life ---------- */
 const DPS={log:[],cur:{main:0,off:0,other:0},fight:null,last:null,pend:{main:0,off:0,remote:0}};

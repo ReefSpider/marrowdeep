@@ -27,12 +27,12 @@ BAL.row=function(tier,m,K,plvlOff){ K=K||40; const pl=Math.max(1,m+(plvlOff==nul
   try{
     const foes={}; for(const t of BAL_FOES){ let hp=0,dmg=0; for(let i=0;i<6;i++){ const e=mkEnemy({x:0,y:0,t}); hp+=e.maxhp; dmg+=e.dmg; } foes[t]={hp:Math.round(hp/6),hit:Math.round(dmg/6)}; }
     const row={tier,m,pl,il,foes,prof:{}};
-    for(const [name,pr] of Object.entries(BAL_PROF)){ const dps=[],eff=[],main=[];
+    for(const [name,pr] of Object.entries(BAL_PROF)){ const dps=[],eff=[],main=[],dv=[],lf=[];
       for(let k=0;k<K;k++){ P.lvl=pl; P.equip={weapon:null,off:null,armor:null,helm:null,ring:null,amulet:null}; P.way=null;
-        for(const s of BAL_SLOTS) P.equip[s]=balItem(pr.w[s],s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); }
+        for(const s of BAL_SLOTS) P.equip[s]=balItem(pr.w[s],s,il+(pr.il||0)); calcStats(); const d=sheetDps(); dps.push(d.total); eff.push(effLife(P.stats)); dv.push(P.stats.def); lf.push(P.stats.life); }
       const g=foes.ghoul, b=foes.brute; const P50=balPct(dps,.5), E50=balPct(eff,.5);
       row.prof[name]={dps:[balPct(dps,.1),P50,balPct(dps,.9)].map(Math.round),eff:[balPct(eff,.1),E50,balPct(eff,.9)].map(Math.round),
-        ttkGhoul:+(g.hp/P50).toFixed(2),ttkBrute:+(b.hp/P50).toFixed(2),ttkGhoulP90:+(g.hp/balPct(dps,.9)).toFixed(2),htdGhoul:+(E50/Math.max(1,g.hit)).toFixed(1),htdBrute:+(E50/Math.max(1,b.hit)).toFixed(1)}; }
+        ttkGhoul:+(g.hp/P50).toFixed(2),ttkBrute:+(b.hp/P50).toFixed(2),ttkGhoulP90:+(g.hp/balPct(dps,.9)).toFixed(2),def:Math.round(balPct(dv,.5)),life:Math.round(balPct(lf,.5)),htdGhoul:+(E50/Math.max(1,g.hit)).toFixed(1),htdBrute:+(E50/Math.max(1,b.hit)).toFixed(1)}; }
     return row;
   } finally{ ngp=sv.ngp; mlvl=sv.mlvl; if(sv.ec) eliteChance=sv.ec; } };
 /* which monster levels a tier spans (tierRange: Pilgrim 1–21, then lo to lo+10) */
@@ -49,3 +49,14 @@ BAL.factors=function(ms){ const out=[]; const svP=P; P=newPlayer(); calcStats();
     out.push({m,base:(best.min+best.max)/2,ilvlMul:+(1+(il-1)*.075).toFixed(2),heroMul:+(1+(m+1)*.05).toFixed(2),flatMul:+(1+.05*Math.max(0,il-12)).toFixed(2),
       foeBase:+((1+.3*(m-1)/2)*(1+.002*((m-1)/2)**2)).toFixed(2),ramp:+RAMP.hp(m).toFixed(2)}); } }
   finally{ P=svP; if(P) calcStats(); } return out; };
+/* v34: bosses. For every boss level on a tier: the boss's life and hit, and seconds of pure swinging to kill it with the
+   median kit of each profile (life ÷ sheet DPS). Real fights run longer (dodging, phases, grit). Needs a level loaded,
+   so it loads each boss level in turn; call it from the harness, not mid-run. */
+BAL.bosses=function(opt){ opt=opt||{}; const tiers=opt.tiers||[0,1,2,4,6,8,10], K=opt.K||24, out=[];
+  const svP=P, svI=lvlIdx, svN=ngp; P=newPlayer(); P.skills=new Set(); calcStats();
+  try{ for(const t of tiers){ if(t>0&&!DIFFS[t]) continue; ngp=t;
+    for(let i=0;i<LEVELS.length;i++){ const d=LEVELS[i]; if(!d.boss) continue; loadLevel(i); const m=mlvl();
+      let hp=0,dmg=0; for(let j=0;j<3;j++){ const e=spawnBoss(d.boss); hp+=e.maxhp; dmg+=e.dmg; } hp/=3; dmg/=3;
+      const row=BAL.row(t,m,K); const sec={}; for(const p of ['rare','leg','uniq','abyss']) sec[p]=Math.round(hp/row.prof[p].dps[1]);
+      out.push({tier:t,boss:d.boss,m,hp:Math.round(hp),hit:Math.round(dmg),sec,htd:+(row.prof.rare.eff[1]/Math.max(1,dmg)).toFixed(1)}); } } }
+  finally{ P=svP; ngp=svN; lvlIdx=svI; if(P) calcStats(); } return out; };
