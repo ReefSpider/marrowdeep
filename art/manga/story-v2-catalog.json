@@ -46,7 +46,7 @@
     },
     {
       "id": "pr-01-kesh",
-      "file": "pr-01-kesh.png",
+      "file": "pr-01-kesh.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -62,7 +62,7 @@
     },
     {
       "id": "pr-02-backs",
-      "file": "pr-02-backs.png",
+      "file": "pr-02-backs.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -78,7 +78,7 @@
     },
     {
       "id": "pr-03-order",
-      "file": "pr-03-order.png",
+      "file": "pr-03-order.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -94,7 +94,7 @@
     },
     {
       "id": "pr-04-granary",
-      "file": "pr-04-granary.png",
+      "file": "pr-04-granary.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -124,7 +124,7 @@
     },
     {
       "id": "pr-05-triumph",
-      "file": "pr-05-triumph.png",
+      "file": "pr-05-triumph.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -141,7 +141,7 @@
     },
     {
       "id": "pr-06-heir",
-      "file": "pr-06-heir.png",
+      "file": "pr-06-heir.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -158,7 +158,7 @@
     },
     {
       "id": "pr-07-insult",
-      "file": "pr-07-insult.png",
+      "file": "pr-07-insult.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -187,7 +187,7 @@
     },
     {
       "id": "pr-08-crypt",
-      "file": "pr-08-crypt.png",
+      "file": "pr-08-crypt.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "4:5",
@@ -202,7 +202,7 @@
     },
     {
       "id": "pr-09-altar",
-      "file": "pr-09-altar.png",
+      "file": "pr-09-altar.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -219,7 +219,7 @@
     },
     {
       "id": "pr-10-price",
-      "file": "pr-10-price.png",
+      "file": "pr-10-price.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -235,7 +235,7 @@
     },
     {
       "id": "pr-11-letters",
-      "file": "pr-11-letters.png",
+      "file": "pr-11-letters.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -250,7 +250,7 @@
     },
     {
       "id": "pr-12-wine",
-      "file": "pr-12-wine.png",
+      "file": "pr-12-wine.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -267,7 +267,7 @@
     },
     {
       "id": "pr-13-wake",
-      "file": "pr-13-wake.png",
+      "file": "pr-13-wake.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -339,7 +339,7 @@
     },
     {
       "id": "pr-14-doorway",
-      "file": "pr-14-doorway.png",
+      "file": "pr-14-doorway.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "4:5",
@@ -357,7 +357,7 @@
     },
     {
       "id": "pr-15-trial",
-      "file": "pr-15-trial.png",
+      "file": "pr-15-trial.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -376,7 +376,7 @@
     },
     {
       "id": "pr-16-rook",
-      "file": "pr-16-rook.png",
+      "file": "pr-16-rook.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -394,7 +394,7 @@
     },
     {
       "id": "pr-17-mercy",
-      "file": "pr-17-mercy.png",
+      "file": "pr-17-mercy.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -412,7 +412,7 @@
     },
     {
       "id": "pr-18-hostage",
-      "file": "pr-18-hostage.png",
+      "file": "pr-18-hostage.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -432,7 +432,7 @@
     },
     {
       "id": "pr-19-window",
-      "file": "pr-19-window.png",
+      "file": "pr-19-window.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -451,7 +451,7 @@
     },
     {
       "id": "pr-20-candle",
-      "file": "pr-20-candle.png",
+      "file": "pr-20-candle.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -470,7 +470,7 @@
     },
     {
       "id": "pr-21-horse",
-      "file": "pr-21-horse.png",
+      "file": "pr-21-horse.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -488,7 +488,7 @@
     },
     {
       "id": "pr-22-hood",
-      "file": "pr-22-hood.png",
+      "file": "pr-22-hood.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -506,7 +506,7 @@
     },
     {
       "id": "pr-23-ride",
-      "file": "pr-23-ride.png",
+      "file": "pr-23-ride.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -525,7 +525,7 @@
     },
     {
       "id": "pr-24-crowned",
-      "file": "pr-24-crowned.png",
+      "file": "pr-24-crowned.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -543,7 +543,7 @@
     },
     {
       "id": "pr-25-eye",
-      "file": "pr-25-eye.png",
+      "file": "pr-25-eye.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -562,7 +562,7 @@
     },
     {
       "id": "a1-01-exile",
-      "file": "a1-01-exile.png",
+      "file": "a1-01-exile.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -580,7 +580,7 @@
     },
     {
       "id": "a1-04-road",
-      "file": "a1-04-road.png",
+      "file": "a1-04-road.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -599,7 +599,7 @@
     },
     {
       "id": "b01-2-sisters",
-      "file": "b01-2-sisters.png",
+      "file": "b01-2-sisters.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -617,7 +617,7 @@
     },
     {
       "id": "b01-3-sink",
-      "file": "b01-3-sink.png",
+      "file": "b01-3-sink.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -635,7 +635,7 @@
     },
     {
       "id": "b02-2-warrant",
-      "file": "b02-2-warrant.png",
+      "file": "b02-2-warrant.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -653,7 +653,7 @@
     },
     {
       "id": "b02-3-hounds",
-      "file": "b02-3-hounds.png",
+      "file": "b02-3-hounds.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -671,7 +671,7 @@
     },
     {
       "id": "b03-2-eyes",
-      "file": "b03-2-eyes.png",
+      "file": "b03-2-eyes.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -689,7 +689,7 @@
     },
     {
       "id": "b03-3-still",
-      "file": "b03-3-still.png",
+      "file": "b03-3-still.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -707,7 +707,7 @@
     },
     {
       "id": "a1-05-tithe",
-      "file": "a1-05-tithe.png",
+      "file": "a1-05-tithe.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -725,7 +725,7 @@
     },
     {
       "id": "b04-2-preacher",
-      "file": "b04-2-preacher.png",
+      "file": "b04-2-preacher.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "4:5",
@@ -743,7 +743,7 @@
     },
     {
       "id": "b04-3-lantern",
-      "file": "b04-3-lantern.png",
+      "file": "b04-3-lantern.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -761,7 +761,7 @@
     },
     {
       "id": "a1-06-crow",
-      "file": "a1-06-crow.png",
+      "file": "a1-06-crow.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -778,7 +778,7 @@
     },
     {
       "id": "b05-2-piet",
-      "file": "b05-2-piet.png",
+      "file": "b05-2-piet.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -798,7 +798,7 @@
     },
     {
       "id": "b05-3-window",
-      "file": "b05-3-window.png",
+      "file": "b05-3-window.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -816,7 +816,7 @@
     },
     {
       "id": "a2-01-sealed",
-      "file": "a2-01-sealed.png",
+      "file": "a2-01-sealed.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -835,7 +835,7 @@
     },
     {
       "id": "a2-02-curfew",
-      "file": "a2-02-curfew.png",
+      "file": "a2-02-curfew.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -853,7 +853,7 @@
     },
     {
       "id": "b06-2-brann",
-      "file": "b06-2-brann.png",
+      "file": "b06-2-brann.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -871,7 +871,7 @@
     },
     {
       "id": "b07-3-names",
-      "file": "b07-3-names.png",
+      "file": "b07-3-names.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -889,7 +889,7 @@
     },
     {
       "id": "b09-2-rook",
-      "file": "b09-2-rook.png",
+      "file": "b09-2-rook.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -908,7 +908,7 @@
     },
     {
       "id": "b09-3-hostages",
-      "file": "b09-3-hostages.png",
+      "file": "b09-3-hostages.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -927,7 +927,7 @@
     },
     {
       "id": "b09-4-under",
-      "file": "b09-4-under.png",
+      "file": "b09-4-under.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -946,7 +946,7 @@
     },
     {
       "id": "a2-03-gate",
-      "file": "a2-03-gate.png",
+      "file": "a2-03-gate.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -964,7 +964,7 @@
     },
     {
       "id": "a2-04-horse",
-      "file": "a2-04-horse.png",
+      "file": "a2-04-horse.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -983,7 +983,7 @@
     },
     {
       "id": "a2-05-eyes",
-      "file": "a2-05-eyes.png",
+      "file": "a2-05-eyes.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "1:1",
@@ -1003,7 +1003,7 @@
     },
     {
       "id": "a2-06-charge",
-      "file": "a2-06-charge.png",
+      "file": "a2-06-charge.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -1023,7 +1023,7 @@
     },
     {
       "id": "b10-2-torch",
-      "file": "b10-2-torch.png",
+      "file": "b10-2-torch.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "16:9",
@@ -1041,7 +1041,7 @@
     },
     {
       "id": "b10-3-balcony",
-      "file": "b10-3-balcony.png",
+      "file": "b10-3-balcony.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "4:5",
@@ -1059,7 +1059,7 @@
     },
     {
       "id": "b10-4-blast",
-      "file": "b10-4-blast.png",
+      "file": "b10-4-blast.webp",
       "type": "story-panel",
       "status": "generated",
       "ratio": "21:9",
@@ -1079,10 +1079,10 @@
     },
     {
       "id": "a1-02-crow",
-      "file": "a1-02-crow.png",
+      "file": "a1-02-crow.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/op-5-crow.png",
+      "source": "art/manga/op-5-crow.webp",
       "ratio": "21:9",
       "caption": "A crow found you.",
       "tags": [
@@ -1095,10 +1095,10 @@
     },
     {
       "id": "a1-03-letter",
-      "file": "a1-03-letter.png",
+      "file": "a1-03-letter.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/a2-3-letter.png",
+      "source": "art/manga/a2-3-letter.webp",
       "ratio": "16:9",
       "caption": "\"He comes to the house now. The children ask for you. Come home.\"",
       "tags": [
@@ -1112,10 +1112,10 @@
     },
     {
       "id": "b07-2-ledger",
-      "file": "b07-2-ledger.png",
+      "file": "b07-2-ledger.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/a3-2-ledger.png",
+      "source": "art/manga/a3-2-ledger.webp",
       "ratio": "21:9",
       "caption": "The tithe: one soul in ten.",
       "tags": [
@@ -1129,10 +1129,10 @@
     },
     {
       "id": "b07-4-cage",
-      "file": "b07-4-cage.png",
+      "file": "b07-4-cage.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/b3-2-cage.png",
+      "source": "art/manga/b3-2-cage.webp",
       "ratio": "16:9",
       "caption": "The debtors climb out, still holding out their coins.",
       "tags": [
@@ -1145,10 +1145,10 @@
     },
     {
       "id": "b08-2-mouths",
-      "file": "b08-2-mouths.png",
+      "file": "b08-2-mouths.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/b2-2-mouths.png",
+      "source": "art/manga/b2-2-mouths.webp",
       "ratio": "16:9",
       "caption": "\"…long live the King, long live the King…\"",
       "tags": [
@@ -1161,10 +1161,10 @@
     },
     {
       "id": "b08-3-shut",
-      "file": "b08-3-shut.png",
+      "file": "b08-3-shut.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/b2-4-shut.png",
+      "source": "art/manga/b2-4-shut.webp",
       "ratio": "16:9",
       "caption": "Silence is also a note.",
       "tags": [
@@ -1177,10 +1177,10 @@
     },
     {
       "id": "a2-07-fall",
-      "file": "a2-07-fall.png",
+      "file": "a2-07-fall.webp",
       "type": "story-panel",
       "status": "reused",
-      "source": "art/manga/a1-1-fall.png",
+      "source": "art/manga/a1-1-fall.webp",
       "ratio": "21:9",
       "caption": "You fell.",
       "tags": [
