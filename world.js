@@ -481,8 +481,8 @@ function updPlats(dt){
 }
 function drawPlats(){
   for(const p of L.plats){ const sx=Math.round(p.x-camR.x), sy=Math.round(p.y-camR.y); if(sx>W||sx+p.w<0||sy<-40||sy>H+40) continue;
-    if(p.type==='lift'){ rect(ctx,sx,sy,p.w,5,'#3a2e28'); rect(ctx,sx,sy,p.w,1,'#7a6a5a'); rect(ctx,sx,sy+5,p.w,2,'#120c0a'); for(const cx of [sx+2,sx+p.w-3]){ for(let y=sy-1;y>sy-300;y-=3) rect(ctx,cx,y-2,1,2,'#3e3a44'); } emisAt(p.x+p.w/2,p.y+3,1,g=>{ g.fillStyle='rgba(255,170,90,.5)'; g.fillRect(-1,0,2,1); }); }
-    else if(p.type==='crumb'&&p.st!==2){ const jx=p.st===1?ri(-1,1):0; rect(ctx,sx+jx,sy,p.w,4,'#4a3020'); rect(ctx,sx+jx,sy,p.w,1,'#6a4a30'); for(let i=4;i<p.w;i+=7) rect(ctx,sx+jx+i,sy+1,1,3,'#1a100a'); rect(ctx,sx+jx+5,sy+2,3,1,'#1a100a'); } }
+    if(p.type==='lift'){ envWood(ctx,sx,sy,p.w,'lift'); for(const cx of [sx+2,sx+p.w-3]){ for(let y=sy-1;y>sy-300;y-=3) rect(ctx,cx,y-2,1,2,'#3e3a44'); } emisAt(p.x+p.w/2,p.y+3,1,g=>{ g.fillStyle='rgba(255,170,90,.5)'; g.fillRect(-1,0,2,1); }); }
+    else if(p.type==='crumb'&&p.st!==2){ const jx=p.st===1?ri(-1,1):0; envWood(ctx,sx+jx,sy,p.w,'crumb',p.st); } }
   for(const pd of L.pends){ const ax=pd.x-camR.x, ay=pd.y-camR.y, bx=pd.bx-camR.x, by=pd.by-camR.y; if(Math.max(ax,bx)<-40||Math.min(ax,bx)>W+40) continue;
     const n=Math.floor(pd.len/4); for(let i=0;i<n;i++){ const k=i/n; rect(ctx,Math.round(lerp(ax,bx,k)),Math.round(lerp(ay,by,k)),1,2,'#3e3a44'); }
     ctx.save(); ctx.translate(bx,by); ctx.rotate(-pd.a); ctx.fillStyle='#4a4a52'; ctx.beginPath(); ctx.arc(0,0,13,.15,Math.PI-.15); ctx.lineTo(-6,2); ctx.arc(0,-2,7,Math.PI,0,true); ctx.fill(); ctx.fillStyle='#bdb6a8'; ctx.beginPath(); ctx.arc(0,0,13,.3,Math.PI-.3); ctx.arc(0,0,12,Math.PI-.3,.3,true); ctx.fill(); ctx.fillStyle='#5a1414'; ctx.fillRect(-3,9,5,2); ctx.restore();
