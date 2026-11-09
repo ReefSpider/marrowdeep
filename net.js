@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-44'; /* v44: boss guard and openings */ /* v43: duels */ /* v42: Pilgrim ramps from Act I's end; unique damage types smaller early */ /* v41: late foes and levels step up */ /* v40: attributes, sets and threat */ /* v38: chests have kinds; an older build would roll the wrong kind of item */
+const NET_V='marrowdeep-45'; /* v45: co-op items and names are checked on arrival; builds rebalance */ /* v44: boss guard and openings */ /* v43: duels */ /* v42: Pilgrim ramps from Act I's end; unique damage types smaller early */ /* v41: late foes and levels step up */ /* v40: attributes, sets and threat */ /* v38: chests have kinds; an older build would roll the wrong kind of item */
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,
