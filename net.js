@@ -25,7 +25,7 @@ function makeCode(){ const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s=''; for(le
 const cleanCode=s=>(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
 let peerLib=null;
 function loadPeer(){ if(window.Peer) return Promise.resolve(); if(peerLib) return peerLib;
-  peerLib=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'; sc.onload=()=>res(); sc.onerror=()=>{ peerLib=null; rej(new Error('lib')); }; document.head.appendChild(sc); }); return peerLib; }
+  peerLib=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='lib/peerjs.min.js?v=1.5.4'; /* v45: self-hosted (PeerJS 1.5.4, MIT; was jsDelivr) */ sc.onload=()=>res(); sc.onerror=()=>{ peerLib=null; rej(new Error('lib')); }; document.head.appendChild(sc); }); return peerLib; }
 /* Where two machines find a route to each other. STUN finds a direct path; when a network won't allow one
    (mobile data, carrier-grade NAT, office firewalls) a TURN relay has to carry the game instead.
    METERED_TURN: paste a Metered TURN credentials URL here (free account, 20 GB a month) for a dedicated relay:
@@ -145,7 +145,7 @@ function renderCoop(code){ const lobby=NET.conn;
     $('#cpHost').onclick=()=>netHost(); $('#cpJoin').onclick=()=>netJoin(cleanCode($('#cpCode').value)); $('#cpBack').onclick=closeCoop;
     $('#cpCode').onkeydown=e=>{ if(e.key==='Enter') netJoin(cleanCode($('#cpCode').value)); }; return; }
   const tier=NET.tier!=null?NET.tier:(META.pick||0); const [a,b]=tierRange(tier);
-  coopScr.innerHTML=`<h2 class="mh">Together <span>共に</span></h2><div class="sub">Send this code to the others. They open the same page, press Together and type it in.</div>
+  coopScr.innerHTML=`<h2 class="mh">Together <span>共に</span></h2><div class="sub">Send this code to the others. They open the same page, press Co-op and type it in.</div>
     <div class="cpbox"><div class="cpcode">${NET.code}</div>${NET.host?'<div class="row"><button class="btn ghost" id="cpCopy">Copy code</button><button class="btn ghost" id="cpLink">Copy link</button></div>':''}
     <div class="cpseats">${[0,1,2,3].map(i=>{ const x=seatOf(i); return `<div class="cpseat${x?' on':''}"><i style="background:${x?SEAT_C[i]:'#222'}"></i>${x?x.name+(i===0?' · host':'')+(i===NET.me?' · you':''):'Empty'}<small>${x?'Level '+x.lvl:''}</small></div>`; }).join('')}</div>
     <div class="sub" style="margin:0">${DIFFS[tier].n} · monster level ${a}–${b}${NET.seats.length>1?` · ${NET.seats.length} sellswords: foes have ${Math.round(60*(NET.seats.length-1))}% more life and there are more of them`:''}</div>

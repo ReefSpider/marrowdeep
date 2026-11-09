@@ -1,0 +1,7 @@
+# local tooling and scratch output
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+tools/lab/out/

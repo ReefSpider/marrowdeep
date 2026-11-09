@@ -14,7 +14,7 @@ const wpick=ws=>{let s=0;for(const k in ws)s+=ws[k];let r=R()*s;for(const k in w
 const hsh=(a,b)=>{const s=Math.sin(a*127.1+b*311.7)*43758.5453;return s-Math.floor(s);};
 function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 function withSeed(seed,fn){ const prev=RNG; RNG=mulberry(seed>>>0); try{ return fn(); } finally { RNG=prev; } }
-const store={get(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const store={get(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v)); return true;}catch(e){ /* v45: say so once instead of failing quietly (storage full, private window, blocked) */ if(!store.warned){ store.warned=true; setTimeout(()=>{ try{ toast('Your progress can\'t be saved in this browser: its storage is full or blocked.',2); }catch(_){} },0); } return false; }},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 
 /* ---------- audio (all synthesized) ---------- */
 const SETTINGS=Object.assign({music:.75,sfx:1},store.get('marrowdeep.settings')||{});
