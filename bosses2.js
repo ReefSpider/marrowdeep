@@ -166,12 +166,7 @@ function bridgeFall(){ for(const e of enemies) if(!e.dead) e.stun=99;
 function horse(c,t,run,col){ const g=run?Math.sin(t*14)*2:Math.sin(t*2)*.5; col=col||'#2a2420';
   rect(c,-14,-20,26,10,col); rect(c,9,-27,5,9,col); rect(c,11,-31,8,6,col); rect(c,17,-29,2,2,'#140c0c'); rect(c,-16,-20,3,8,mixc(col,'#000000',.3));
   for(const [x,o] of [[-12,g],[-7,-g],[5,-g],[9,g]]) rect(c,x,-10+Math.min(0,o),2,10-Math.min(0,o),mixc(col,'#000000',.4)); rect(c,-12,-21,22,1,mixc(col,'#ffffff',.15)); }
-function dOdo(c,e){ const t=e.anim, p=e.pat&&e.pat.name; if(e.mounted){ horse(c,t,p==='charge'||p==='lance','#2a2018'); c.save(); c.translate(0,-18); }
-  rect(c,-5,-16,10,12,'#5a4a36'); c.fillStyle='#3a2a1a'; c.beginPath(); c.moveTo(-7,-17); c.lineTo(7,-17); c.lineTo(8,-6); c.lineTo(-8,-6); c.fill(); for(let i=0;i<5;i++) rect(c,-7+i*3,-7,2,2,'#2a1e12');
-  if(!e.mounted){ rect(c,-4,-4,3,8,'#2a2018'); rect(c,1,-4,3,8,'#2a2018'); }
-  rect(c,-3,-22,6,6,'#c8a890'); rect(c,-5,-25,10,4,'#3a2a1a'); rect(c,-6,-23,3,3,'#3a2a1a'); rect(c,1,-20,1,1,'#120c0c'); rect(c,-2,-18,5,1,'#5a3a2a');
-  const arm=p==='lance'?0:p==='net'?-1.4:p==='duel'?Math.sin(t*20)*.8:.4; c.save(); c.translate(4,-12); c.rotate(arm); if(e.mounted){ rect(c,0,-.5,30,1,'#5a4a30'); rect(c,29,-1.5,4,3,'#cfc6b2'); } else { rect(c,0,-1,14,2,'#a8a4a0'); } c.restore();
-  if(e.mounted) c.restore(); }
+/* v45: dOdo lived here; bosses29.js replaces it */
 function dSister(c,e,i,dim){ const t=e.anim+i; const col=['#2a1c30','#3a2a40','#1e2a1c'][i]; c.fillStyle=col; c.beginPath(); c.moveTo(-8,0); c.lineTo(-5,-22); c.lineTo(5,-24); c.lineTo(9,0); c.fill();
   for(let k=0;k<5;k++) rect(c,-7+k*3,-2,1,3+(k%2)*2,'#4a2f4f'); rect(c,-3,-30,7,7,'#a9b46c'); rect(c,-5,-31,11,3,'#141012'); rect(c,-6,-29,3,16,'#141012');
   if(i===0){ rect(c,-2,-28,5,2,'#6a7a4a'); } else { rect(c,-1,-28,1,1,'#120c0c'); rect(c,2,-28,1,1,'#120c0c'); }
@@ -191,18 +186,13 @@ function dPiet(c,e){ const t=e.anim, p=e.pat&&e.pat.name, rl=e.rollT!=null; c.sa
   rect(c,-3,-28,6,6,'#d8c0a0'); rect(c,-4,-30,8,3,'#6a4a2a'); rect(c,1,-26,1,1,'#120c0c'); rect(c,-1,-24,3,1,'#8a5a4a');
   const gd=e.guard||p==='charge'; const sx=gd?6:-9; rect(c,sx,-30,5,28,'#4a3a2a'); rect(c,sx,-30,5,1,'#8a7a5a'); rect(c,sx+1,-18,3,5,'#b0141a'); rect(c,sx+2,-27,1,22,'#2a1e14');
   const sw=p==='duel'?Math.sin(t*20)*.9:gd?1.2:.4; c.save(); c.translate(gd?-2:5,-18); c.rotate(sw); rect(c,0,-1,15,2,'#cfc6b2'); rect(c,-1,-2,3,4,'#4a3a2a'); c.restore(); c.restore(); }
-function dBrann(c,e){ const t=e.anim; rect(c,-6,-12,5,12,'#3a2e22'); rect(c,1,-12,5,12,'#3a2e22'); rect(c,-9,-28,18,16,'#5a4430'); rect(c,-9,-28,18,1,'#8a6a32'); rect(c,-10,-20,20,2,'#2a1e14'); for(let i=0;i<3;i++) rect(c,-7+i*5,-26,2,2,'#b08a3a');
-  rect(c,-4,-35,9,8,'#c8a890'); rect(c,-5,-37,11,3,'#3a3236'); rect(c,1,-32,1,1,'#120c0c'); rect(c,3,-32,1,1,'#120c0c'); rect(c,-2,-29,6,1,'#5a3a2a'); for(let i=0;i<3;i++) rect(c,-5+i*4,-31+i,1,1,'rgba(220,220,255,.5)');
-  /* the mortar beside him */ rect(c,12,-10,12,10,'#2a2420'); c.save(); c.translate(16,-8); c.rotate(-.9); rect(c,0,-4,16,8,'#3a3438'); rect(c,15,-4,2,8,'#1a1418'); c.restore(); if(e.pat&&(e.pat.name==='barrage'||e.pat.name==='creep')&&Math.sin(t*20)>.5){ rect(c,24,-24,4,4,'#ffd27a'); } }
-function dRook(c,e){ const t=e.anim, p=e.pat&&e.pat.name; if(e.mounted){ horse(c,t,p==='charge'||p==='lance','#5a4a3a'); c.save(); c.translate(0,-18); }
-  rect(c,-6,-16,12,13,'#6a6a72'); rect(c,-6,-16,12,1,'#a8a8b0'); if(!e.mounted){ rect(c,-4,-3,3,7,'#3a3a40'); rect(c,1,-3,3,7,'#3a3a40'); }
-  rect(c,-4,-24,8,8,'#5a5a62'); rect(c,-4,-24,8,1,'#a8a8b0'); rect(c,-1,-21,4,1,'#050304'); rect(c,-1,-30,2,6,'#e8e0d0'); rect(c,-3,-27,6,1,'#cfc6b2');
-  const sw=p==='duel'?Math.sin(t*20)*.9:p==='lance'||p==='charge'?0:.4; c.save(); c.translate(5,-12); c.rotate(sw); if(e.mounted){ rect(c,0,-.5,32,1,'#5a4a30'); rect(c,31,-1.5,4,3,'#cfc6b2'); } else { rect(c,0,-1,20,2,'#cfc6b2'); rect(c,-1,-2,3,4,'#3a2a20'); } c.restore(); if(e.mounted) c.restore(); }
+/* v45: dBrann lived here; brann27.js replaces it */
+/* v45: dRook lived here; bosses29.js replaces it */
 function dGideon(c,e){ const t=e.anim, p=e.pat&&e.pat.name, wk=Math.round(Math.sin(t*3)*Math.min(2,Math.abs(e.vx)/10)); rect(c,-4+wk,-11,3,11,'#5a0a0e'); rect(c,1-wk,-11,3,11,'#6a0e12'); rect(c,-7,-25,14,14,'#a01418'); rect(c,-7,-25,14,1,'#e04848'); rect(c,-7,-18,14,1,'#5a0a0e'); rect(c,-10,-26,4,6,'#a01418'); rect(c,6,-26,4,6,'#a01418');
   rect(c,-3,-32,7,7,'#d8c0a0'); rect(c,-4,-34,9,3,'#2a1a10'); rect(c,1,-29,1,1,'#120c0c'); rect(c,-1,-27,4,1,'#8a3a2a'); rect(c,3,-27,1,1,'#120c0c');
   const sw=p==='duel'?Math.sin(t*20)*.9:p==='flame'?Math.sin(t*10)*1.2:p==='sunder'?-2.2+Math.min(2.6,(e.pat.t||0)*2.4):.3; c.save(); c.translate(6,-21); c.rotate(sw); rect(c,0,-1,20,2,'#cfc6b2'); rect(c,-1,-2,3,4,'#5a0a0e'); c.restore();
   rect(c,-12,-20,2,10,'#3a2a1a'); }
-Object.assign(BDRAW,{odo:dOdo,sisters:dSisters,preacher:dPreacher,merrow:dMerrow,piet:dPiet,brann:dBrann,rook:dRook,gideon:dGideon});
+Object.assign(BDRAW,{sisters:dSisters,preacher:dPreacher,merrow:dMerrow,piet:dPiet,gideon:dGideon}); /* v45: odo, rook (bosses29.js) and brann (brann27.js) are set by their own modules */
 /* the sisters who aren't out wait in their pools */
 (function(){ const o=drawBossOverlays; drawBossOverlays=function(){ o(); for(const e of enemies){ if(!e.boss||e.kind!=='sisters'||e.dead) continue;
   e.sis.forEach((s,i)=>{ if(i===e.cur||!s.alive) return; blit(g=>dSister(g,e,i,true),s.x,FLOOR()+6,Math.sign(P.x-s.x)||1); });
