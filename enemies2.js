@@ -79,10 +79,29 @@ const EAI={
   relicx(e,dt){ e.y=e.hy+Math.sin(time*2+e.seed)*4; }
 };
 /* ---------- sprites ---------- */
-function drawHound(c,e){ const wk=Math.sin(e.walk*1.2); const pn=e.state==='pounce';
-  [[-5,1],[-3,-1],[3,1],[5,-1]].forEach(([lx,s])=>rect(c,lx+wk*s*2,-5,1.5,5,'#3a302c'));
-  c.fillStyle='#4a3e36'; c.beginPath(); c.moveTo(-7,-5); c.lineTo(-6,-9); c.lineTo(4,-10); c.lineTo(6,-6); c.lineTo(-6,-4); c.fill(); for(let i=0;i<4;i++) rect(c,-3+i*1.8,-8.5,.5,3,'#2a2220');
-  c.beginPath(); c.moveTo(4,-10); c.lineTo(10,-9+(pn?-1:0)); c.lineTo(11,-7); c.lineTo(5,-6); c.fill(); rect(c,7.5,-7,3,.6,'#d8ccb0'); rect(c,4.5,-11.5,1,2,'#2a2220'); rect(c,-9,-8,3,1,'#3a302c'); rect(c,-2,-9.5,2,1,'#6a5a4a'); }
+function drawHound(c,e){
+  const pn=e.state==='pounce',wk=Math.round(Math.sin((e.walk||0)*1.2)*2);
+  const p=(col,pts)=>artPoly(c,col,pts),r=(x,y,w,h,col)=>rect(c,x,y,w,h,col);
+  const dark='#302c2b',mid='#655343',light='#9d8665';
+  // Far legs fold through the hock instead of sliding as vertical pegs.
+  p(dark,[[-6,-7],[-3,-6],[-4-wk,-3],[-2-wk,-1],[-3-wk,0],[-6-wk,-2]]);
+  p(dark,[[3,-8],[5,-8],[5+wk,-3],[7+wk,-1],[4+wk,0],[3+wk,-3]]);
+  p(mid,[[-10,-9],[-8,-12],[-4,-13],[0,-12],[4,-14],[7,-11],[6,-6],[2,-5],[-2,-7],[-6,-6],[-9,-7]]);
+  p(light,[[-8,-11],[-5,-12],[-1,-11],[1,-10],[4,-12],[5,-10],[1,-8],[-4,-9]]);
+  p(dark,[[-3,-8],[1,-7],[4,-8],[4,-5],[1,-5],[-2,-6]]);
+  // Lean ribcage, heavy shoulder and tucked belly.
+  r(-3,-10,.5,2,'#403a31');r(-1,-9,.5,2,'#403a31');r(1,-9,.5,2,'#403a31');
+  p(mid,[[-8,-8],[-5,-7],[-6+wk,-4],[-5+wk,-2],[-3+wk,-1],[-3+wk,0],[-6+wk,0],[-8+wk,-4]]);
+  p(light,[[3,-10],[5,-9],[5,-5],[pn?8:4-wk,pn?-4:-1],[pn?10:7-wk,pn?-4:-1],[pn?10:7-wk,pn?-3:0],[pn?6:2-wk,pn?-3:0],[2,-5]]);
+  p(dark,[[-8,-10],[-11,-10],[-13,-13],[-12,-9],[-10,-7],[-8,-7]]);
+  // Neck, folded ear, brow, long muzzle and a separate lower jaw.
+  p(mid,[[4,-11],[4,-15],[7,-17],[10,-15],[11,-12],[14,-11],[14,-9],[9,-8],[6,-9]]);
+  p(light,[[6,-15],[8,-16],[10,-14],[10,-12],[13,-11],[10,-10],[7,-11]]);
+  p(dark,[[5,-15],[4,-18],[7,-16],[7,-13]]);
+  r(9,-14,2,1,'#201c1d');r(10,-14,.5,.5,'#d0b073');r(13,-11,2,1,'#211c1c');
+  r(10,-9,4,pn?2:1,'#2e1c20');r(11,-9,2,.5,'#dbccaa');
+  if(pn){p(mid,[[9,-7],[13,-6],[14,-7],[14,-6],[11,-5],[8,-7]]);r(12,-7,1,1,'#dbccaa');}
+}
 function drawSwarm(c,e){ for(let i=0;i<6;i++){ const a=time*7+i*1.1+e.seed, x=Math.cos(a)*3.5, y=-4+Math.sin(a*1.3)*3; rect(c,x,y,1.2,1.2,'#0e0a0c'); const w=Math.sin(time*40+i)>0; rect(c,x-.8,y-(w?.8:-.4),.8,.5,'#4a4048'); rect(c,x+1,y-(w?.8:-.4),.8,.5,'#4a4048'); } }
 function drawPenitent(c,e){ const wk=Math.round(Math.sin(e.walk)*2), spin=e.state==='spin';
   rect(c,-3+wk,-8,2,8,'#9a7a62'); rect(c,1-wk,-8,2,8,'#8a6a52'); c.fillStyle='#3a2a1e'; c.beginPath(); c.moveTo(-5,-12); c.lineTo(5,-12); c.lineTo(6,-3); c.lineTo(-6,-3); c.fill();

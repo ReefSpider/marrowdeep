@@ -116,6 +116,8 @@ function tipHTML(it){ return tipParts(it,false).html; }
 
 /* ---------- icons ---------- */
 function getIcon(it){ if(it._ic) return it._ic; const c=document.createElement('canvas'); c.width=c.height=32; const g=c.getContext('2d');
+  if(it.slot==='weapon'&&proofWeapon(it)){ g.save(); g.translate(1,30); g.rotate(-Math.PI/4); g.scale(1.35,1.35); drawCraftWeapon(g,it); g.restore(); it._ic=c; return c; }
+  if(it.slot==='helm'&&it.base.name==='Kettle Hat'){ drawKettle(g,it.rarity); it._ic=c; return c; }
   const px=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
   const b=it.base, rc=RCOL[it.rarity];
   const M=it.rarity===5?['#1a0303','#5a0f0f','#ff5a40']:it.rarity===4?['#5a1a3e','#a03a78','#ff9ad4']:it.rarity===3?['#5a3410','#a8641e','#ffbe6a']:['#3e424b','#737a87','#cfcabd'];
