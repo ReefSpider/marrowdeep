@@ -240,10 +240,12 @@ function updPlayer(dt){
   if(p.onGround&&!p.plat&&tileAt(Math.floor(p.x/T),Math.floor(p.y/T))===1&&tileAt(Math.floor((p.x-5)/T),Math.floor(p.y/T))===1&&tileAt(Math.floor((p.x+5)/T),Math.floor(p.y/T))===1){ p.safe.x=p.x; p.safe.y=p.y; }
   for(const pd of L.pends){ if(Math.hypot(pd.bx-p.x,pd.by+6-(p.y-12))<15) hurtPlayer(14+diff()*3,{x:pd.bx,hp:0,dead:true}); }
   if(p.lava&&!p.dead){ for(let i=0;i<20;i++) part({x:p.x+rnd(-6,6),y:p.y-4,vx:rnd(-60,60),vy:rnd(-160,-40),g:300,life:rnd(.3,.7),em:true,col:pick(['#ff9a3c','#ffcf7a','#ff4a1a'])}); AU.noise(.5,2000,200,1,.4,'lowpass',.2); }
-  if(p.spiked||p.y>L.h*T+30){ bleed(p.x,p.y-6,14,1,1.2); const ff=Math.round(s.life*.25); p.inv=0; p.dash=0; p.attack=null; p.teth=null; hurtPlayer(ff,{x:p.x,hp:0,dead:true}); if(!p.dead){ if(typeof beamRespawn==='function') beamRespawn(p.safe.x,p.safe.y); else { p.x=p.safe.x; p.y=p.safe.y; p.vx=p.vy=0; p.inv=1; } } }
+  if(p.spiked||p.y>L.h*T+30){ bleed(p.x,p.y-6,14,1,1.2); const ff=fallHurt(s); p.inv=0; p.dash=0; p.attack=null; p.teth=null; hurtPlayer(ff,{x:p.x,hp:0,dead:true}); if(!p.dead){ if(typeof beamRespawn==='function') beamRespawn(p.safe.x,p.safe.y); else { p.x=p.safe.x; p.y=p.safe.y; p.vx=p.vy=0; p.inv=1; } } }
 }
 /* share of a blow that gets through your defense (v34 replaces this in bal34.js: defense measured against the monster level) */
 let defMul=def=>100/(100+def*2);
+/* life a fall into spikes, lava or the pit takes (play37.js sets the real rule) */
+let fallHurt=s=>Math.round(s.life*.25);
 function hurtPlayer(d,src){
   if(P.dead||P.ghostT>0||mode!=='play') return;
   if(P.dash>0){ if(has('clar')&&P.dashAge<.2&&P.clarCd<=0) triggerClarity(); return; }
