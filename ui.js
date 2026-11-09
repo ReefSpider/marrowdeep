@@ -220,7 +220,7 @@ function actCard(act,next){ const A=ACTS[act]; if(!A){ next(); return; } showCar
 /* ---------- cutscenes ---------- */
 function playCut(steps,onEnd){ cut={steps,i:-1,t:0,onEnd}; mode='cut'; hud.hidden=true; bars(true); if(typeof MUS!=='undefined'&&!steps.keepMood) MUS.setMood('cut'); nextCutStep(); }
 function nextCutStep(){ cut.i++; const s=cut.steps[cut.i]; if(!s){ endCut(); return; } cut.t=0; cut.s=s; camZT=s.zoom||1; if(s.fade!=null) fadeTarget=s.fade; if(s.fn) s.fn(); if(s.cap!==undefined) caption(s.cap,s.jp); }
-function updCut(dt){ if(!cut) return; const s=cut.s; cut.t+=dt; if(s.cam){ cam.x=lerp(cam.x,clamp(s.cam.x-W/2,0,L.w*T-W),Math.min(1,dt*2.5)); cam.y=lerp(cam.y,clamp(s.cam.y-H*.6,0,L.h*T-H),Math.min(1,dt*2.5)); } if(s.tick) s.tick(dt,cut.t); if(cut.t>=s.dur) nextCutStep(); }
+function updCut(dt){ if(!cut) return; const s=cut.s; cut.t+=dt; if(s.cam){ cam.x=lerp(cam.x,camClampX(s.cam.x-W/2),Math.min(1,dt*2.5)); cam.y=lerp(cam.y,clamp(s.cam.y-H*.6,0,L.h*T-H),Math.min(1,dt*2.5)); } if(s.tick) s.tick(dt,cut.t); if(cut.t>=s.dur) nextCutStep(); }
 function skipCut(){ if(cut&&cut.t>.35&&cut.s.skip!==false) nextCutStep(); }
 function endCut(){ bars(false); caption(''); const f=cut.onEnd; cut=null; fadeTarget=1; camZT=1; mode='play'; hud.hidden=false; if(typeof MUS!=='undefined') MUS.setMood(moodFor(L&&L.def)); f&&f(); }
 
@@ -235,7 +235,7 @@ function loadLevel(idx,opt){ opt=opt||{}; lvlIdx=idx; interact=null; promptTxt='
   if(def.kind==='boss'){ const b=spawnBoss(def.boss); enemies.push(b); L.locked=false; L.noExit=true; if(def.id==='count') L.wound=.35; }
   P.x=L.spawn.x; P.y=L.spawn.y; P.vx=P.vy=0; P.safe={x:P.x,y:P.y}; P.attack=null; P.dash=0; P.teth=null; P.iai=null; P.shade=null; P.dead=false; P.deadT=0; P.ghostT=0; P.lastUsed=false; P.houndT=0; P.exhaustT=0; P.clarT=0; P.face=1;
   if(opt.stain) drops.push({kind:'gold',x:opt.stain.x,y:opt.stain.y-6,vx:0,vy:0,n:opt.stain.n,big:true});
-  cam.x=clamp(P.x-W/2,0,L.w*T-W); cam.y=clamp(P.y-H*.6,0,L.h*T-H);
+  cam.x=camClampX(P.x-W/2); cam.y=clamp(P.y-H*.6,0,L.h*T-H);
   U.uAmb.value.set(pal.amb[0],pal.amb[1],pal.amb[2]);
   $('#floorName').textContent=def.name; $('#actTxt').textContent=def.act+(typeof diffLabel==='function'&&def.kind!=='cabin'?' · '+diffLabel():''); $('#floorJp').textContent=def.jp||'';
   targetE=null; lastHud=''; updBelt(); AU.setTension(0); deathShown=false; L.dark=0; L.cand=null; L.gaze=null; dropQ=[]; dropSlow=0; P.streak=0; $('#drolls').innerHTML=''; dropActive=null;
@@ -302,6 +302,8 @@ function uiKey(k,e){ const m0=mode; /* a key that closes a screen must not also 
   if(m0==='play'&&mode==='play'&&k==='e'&&interact){ interact.act(); }
   if(mode==='death'&&(k==='Enter'||k==='space')) respawn(); }
 
+/* a level narrower than the view (a phone's wide screen) sits in the middle */
+function camClampX(x){ const lw=L.w*T; return lw<=W?(lw-W)/2:clamp(x,0,lw-W); }
 /* ---------- render ---------- */
 function tileBG(img,off,y){ const w=img.width; let ox=-(((off%w)+w)%w); for(let x=ox;x<W;x+=w) ctx.drawImage(img,Math.round(x),Math.round(y)); }
 function drawHeroAndFX(){
@@ -331,7 +333,7 @@ function drawHeroAndFX(){
   if(P.clarT>0) emisAt(P.x,P.y,1,g=>{ g.strokeStyle=`rgba(200,220,255,${(.25*P.clarT).toFixed(2)})`; g.lineWidth=1; g.beginPath(); g.ellipse(0,-14,24,30,0,0,Math.PI*2); g.stroke(); });
   addLight(P.x,P.y-16,85,.55,.85,.75,.62); }
 function render(){
-  const sh=shakeV; camR.x=Math.round(clamp(cam.x+rnd(-1,1)*sh,0,Math.max(0,L.w*T-W))); camR.y=Math.round(clamp(cam.y+rnd(-1,1)*sh,0,Math.max(0,L.h*T-H)));
+  const sh=shakeV; camR.x=Math.round(L.w*T<=W?(L.w*T-W)/2:clamp(cam.x+rnd(-1,1)*sh,0,L.w*T-W)); camR.y=Math.round(clamp(cam.y+rnd(-1,1)*sh,0,Math.max(0,L.h*T-H)));
   const maxY=Math.max(1,L.h*T-H);
   lights.length=0; beginFrame(); ctx.globalAlpha=1;
   tileBG(BG.far,camR.x*.1,-20-(camR.y/maxY)*20);
@@ -375,7 +377,7 @@ function update(dt){
   targetT-=dt; barkT-=dt; barkCd-=dt; if(barkT<=0) $('#bark').classList.remove('on');
   const tx=P.x-W/2+P.face*28, ty=P.y-H*.6+(P.vy>200?40:0);
   cam.x=lerp(cam.x,tx,Math.min(1,dt*5)); cam.y=lerp(cam.y,ty,Math.min(1,dt*(L.surface?3:4.5)));
-  cam.x=clamp(cam.x,0,Math.max(0,L.w*T-W)); cam.y=clamp(cam.y,0,Math.max(0,L.h*T-H));
+  cam.x=camClampX(cam.x); cam.y=clamp(cam.y,0,Math.max(0,L.h*T-H));
   interact=P.dead?null:findInteract();
   if(L.def.id==='wall'&&!L.redDone&&P.x>(L.exit.x-10)*T) redHourCut();
   const boss=enemies.find(e=>e.boss); if(boss&&boss.intro&&bossIntroReady(boss)) bossIntro(boss);
@@ -395,7 +397,7 @@ function frame(now){
   if(mode==='play'){ if(freeze>0){ freeze=Math.min(freeze,lastKillT>time-.05?0:.025); freeze-=rdt; } if(freeze<=0){ let left=rdt*timeScale; while(left>1e-5){ const st=Math.min(left,1/60); update(st); left-=st; } } }
   else if(mode==='cut'){ updCut(rdt); passive(rdt); updFX(rdt); for(const c of chests) if(c.open) c.t+=rdt; }
   else if(mode==='pause'){ /* the world holds its breath */ }
-  else if(mode==='title'){ passive(rdt); cam.x=lerp(cam.x,clamp(P.x-W*.35+Math.sin(time*.1)*60,0,L.w*T-W),.02); }
+  else if(mode==='title'){ passive(rdt); cam.x=lerp(cam.x,camClampX(P.x-W*.35+Math.sin(time*.1)*60),.02); }
   shakeV=Math.max(0,shakeV-rdt*22); hurtV=Math.max(0,hurtV-rdt*2.2); impactT-=rdt;
   U.uWhite.value=mode==='cut'?Math.min(.25,Math.max(0,U.uWhite.value-rdt*1.6)):0; U.uSlow.value=lerp(U.uSlow.value,P&&P.clarT>0?1:0,.12);
   U.uRed.value=lerp(U.uRed.value,L&&(L.redHour||(L.def.id==='count'&&L.wound))?Math.max(L.redHour||0,(L.wound||0)*.6):0,.04);

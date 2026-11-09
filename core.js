@@ -1,6 +1,6 @@
 'use strict';
 /* ===== core: utilities, seeded RNG, audio, renderer, sprite blitting, input ===== */
-const W=480,H=270,T=16, RES=2;
+const W=(typeof window!=='undefined'&&window.MDW)||480,H=270,T=16, RES=2; /* v33: phones widen the view to their own shape (mobile-boot in index.html) */
 const $=s=>document.querySelector(s);
 let COOP=null; /* set while a co-op descent is running (net.js) */
 let RNG=Math.random; const R=()=>RNG();
@@ -84,7 +84,7 @@ function mkScr(n){ const mk=()=>{const c=document.createElement('canvas'); c.wid
 const SCRS=mkScr(128), SCRB=mkScr(320);
 
 const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.MOBILE?1.5:2)); /* the art is 2× of 480 wide: 1.5× of a phone's width already covers it */
 stage.insertBefore(renderer.domElement,stage.firstChild);
 const mkTex=(c,filt)=>{const t=new THREE.CanvasTexture(c);t.magFilter=filt;t.minFilter=filt;t.generateMipmaps=false;return t;};
 const tBase=mkTex(cv,THREE.NearestFilter), tEmis=mkTex(ev,THREE.LinearFilter);
@@ -101,12 +101,12 @@ void main(){
   vec2 c=uv-.5; float d=dot(c,c);
   float ca=.0012+d*.008+uSlow*.004;
   vec3 base=vec3(texture2D(tBase,uv+c*ca).r,texture2D(tBase,uv).g,texture2D(tBase,uv-c*ca).b);
-  vec2 px=vec2(uv.x*480.,(1.-uv.y)*270.);
+  vec2 px=vec2(uv.x*${W}.,(1.-uv.y)*${H}.);
   vec3 lt=uAmb*1.2+vec3(.04);
   for(int i=0;i<${LMAX};i++){ if(i>=uN) break; vec4 L=uL[i]; float a=clamp(1.-distance(px,L.xy)/L.z,0.,1.); lt+=uC[i]*(a*a*L.w); }
   vec3 band=floor(lt*5.)/5.; lt=mix(lt,band+.07,.45);
   vec3 col=base*lt;
-  vec2 tx=vec2(1./480.,1./270.);
+  vec2 tx=vec2(1./${W}.,1./${H}.);
   vec3 em=texture2D(tEmis,uv).rgb;
   vec3 bl=vec3(0.);
   for(int i=0;i<10;i++){ float a=float(i)*.6283; vec2 o=vec2(cos(a),sin(a)); bl+=texture2D(tEmis,uv+o*tx*2.5).rgb; bl+=texture2D(tEmis,uv+o*tx*6.).rgb*.7; bl+=texture2D(tEmis,uv+o*tx*12.).rgb*.4; }
@@ -135,8 +135,10 @@ const scene=new THREE.Scene(); scene.add(new THREE.Mesh(new THREE.PlaneGeometry(
 const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 let SCALE=2;
 function fit(){ const cs=getComputedStyle(document.body); const aw=document.body.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); const ah=document.body.clientHeight;
-  let s=Math.min(aw/W,ah/H); if(s>=2&&Math.floor(s)/s>.86) s=Math.floor(s); s=Math.max(.5,s);
-  const sw=Math.floor(W*s), sh=Math.floor(H*s); stage.style.width=sw+'px'; stage.style.height=sh+'px'; stage.style.setProperty('--u',(sw/100)+'px');
+  let s=Math.min(aw/W,ah/H); if(!window.MOBILE&&s>=2&&Math.floor(s)/s>.86) s=Math.floor(s); s=Math.max(window.MOBILE?.2:.5,s);
+  const sw=Math.floor(W*s), sh=Math.floor(H*s); stage.style.width=sw+'px'; stage.style.height=sh+'px';
+  /* --u is 1% of a 16:9 stage of this height, so screens laid out for 16:9 keep their proportions on a wider phone */
+  stage.style.setProperty('--u',(Math.min(sw,sh*16/9*(window.MOBILE?window.MUI||1.18:1))/100)+'px');
   renderer.setSize(sw,sh,false); SCALE=sw/W; }
 addEventListener('resize',fit);
 

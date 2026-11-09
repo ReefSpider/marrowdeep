@@ -1,4 +1,17 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Marrowdeep">
+<meta name="theme-color" content="#050304"><meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="art/icon-180.png"><link rel="icon" type="image/png" href="art/icon-192.png">
+<script>/* v33 mobile boot: decide touch play before the engine sizes itself. ?touch=1 / ?touch=0 forces it. */
+(function(){ var q=new URLSearchParams(location.search), f=q.get('touch'); try{ if(f==='1'||f==='0') localStorage.setItem('marrowdeep.touch',f); else f=localStorage.getItem('marrowdeep.touch'); }catch(e){}
+  var coarse=matchMedia('(pointer: coarse)').matches&&(navigator.maxTouchPoints||0)>0;
+  var on=f==='1'||(f!=='0'&&coarse); window.MOBILE=on; if(!on) return;
+  document.documentElement.classList.add('mobile');
+  if(navigator.standalone||matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches) document.documentElement.classList.add('standalone');
+  var vw=innerWidth, vh=innerHeight, sw=screen.width, sh=screen.height;
+  var asp=vw>vh?vw/vh:Math.max(sw,sh)/Math.min(sw,sh);
+  window.MDW=Math.max(480,Math.min(640,Math.round(270*asp/2)*2)); window.MUI=1.18; })();</script><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Marrowdeep</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -546,6 +559,7 @@ label.chk{display:flex;align-items:center;gap:.6em}
 <script src="dps32.js"></script>
 <script src="hands32.js"></script>
 <script src="lab32.js"></script>
+<script src="mobile.js"></script>
 <script src="boot.js"></script>
 
 </body></html>

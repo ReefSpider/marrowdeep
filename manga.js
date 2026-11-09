@@ -34,7 +34,7 @@ function inkify(src,w,h,opt){ opt=opt||{}; const c=document.createElement('canva
 
 /* ---------- shots of the actual level ---------- */
 function mgShot(cx,cy,zoom){ if(!L||!LV) return null; const sv={cx:cam.x,cy:cam.y,sh:shakeV,z:camZ,px:camPX,py:camPY};
-  try{ cam.x=clamp(cx-W/2,0,Math.max(0,L.w*T-W)); cam.y=clamp(cy-H*.55,0,Math.max(0,L.h*T-H)); shakeV=0; camZ=zoom||1; camPX=W/2; camPY=H/2; render();
+  try{ cam.x=camClampX(cx-W/2); cam.y=clamp(cy-H*.55,0,Math.max(0,L.h*T-H)); shakeV=0; camZ=zoom||1; camPX=W/2; camPY=H/2; render();
     const c=document.createElement('canvas'); c.width=W*RES; c.height=H*RES; const g=c.getContext('2d'); g.drawImage(cv,0,0); g.globalCompositeOperation='lighter'; g.drawImage(ev,0,0); return c; }
   catch(e){ console.warn('manga shot',e); return null; }
   finally{ cam.x=sv.cx; cam.y=sv.cy; shakeV=sv.sh; camZ=sv.z; camPX=sv.px; camPY=sv.py; } }
