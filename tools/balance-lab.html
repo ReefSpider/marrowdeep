@@ -1,0 +1,249 @@
+<title>Marrowdeep Balance Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column of findings, charts full-column, a report reader at the foot */
+:root{
+  --bg:#f7f4f2; --panel:#fffdfb; --ink:#1d1416; --ink2:#5b4c4e; --ink3:#8b7c7d; --rule:#e3d9d6; --grid:#ece4e1;
+  --accent:#9b1c1c; --accent-soft:#f3e2df;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#1f7a3a; --bad:#b4232a; --band:rgba(31,122,58,.10);
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Times New Roman",serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141011; --panel:#1c1718; --ink:#efe7e4; --ink2:#c2b4b1; --ink3:#8f817f; --rule:#342a2b; --grid:#2a2223;
+  --accent:#e26a5c; --accent-soft:#3a1f1d; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#5cc27a; --bad:#ff7a70; --band:rgba(92,194,122,.10); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#141011; --panel:#1c1718; --ink:#efe7e4; --ink2:#c2b4b1; --ink3:#8f817f; --rule:#342a2b; --grid:#2a2223;
+  --accent:#e26a5c; --accent-soft:#3a1f1d; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#5cc27a; --bad:#ff7a70; --band:rgba(92,194,122,.10); color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(30px,5vw,42px)} h2{font-size:24px} h3{font-size:17px;font-family:var(--f-body);font-weight:600}
+p{margin:0;max-width:66ch} section{display:flex;flex-direction:column;gap:14px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:19px;color:var(--ink2)}
+.kanji{font-family:var(--f-disp);color:var(--accent);margin-right:.3em}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.verdict div{border-top:2px solid var(--ink);padding-top:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.verdict b{font-family:var(--f-mono);font-size:22px;font-weight:600}
+.verdict span{color:var(--ink2);font-size:14px}
+.verdict .hot b{color:var(--accent)}
+.chart{background:var(--panel);border:1px solid var(--rule);padding:14px 14px 8px;position:relative;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .cap{font-size:13px;color:var(--ink3);margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2);margin-bottom:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.tt{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);box-shadow:0 4px 18px rgba(0,0,0,.12);padding:8px 10px;font-size:13px;line-height:1.4;min-width:150px;z-index:2}
+.tt[hidden]{display:none}.tt b{font-family:var(--f-mono);font-weight:600}.tt .r{display:flex;justify-content:space-between;gap:12px}
+.tt i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+svg text{fill:var(--ink3);font-family:var(--f-mono);font-size:11px}
+svg .lbl{fill:var(--ink2);font-family:var(--f-body);font-size:12px;font-weight:600}
+.tablebox{overflow-x:auto;border:1px solid var(--rule);background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--ink2);font-size:12px;letter-spacing:.04em}
+td.x{font-family:var(--f-mono)} td.hi{color:var(--bad);font-weight:600} td.ok{color:var(--good)}
+.causes{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--rule)}
+.cause{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.cause p{color:var(--ink2);font-size:15px;grid-column:1/-1}
+.cause code,.mono{font-family:var(--f-mono);font-size:13px;background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+.cause .mag{font-family:var(--f-mono);font-size:13px;color:var(--accent);font-weight:600}
+ol.plan{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:68ch}
+ol.plan li::marker{font-family:var(--f-mono);color:var(--accent)}
+.refs{font-size:14px;color:var(--ink2);display:flex;flex-direction:column;gap:8px}
+.refs a{color:var(--accent)}
+textarea{width:100%;min-height:110px;box-sizing:border-box;font-family:var(--f-mono);font-size:12px;background:var(--panel);color:var(--ink);border:1px solid var(--rule);padding:10px;resize:vertical}
+textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:600 14px var(--f-body);background:var(--ink);color:var(--bg);border:0;padding:8px 14px;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.chip{font-family:var(--f-mono);font-size:12px;padding:2px 8px;border:1px solid var(--rule);color:var(--ink2)}
+.chip.ex{border-color:var(--s4);color:var(--ink)}
+.msg{font-size:14px;color:var(--ink2)} .msg.err{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px}
+.jumps{font-family:var(--f-mono);font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+footer{font-size:13px;color:var(--ink3);border-top:1px solid var(--rule);padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">v32 · balance lab · 9 Nov 2026</div>
+  <h1><span class="kanji">髄</span>Where Marrowdeep's scaling breaks</h1>
+  <p class="lede">The level curve holds. Rarity doesn't. A typical rare kit kills an ordinary foe in about a second from monster level 1 to 100, but a unique kit does the same job 2 to 9 times faster and an abyssal weapon 11 to 38 times faster. Bad gear barely hurts; good gear removes the fight.</p>
+  <div class="verdict">
+    <div><b>0.6 – 1.3 s</b><span>Rare kit, seconds to kill a ghoul, across every tier</span></div>
+    <div class="hot"><b>×2 – ×9</b><span>Unique kit DPS against a rare kit at the same level</span></div>
+    <div class="hot"><b>×11 – ×38</b><span>Abyssal weapon kit DPS against a rare kit</span></div>
+    <div><b>×0.4 – ×0.7</b><span>Gear 10 levels old against a current rare kit: barely a penalty</span></div>
+  </div>
+</header>
+
+<section>
+  <h2>Time to kill a ghoul, by gear</h2>
+  <p>Each line is the median of 60 random kits rolled by the game's own <span class="mono">genItem</span> at the item level that monster level drops, worn by a hero two levels above the foes. Seconds are the ghoul's life divided by sheet DPS. The scale is logarithmic, so equal gaps are equal ratios. The step at monster level 22 is the move from Pilgrim to Ashen, where ordinary foes lose 28% of their life.</p>
+  <div class="chart" id="c1"><div class="legend" id="l1"></div><svg id="s1"></svg><div class="tt" id="t1" hidden></div>
+    <div class="cap">Shaded: the band an ordinary foe should sit in with current, typical gear (0.8 – 2 s).</div></div>
+</section>
+
+<section>
+  <h2>DPS against a current rare kit</h2>
+  <p>Ratios of median sheet DPS. Anything above ×2 for a single rarity step is where "good gear breaks the game". The last two columns are how many ghoul hits it takes to kill you.</p>
+  <div class="tablebox"><table id="ratio"></table></div>
+</section>
+
+<section>
+  <h2>What multiplies</h2>
+  <p>Every source of damage multiplies every other one, and the rarer items add sources on top of bigger numbers. These are the specific stacks, in the order they matter.</p>
+  <div class="causes">
+    <div class="cause"><h3>Flat damage types ignore item level on uniques</h3><span class="mag">×4 – ×9 early</span>
+      <p><span class="mono">signatureElem</span> always rolls the top tier of a damage type (9–16 fire, ×1.2 on uniques, ×1.5 on abyssals), even at item level 1. A level-1 weapon hits for about 7, so a unique's +15 fire per blow more than doubles it, and rings and amulets add more. This is the whole early-game blowout.</p></div>
+    <div class="cause"><h3>Abyssal items stack five boosts at once</h3><span class="mag">×11 at every level</span>
+      <p>Enhanced Damage of 380–500% (rares top out at 130%), the best base of the class ×1.2, crit 25–45%, attack speed 20–30%, and a damage type at ×1.5. Each alone is a fair abyssal; together they are an order of magnitude.</p></div>
+    <div class="cause"><h3>Uniques get four boosts rares don't</h3><span class="mag">×2 late</span>
+      <p><span class="mono">uniqueFloor</span> (best base ×1.05), <span class="mono">empower</span> (stats ×1.2), two extra legendary-strength stats, and the signature damage type. v16 did this to stop uniques being weaker than legendaries; it overshot.</p></div>
+    <div class="cause"><h3>The Abyssal grade doubles a stat</h3><span class="mag">up to ×2 on one line</span>
+      <p>A grade-4 roll lands between 1.5× and 2× the top of its range, so a 130% Enhanced Damage line can roll 260%. Rare, but it is what players remember.</p></div>
+    <div class="cause"><h3>Weapon class spread is wider than rarity</h3><span class="mag">×4.7 between classes</span>
+      <p>At monster level 50 a rare great hammer averages 3,738 sheet DPS and a rare sickle 796. Within one rarity, the 90th-percentile kit has 3–4× the DPS of the 10th, mostly from the class it rolled. Reach, stun and dual wield make up some of this, but not ×4.7.</p></div>
+    <div class="cause"><h3>Defense has no level in its formula</h3><span class="mag">20–60 hits to die</span>
+      <p>Damage taken is <span class="mono">100 / (100 + 2 × defense)</span>. Defense grows 5% per item level and with Enhanced Defense, so a rare kit already takes 20 ghoul hits to kill and a unique kit 40–60. Monster damage can't catch up because it isn't part of the sum.</p></div>
+  </div>
+  <div class="chart" id="c2"><svg id="s2"></svg><div class="tt" id="t2" hidden></div>
+    <div class="cap">Median sheet DPS of a rare weapon by class at monster level 50, one weapon only (dual wield adds a second hand to one-handers).</div></div>
+</section>
+
+<section>
+  <h2>How other games keep this in check</h2>
+  <div class="refs">
+    <p><b>A budget per item level.</b> In World of Warcraft an item's level and slot set the total stats it can carry, and each stat has a price against that budget. Rarity changes how the budget is spent, not how big it is by orders of magnitude. <a href="https://warcraft.wiki.gg/wiki/Stat_budget">Stat budget</a></p>
+    <p><b>Fewer stats, fewer conditional multipliers, hard caps.</b> Diablo IV's Season 4 cut rares to 2 affixes and legendaries to 3, removed many conditional affixes, and capped armour at 85% physical reduction regardless of monster level; power moved into crafting steps players control. <a href="https://www.wowhead.com/news=339150/diablo-4-season-4-loot-reborn-developer-update-livestream-summary">Season 4 summary</a></p>
+    <p><b>Additive pools and defence that depends on the hit.</b> Path of Exile adds every "increased" bonus into one pool and keeps the multiplicative "more" bonuses rare, so stacking one more % stat gains less each time. Armour reduces a hit by armour ÷ (armour + 5 × hit), so it weakens against bigger monsters. <a href="https://www.poewiki.net/wiki/Armor">Armour</a></p>
+    <p><b>A target curve and a simulator.</b> The common thread: designers write down target time-to-kill and hits-to-die per level, simulate typical, bad and best gear against it, and treat any change that leaves the band as a regression. That's what <span class="mono">BAL.run()</span> now does for Marrowdeep.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Proposed fix</h2>
+  <p>Targets, as multiples of a current rare kit's sheet DPS: stale gear ×0.5, magic ×0.75, rare ×1, legendary ×1.25, unique ×1.5, abyssal ×1.9. A lucky roll (90th percentile) adds at most a further ×1.3.</p>
+  <ol class="plan">
+    <li>Roll unique and abyssal damage types at the item level's tier, like every other stat, and scale flat damage types with the weapon's own damage instead of a fixed table.</li>
+    <li>Give abyssal and unique items a damage budget: keep their identities (crit, speed, a type) but cut Enhanced Damage to fit the ×1.5 and ×1.9 targets. Drop the extra ×1.2 from <span class="mono">empower</span>.</li>
+    <li>Make the Abyssal grade +25% over the top of a range, not up to +100%.</li>
+    <li>Pull weapon classes to within ±25% of each other by sheet DPS at equal hands, crediting reach and stun.</li>
+    <li>Put monster level into defense: reduction = defense ÷ (defense + 40 × monster level), capped at 75%.</li>
+    <li>Smooth the Pilgrim → Ashen seam so the first Ashen level is no easier than the Count's.</li>
+    <li>Run <span class="mono">BAL.run()</span> after every balance change; any profile outside its band fails.</li>
+  </ol>
+</section>
+
+<section id="reader">
+  <h2>Read a playtest report</h2>
+  <p>Paste a report copied from the game (F8, then Pause › Playtest report › Copy report). It needs a v32 build; older reports have no balance lines. Nothing leaves this page.</p>
+  <textarea id="paste" placeholder="Marrowdeep playtest report · …  RAW {…}"></textarea>
+  <div class="row"><button id="read">Read report</button><button class="ghost" id="sample">Show the example</button><span class="chip ex" id="which">Example data</span><span class="msg" id="msg"></span></div>
+  <div class="grid2">
+    <div class="chart" id="c3"><div class="legend" id="l3"></div><svg id="s3"></svg><div class="tt" id="t3" hidden></div><div class="cap">Your level against the monster level, per level visit.</div></div>
+    <div class="chart" id="c4"><div class="legend" id="l4"></div><svg id="s4"></svg><div class="tt" id="t4" hidden></div><div class="cap">Sheet DPS against what you actually dealt while fighting.</div></div>
+    <div class="chart" id="c5"><div class="legend" id="l5"></div><svg id="s5"></svg><div class="tt" id="t5" hidden></div><div class="cap">Median seconds to kill an ordinary foe. Shaded: 0.8 – 2 s.</div></div>
+    <div class="chart" id="c6"><div class="legend" id="l6"></div><svg id="s6"></svg><div class="tt" id="t6" hidden></div><div class="cap">How many of an ordinary foe's hits it takes to kill you.</div></div>
+  </div>
+  <h3>Big gear jumps</h3><div class="jumps" id="jumps"></div>
+</section>
+
+<footer>Simulated with the v32 build's own item, stat and foe code (lab32.js), 60 kits per point, no Marrow, Ways, vows or borrowed power. Sheet DPS leaves out grit, misses, rhythm and combinations, so real fights run slower; ratios between gear are what matter here.</footer>
+</div>
+
+<script>
+const D=[[0,1,28,8,119,33,37,45,75,407,1693,97,103,130,233,468,562,27,39,21,47,30,58,40,92,289,562,1454,1956],[0,3,36,9,155,37,52,80,119,438,2071,113,129,171,256,556,575,28,46,40,79,54,105,71,169,301,727,1829,2387],[0,5,64,13,276,38,74,111,166,549,2414,129,168,225,350,615,664,31,47,45,111,76,159,100,258,390,881,2143,2747],[0,7,100,17,432,43,108,185,213,612,2989,146,210,301,404,710,688,34,53,57,208,120,293,154,386,441,902,2665,3287],[0,9,145,22,625,42,133,206,313,695,3385,163,342,423,603,864,928,29,56,78,219,106,342,163,575,468,1370,2985,3805],[0,11,199,27,860,59,173,320,376,786,3887,186,379,515,699,991,1061,42,93,80,313,151,591,231,770,629,1567,3426,4402],[0,13,264,33,1141,94,181,365,409,882,4379,247,531,910,988,1494,1613,58,121,94,382,148,957,242,820,713,2064,3873,4889],[0,15,337,40,1455,121,195,406,464,1000,5060,278,613,938,1219,1790,1904,66,190,107,483,206,748,262,968,612,2441,4446,5543],[0,17,380,47,1640,155,242,429,594,1214,5639,413,673,1053,1412,1990,2046,84,243,150,448,206,893,310,1229,961,2559,5085,6247],[0,19,426,55,1838,199,306,531,597,1252,6149,440,719,1091,1534,2289,2481,108,362,138,720,239,994,341,1094,955,2925,5598,7148],[0,21,475,64,2052,259,307,608,684,1476,6941,514,852,1286,1680,2396,2676,128,481,156,632,298,1103,298,1291,1111,3400,6168,7717],[1,22,361,69,1559,303,338,562,642,1471,7678,712,808,1437,1689,2697,2736,153,531,185,745,325,1454,353,1413,1034,3499,6746,8422],[1,24,401,79,1732,243,352,716,931,1529,8004,756,972,1542,1718,2866,3167,139,547,172,847,307,1331,510,1498,1247,3670,7244,8905],[1,26,444,88,1919,282,409,872,984,1802,8972,894,1095,1685,2295,3160,3462,148,558,196,844,372,1660,518,1908,981,4156,8064,10016],[1,28,491,94,2121,312,515,816,963,1991,9906,952,1178,1792,2440,3451,3594,221,542,263,819,414,1545,519,2077,1461,4847,8944,11016],[1,30,542,100,2339,387,508,921,1008,1922,10970,964,1158,2120,2670,3675,4073,195,658,241,870,526,1757,614,2153,1464,4573,9495,12515],[2,32,596,106,2575,360,497,954,1140,2135,11735,1103,1260,2187,2878,3951,4358,229,822,306,1149,412,1958,623,2330,1738,4995,10693,12923],[2,34,655,113,2829,458,520,1150,1192,2231,12611,1305,1423,2593,3205,4245,4646,222,838,287,1097,668,2259,662,2296,1588,5622,11332,13570],[2,36,718,120,3102,471,684,1092,1296,2520,13491,1257,1518,2553,3275,4669,5282,233,1071,330,1313,583,2618,692,2288,1456,6107,12255,15177],[2,38,786,128,3396,582,682,1178,1422,3901,14696,1552,1640,2420,3257,5192,5541,350,1121,321,1513,595,2520,884,2580,1955,7229,13010,16195],[3,40,860,136,3712,611,665,1257,1575,2656,16004,1613,1778,2834,3724,5706,5509,329,1206,398,1238,487,2016,860,3262,2038,6941,14074,17368],[3,42,938,144,4051,639,704,1298,1675,3058,16573,1731,1982,3198,3641,5912,6689,322,1242,474,1591,649,2930,798,2899,1588,7640,14981,18506],[3,44,1022,152,4413,753,857,1540,1664,3115,18008,1823,2121,3296,3728,6549,6864,391,1436,399,1480,761,3311,982,2983,1877,8292,16186,19896],[3,46,1112,161,4801,750,836,1659,1788,3246,19516,1993,2105,3741,4549,6993,6475,391,1549,444,1905,838,2933,1027,4170,2799,9038,17530,21207],[4,48,1208,170,5215,767,891,1809,1761,3745,20055,1980,2398,3912,4765,7126,7430,555,1603,454,1707,810,3221,1069,3708,3020,9277,18171,22806],[4,50,1310,180,5656,801,929,1649,2129,3692,21895,2132,2294,4140,5112,7625,7827,436,1805,473,1978,814,3446,1199,5012,2994,8614,18677,23631],[4,52,1418,190,6125,893,1111,1860,1898,4046,23014,2380,2465,4010,5783,8168,9340,489,2025,574,2321,847,3499,1368,4420,3209,10606,20875,25021],[4,54,1534,200,6624,873,1221,1727,2350,4165,24482,2391,2572,4836,5422,8539,9354,521,1774,552,2005,906,3962,1463,4810,3381,10089,21772,26708],[5,56,1657,211,7153,1010,1031,1987,2050,4592,25862,2667,2635,4675,6022,9145,9523,554,2216,716,2480,1104,4399,1119,4719,3606,12087,22527,28930],[5,58,1787,223,7715,1045,1121,2055,2588,4802,26972,2573,2990,4817,6170,9752,11133,494,2127,580,2118,934,5082,1351,4667,2529,13257,24032,29754],[5,60,1924,234,8309,1098,1518,2359,2458,5054,28292,2629,3436,5013,6841,9901,10408,578,2507,776,2410,1219,4693,1331,5447,4067,13766,25633,32351],[5,62,2070,247,8937,1155,1642,2340,2572,5064,30251,2805,3313,5677,6785,10061,10831,610,2274,731,2572,964,4208,1745,5983,2640,13077,26745,33798],[6,64,2223,260,9600,1190,1358,2684,3059,5321,31589,3164,3363,6153,6804,11329,11822,613,3049,775,3085,1137,6697,1710,5006,4343,14040,27884,35716],[6,66,2385,273,10299,1239,1359,2563,3799,5852,33586,2989,3828,5352,7709,11763,12412,794,2263,752,3138,1149,5643,2110,7785,3043,15483,29781,36616],[6,68,2556,287,11035,1363,1557,2639,3601,5711,35931,3237,3918,6106,7841,12172,13036,700,3003,893,3121,1440,6467,2203,7283,4369,15064,32254,38326],[6,70,2735,301,11810,1531,1818,4077,3216,7216,36633,3446,3827,6708,7538,12558,14273,829,3231,847,4571,1797,6029,1941,7109,4429,17730,31844,40273],[7,72,2923,316,12624,1564,1650,3390,3531,6404,38020,3778,3814,6214,8535,13010,14573,885,2855,1045,3157,1639,7388,1997,6549,4959,17671,35421,41476],[7,74,3121,332,13479,1335,1913,3242,3440,6633,39173,3697,4398,5938,9156,14422,14944,842,3111,882,3744,1701,6535,1791,6780,4981,18275,34855,43133],[7,76,3329,348,14375,1512,2141,3170,3782,6751,41689,3783,4512,7431,9759,14112,14450,914,3419,897,3893,1473,5608,2138,8868,3652,17564,35750,47922],[7,78,3546,365,15314,1568,1719,3100,4021,7581,44959,4213,4610,7997,8913,14778,15798,863,3953,1130,4419,1741,5947,2287,8274,5205,18163,39801,47660],[8,80,3774,382,16298,1795,2331,3309,4534,7867,44509,4464,4803,8307,10404,15596,16734,933,3888,1073,4113,2052,6726,1993,8902,5889,21282,40328,51418],[8,82,4012,401,17326,1945,2130,3970,4259,7879,46338,4677,5179,8738,10944,16271,17226,987,3509,1220,5160,1870,8548,2515,9325,4137,19130,41284,53778],[8,84,4261,419,18400,1985,1953,4010,4525,7502,49514,4742,5329,8039,11524,17023,17482,1245,4588,1083,4021,2413,9382,2821,9179,4150,21739,42598,54536],[8,86,4521,439,19521,2118,2154,4204,5185,8713,50480,4738,6086,8497,11620,18219,18521,1551,4058,1153,4132,1984,8475,2921,10905,4171,23480,44630,57364],[9,88,4792,459,20691,2140,2484,4359,5556,8714,52726,4623,5502,9363,10857,17542,21187,1235,4477,1402,4795,2234,9504,2716,9387,7240,23709,46902,57467],[9,90,5074,480,21910,2203,2725,4449,5027,8856,53354,4997,5554,8848,12759,18650,21742,1029,4865,1213,6084,2258,7881,2936,9536,6232,25586,48570,61717],[9,92,5368,501,23180,2088,2558,4459,5340,9457,57720,5661,6017,9671,12555,20089,19399,1233,4205,1557,4827,2050,8253,3280,12281,6879,25542,51213,63013],[9,94,5674,524,24501,2218,2719,5000,6822,9630,57419,5351,6079,10076,12298,20403,21237,1244,4378,1494,5028,2674,8483,3067,12661,7098,25508,54620,64285],[10,91,5219,490,22539,2361,2357,4835,5805,8693,56796,5346,5568,10878,12292,19717,20093,1236,5241,1275,4535,2431,8741,3013,11618,4332,26970,48597,62803],[10,93,5519,512,23834,2702,2398,4378,6021,9268,56964,5356,6009,9913,12211,19978,20491,1220,4671,1335,4859,2174,7856,3068,11256,7688,21201,51907,64243],[10,95,5832,535,25182,2733,2322,4841,5558,9836,58576,5871,6509,10771,12722,20556,23355,1400,4671,1430,4372,2145,8662,2905,11261,5126,28387,55480,67999],[10,97,6156,559,26583,2254,2569,4796,5405,10220,62268,5309,6490,11625,14081,21651,23187,1231,5129,1372,5822,2560,10397,3244,14365,7220,30143,54991,69220],[10,99,6493,583,28038,2646,2592,5821,6511,11991,65625,6223,6268,11441,14544,22004,26014,1688,5116,1506,5221,2391,9772,3583,12383,7755,31050,56497,71450],[10,100,6666,595,28786,2792,3107,5780,6497,11596,64897,5977,6953,10585,14160,22985,22834,1311,5390,1378,6394,2472,10578,3447,11640,5387,30844,58149,72613]];
+const PROF=['stale','magic','rare','leg','uniq','abyss'], PN={stale:'Stale (10 lv old, magic)',magic:'Magic',rare:'Rare',leg:'Legendary',uniq:'Unique',abyss:'Abyssal weapon'};
+const TIERS=['Pilgrim','Ashen','Bloodied','Iron Vow','Mourning','Karma','Purgatory','Netherdeep','Asura','Avīci',"Marrow's End"];
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt=v=>v>=1e4?(v/1e3).toFixed(v>=1e5?0:1)+'k':v>=100?Math.round(v).toString():v>=10?v.toFixed(1):v.toFixed(2);
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+/* line chart with one y-scale, crosshair tooltip */
+function lineChart(id,o){const svg=document.getElementById('s'+id),tt=document.getElementById('t'+id),box=document.getElementById('c'+id);svg.innerHTML='';
+  const W=o.w||800,H=o.h||300,m={l:52,r:o.rpad||110,t:10,b:30};svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const xs=o.x, n=xs.length, all=o.series.flatMap(s=>s.v).filter(v=>v!=null&&isFinite(v)&&(!o.log||v>0));
+  let y0=o.ymin!=null?o.ymin:Math.min(...all),y1=o.ymax!=null?o.ymax:Math.max(...all);
+  if(o.log){y0=Math.pow(10,Math.floor(Math.log10(y0)));y1=Math.pow(10,Math.ceil(Math.log10(y1)));} else {y0=Math.min(0,y0);const st=niceStep((y1-y0)/4);y1=Math.ceil(y1/st)*st;}
+  const X=i=>m.l+(n<2?0:i/(n-1))*(W-m.l-m.r), Y=v=>o.log?H-m.b-(Math.log10(v)-Math.log10(y0))/(Math.log10(y1)-Math.log10(y0))*(H-m.t-m.b):H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b);
+  if(o.band){const a=Y(o.band[1]),b=Y(o.band[0]);el('rect',{x:m.l,y:a,width:W-m.l-m.r,height:b-a,fill:cv('--band')},svg);}
+  const ticks=[];if(o.log){for(let v=y0;v<=y1*1.0001;v*=10){ticks.push(v);if(v*3<=y1)ticks.push(v*3);}}else{const st=niceStep((y1-y0)/4);for(let v=y0;v<=y1+1e-9;v+=st)ticks.push(v);}
+  for(const v of ticks){const y=Y(v);el('line',{x1:m.l,x2:W-m.r,y1:y,y2:y,stroke:cv('--grid'),'stroke-width':1},svg);const t=el('text',{x:m.l-8,y:y+4,'text-anchor':'end'},svg);t.textContent=(o.yf||fmt)(v);}
+  const xl=o.xlabels||xs; const step=Math.max(1,Math.ceil(n/(o.xt||9)));
+  for(let i=0;i<n;i+=step){const t=el('text',{x:X(i),y:H-m.b+18,'text-anchor':'middle'},svg);t.textContent=xl[i];}
+  el('line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,stroke:cv('--ink3'),'stroke-width':1},svg);
+  if(o.seam!=null){const x=X(o.seam)-(X(1)-X(0))/2;el('line',{x1:x,x2:x,y1:m.t,y2:H-m.b,stroke:cv('--ink3'),'stroke-dasharray':'3 4'},svg);const t=el('text',{x:x+4,y:m.t+12},svg);t.textContent='Ashen →';}
+  const lg=document.getElementById('l'+id); if(lg) lg.innerHTML=o.series.map(s=>`<span><i style="background:${cv(s.c)}"></i>${s.n}</span>`).join('');
+  for(const s of o.series){let d='';s.v.forEach((v,i)=>{if(v==null||(o.log&&v<=0))return;d+=(d?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);});
+    el('path',{d,fill:'none',stroke:cv(s.c),'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+    let li=s.v.length-1;while(li>0&&s.v[li]==null)li--; if(o.direct!==false&&s.v[li]!=null){el('circle',{cx:X(li),cy:Y(s.v[li]),r:4,fill:cv(s.c),stroke:cv('--panel'),'stroke-width':2},svg);const t=el('text',{x:X(li)+8,y:Y(s.v[li])+4,class:'lbl'},svg);t.textContent=s.short||s.n;}}
+  const cross=el('line',{y1:m.t,y2:H-m.b,stroke:cv('--ink3'),'stroke-width':1,opacity:0},svg);const dots=o.series.map(s=>el('circle',{r:4,fill:cv(s.c),stroke:cv('--panel'),'stroke-width':2,opacity:0},svg));
+  const hit=el('rect',{x:m.l,y:0,width:W-m.l-m.r,height:H,fill:'transparent'},svg);
+  function show(ev){const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)/r.width*W;const i=Math.max(0,Math.min(n-1,Math.round((px-m.l)/((W-m.l-m.r)/Math.max(1,n-1)))));
+    cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.setAttribute('opacity',1);
+    o.series.forEach((s,k)=>{const v=s.v[i];if(v==null){dots[k].setAttribute('opacity',0);return;}dots[k].setAttribute('cx',X(i));dots[k].setAttribute('cy',Y(v));dots[k].setAttribute('opacity',1);});
+    tt.innerHTML=`<div style="margin-bottom:4px;color:var(--ink2)">${o.title(i)}</div>`+o.series.map(s=>s.v[i]==null?'':`<div class="r"><span><i style="background:${cv(s.c)}"></i>${s.n}</span><b>${(o.tf||fmt)(s.v[i])}</b></div>`).join('');
+    tt.hidden=false;const br=box.getBoundingClientRect();let lx=ev.clientX-br.left+14;if(lx+tt.offsetWidth>br.width)lx=ev.clientX-br.left-tt.offsetWidth-14;tt.style.left=Math.max(4,lx)+'px';tt.style.top=Math.max(4,ev.clientY-br.top-tt.offsetHeight-10)+'px';}
+  hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',()=>{tt.hidden=true;cross.setAttribute('opacity',0);dots.forEach(d=>d.setAttribute('opacity',0));});}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1)));const f=r/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p;}
+
+/* chart 1: TTK by gear */
+const rows=D.map(r=>({t:r[0],m:r[1],hp:r[2],hit:r[3],bhp:r[4],dps:r.slice(5,11),eff:r.slice(11,17)}));
+const seamI=rows.findIndex(r=>r.t===1);
+function draw1(){lineChart(1,{x:rows.map(r=>r.m),xlabels:rows.map(r=>r.m),xt:10,log:true,band:[.8,2],seam:seamI,
+  series:[{n:'Stale magic',short:'Stale',c:'--s1',k:0},{n:'Rare',c:'--s2',k:2},{n:'Unique',c:'--s3',k:4},{n:'Abyssal weapon',short:'Abyssal',c:'--s4',k:5}].map(s=>Object.assign(s,{v:rows.map(r=>r.hp/r.dps[s.k])})),
+  yf:v=>Number(v.toPrecision(2))+' s',tf:v=>v.toFixed(2)+' s',title:i=>`Monster level ${rows[i].m} · ${TIERS[rows[i].t]} · ghoul ${rows[i].hp} life`});}
+/* ratio table */
+function drawTable(){const pick=rows.filter(r=>[1,5,11,21,30,50,70,100].includes(r.m));
+  let h='<tr><th>Monster level</th>'+PROF.map(p=>`<th>${PN[p].split(' (')[0]}</th>`).join('')+'<th>Hits to die · rare</th><th>· unique</th></tr>';
+  for(const r of pick){const R=r.dps[2];h+=`<tr><td>${r.m} <span style="color:var(--ink3)">${TIERS[r.t]}</span></td>`+r.dps.map((v,k)=>{const x=v/R;return `<td class="x ${x>=2?'hi':''}">×${x.toFixed(x>=10?0:2)}</td>`;}).join('')+`<td class="x">${(r.eff[2]/r.hit).toFixed(0)}</td><td class="x">${(r.eff[4]/r.hit).toFixed(0)}</td></tr>`;}
+  document.getElementById('ratio').innerHTML=h;}
+/* chart 2: class bars */
+const CLS={"hammer2":3738,"katana2":3551,"sword2":3094,"axe2":2573,"spear2":2301,"mace2":2121,"hammer":1602,"katana":1567,"xbow":1544,"scythe2":1540,"rapier":1505,"flail":1344,"dagger":1246,"axe":1203,"mace":974,"cleaver":971,"sword":949,"sickle":796};
+const CN={hammer2:'Great hammer',katana2:'Nodachi',sword2:'Two-handed sword',axe2:'Great axe',spear2:'Polearm',mace2:'Maul',hammer:'War hammer',katana:'Katana',xbow:'Crossbow',scythe2:'Scythe',rapier:'Rapier',flail:'Flail',dagger:'Dagger',axe:'Axe',mace:'Mace',cleaver:'Cleaver',sword:'Sword',sickle:'Sickle'};
+function draw2(){const svg=document.getElementById('s2'),tt=document.getElementById('t2'),box=document.getElementById('c2');svg.innerHTML='';const ks=Object.keys(CLS),bh=16,gap=6,W=800,l=140,r=60,H=ks.length*(bh+gap)+24;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const mx=4000,X=v=>l+v/mx*(W-l-r);for(const v of [0,1000,2000,3000,4000]){el('line',{x1:X(v),x2:X(v),y1:0,y2:H-20,stroke:cv('--grid')},svg);const t=el('text',{x:X(v),y:H-4,'text-anchor':'middle'},svg);t.textContent=v.toLocaleString();}
+  ks.forEach((k,i)=>{const y=i*(bh+gap);const two=/2$/.test(k);const t=el('text',{x:l-10,y:y+bh-4,'text-anchor':'end',class:'lbl'},svg);t.textContent=CN[k];
+    const w=X(CLS[k])-l;const p=el('path',{d:`M${l} ${y}h${w-4}a4 4 0 0 1 4 4v${bh-8}a4 4 0 0 1 -4 4h${-(w-4)}z`,fill:cv(two?'--s1':'--s2')},svg);
+    const v=el('text',{x:X(CLS[k])+6,y:y+bh-4},svg);v.textContent=CLS[k].toLocaleString();
+    const hr=el('rect',{x:0,y:y-gap/2,width:W,height:bh+gap,fill:'transparent'},svg);hr.addEventListener('pointermove',ev=>{tt.innerHTML=`<b>${CN[k]}</b><div class="r"><span>${two?'Two-handed':'One-handed'}</span><b>${CLS[k].toLocaleString()} DPS</b></div>`;tt.hidden=false;const br=box.getBoundingClientRect();tt.style.left=Math.min(br.width-170,ev.clientX-br.left+12)+'px';tt.style.top=(ev.clientY-br.top-50)+'px';});hr.addEventListener('pointerleave',()=>tt.hidden=true);});
+  const lg=document.createElement('div');lg.className='legend';lg.innerHTML=`<span><i style="background:${cv('--s1')}"></i>Two-handed</span><span><i style="background:${cv('--s2')}"></i>One-handed or crossbow</span>`;if(!box.querySelector('.legend'))box.insertBefore(lg,svg);}
+
+/* the reader */
+const SAMPLE={bal:[
+ {lvl:'fields',tier:0,ml:3,pl0:2,pl1:5,il:3,sheet0:38,sheet1:61,fight:44,peak:96,ttk:1.6,ttkN:24,foeHit:9,htd:11,tpm:140},
+ {lvl:'fen',tier:0,ml:5,pl0:5,pl1:7,il:6,sheet0:61,sheet1:88,fight:63,peak:141,ttk:1.3,ttkN:31,foeHit:12,htd:12,tpm:210},
+ {lvl:'ashes',tier:0,ml:7,pl0:7,pl1:9,il:8,sheet0:88,sheet1:612,fight:420,peak:910,ttk:.3,ttkN:28,foeHit:15,htd:24,tpm:120},
+ {lvl:'pass',tier:0,ml:9,pl0:9,pl1:11,il:9,sheet0:612,sheet1:640,fight:450,peak:1012,ttk:.35,ttkN:35,foeHit:19,htd:26,tpm:150},
+ {lvl:'lastlight',tier:0,ml:11,pl0:11,pl1:13,il:10,sheet0:640,sheet1:655,fight:470,peak:1100,ttk:.42,ttkN:29,foeHit:24,htd:25,tpm:190},
+ {lvl:'villages',tier:0,ml:13,pl0:13,pl1:14,il:11,sheet0:655,sheet1:700,fight:480,peak:990,ttk:.55,ttkN:33,foeHit:30,htd:24,tpm:230}],
+ gear:[{lvl:'ashes',ml:7,pl:8,sheet0:90,sheet1:612}],example:true};
+const NM={fields:'Quiet Fields',fen:'Rushmere Fen',ashes:'Ashes of Kesh',pass:'Weeping Pass',lastlight:'Last Light',villages:'Harvest Villages'};
+function read(s){const B=s.bal||[]; if(!s.example) window._last=s;const lab=b=>(NM[b.lvl]||b.lvl)+' · '+(TIERS[b.tier]||'tier '+b.tier);
+  if(!B.length){msg('This report has no balance lines. It needs a v32 build or newer.',true);return;}
+  const x=B.map((b,i)=>i+1);
+  lineChart(3,{x,w:460,h:280,rpad:70,series:[{n:'Monster level',short:'Monsters',c:'--s2',v:B.map(b=>b.ml)},{n:'Your level (out)',short:'You',c:'--s1',v:B.map(b=>b.pl1)}],tf:v=>String(Math.round(v)),title:i=>lab(B[i])});
+  lineChart(4,{x,w:460,h:280,rpad:60,log:true,series:[{n:'Sheet DPS',short:'Sheet',c:'--s1',v:B.map(b=>b.sheet1||null)},{n:'Real DPS fighting',short:'Real',c:'--s3',v:B.map(b=>b.fight||null)}],title:i=>lab(B[i])});
+  lineChart(5,{x,w:460,h:280,rpad:44,band:[.8,2],ymin:0,series:[{n:'Seconds to kill',short:'TTK',c:'--s2',v:B.map(b=>b.ttk||null)}],tf:v=>v.toFixed(2)+' s',yf:v=>v+' s',title:i=>lab(B[i])+` · ${B[i].ttkN||0} kills`});
+  lineChart(6,{x,w:460,h:280,rpad:44,ymin:0,series:[{n:'Hits to die',short:'Hits',c:'--s4',v:B.map(b=>b.htd||null)}],tf:v=>v.toFixed(1),title:i=>lab(B[i])+` · their hit ${B[i].foeHit||'–'}`});
+  const J=(s.gear||[]).filter(g=>g.sheet0>0&&g.sheet1/g.sheet0>=1.5);
+  document.getElementById('jumps').innerHTML=J.length?J.map(g=>`<div>${NM[g.lvl]||g.lvl} · monster level ${g.ml} · you ${g.pl} · ${fmt(g.sheet0)} → ${fmt(g.sheet1)} sheet DPS <b style="color:var(--accent)">×${(g.sheet1/g.sheet0).toFixed(1)}</b></div>`).join(''):'<div>None: no single change raised sheet DPS by half or more.</div>';
+  document.getElementById('which').textContent=s.example?'Example data':`${B.length} level visits`;document.getElementById('which').className='chip'+(s.example?' ex':'');}
+function msg(t,err){const m=document.getElementById('msg');m.textContent=t;m.className='msg'+(err?' err':'');}
+document.getElementById('read').onclick=()=>{const t=document.getElementById('paste').value;const i=t.indexOf('RAW ');let s;try{s=JSON.parse(i>=0?t.slice(i+4).trim():t.trim());}catch(e){msg('Couldn\'t read that. Paste the whole report, including the line that starts with RAW.',true);return;}msg('');read(s);};
+document.getElementById('sample').onclick=()=>{msg('');read(SAMPLE);};
+function all(){draw1();drawTable();draw2();read(window._last||SAMPLE);}
+all();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);
+new MutationObserver(all).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+</script>
