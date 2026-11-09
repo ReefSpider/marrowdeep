@@ -75,6 +75,8 @@ function attrLine(k,s){ const v=s[k]||0;
 #attrs .at{background:#0a0708;border:1px solid #2e2422;padding:calc(var(--u)*.2) calc(var(--u)*.3);display:flex;align-items:baseline;justify-content:center;gap:calc(var(--u)*.35);cursor:help}
 #attrs .at .kj{font-family:'Shippori Mincho',var(--fb);font-size:max(12px,calc(var(--u)*1.4));line-height:1}
 #attrs .at b{font-family:var(--fd);font-weight:400;font-size:max(14px,calc(var(--u)*1.8));color:#f1e6d2;line-height:1.1}
+html.mobile .equip{grid-template-columns:repeat(4,calc(var(--u)*4.3));grid-template-rows:repeat(3,calc(var(--u)*4.3))}
+html.mobile #attrs{margin:calc(var(--u)*.3) 0 0}
 #attrs .at span.nm{font-family:var(--fs);font-size:max(9px,calc(var(--u)*.9));color:#9a8a7a;letter-spacing:.04em}`; document.head.appendChild(st); })();
 (function(){ const o=renderInv; renderInv=function(){ o(); const st=$('#stats'); if(!st||!P||!P.stats) return; let box=$('#attrs'); if(!box){ box=document.createElement('div'); box.id='attrs'; st.parentNode.insertBefore(box,st); }
   const s=P.stats; box.innerHTML=['mig','fin','fort'].map(k=>`<div class="at" data-k="${k}"><span class="kj" style="color:${ATTR[k].col}">${ATTR[k].kj}</span><b>${s[k]||0}</b><span class="nm">${ATTR[k].n}</span></div>`).join('');
