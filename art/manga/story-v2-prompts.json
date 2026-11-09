@@ -76,5 +76,152 @@
     "b03-3-still.png": "Remove the hooded standing character and the crowned standing character from the centre. Replace those two ONLY with ordinary helmeted foot soldiers matching all the surrounding troops, solid black eyes, shields held upright, no crowns or hoods. Keep fallen captain and all other soldiers unchanged. No hero or king appears in this scene.",
     "a1-05-tithe.png": "Remove BOTH foreground standing sword-bearing men entirely, the white-surcoat man at left and hooded man at right, revealing empty cobbles behind them. Keep the cart of shrouds, distant cloaked cart driver, houses and door marks. NO hero, swordsmen or foreground people. Cart and empty street are subject.",
     "a2-01-sealed.png": "Remove the seven-eyed stone idol face from the city gate completely. Replace it with an ordinary plain medieval stone gate arch and battlement masonry around the existing bricked-up opening. No eyes or red tears in the masonry. Keep the SINGLE red sky Wound above, black banners, sealed brickwork and walls unchanged."
+  },
+  "reference_files": {
+    "ref-children.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/ref-ilse.png"
+    ],
+    "ref-generals.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/ref-cassian.png"
+    ],
+    "ref-act1-foes.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "pr-14-doorway.png": [
+      "art/manga/ref-cassian.png"
+    ],
+    "pr-15-trial.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/ref-generals.png"
+    ],
+    "pr-16-rook.png": [
+      "art/manga/ref-generals.png"
+    ],
+    "pr-17-mercy.png": [
+      "art/manga/ref-cassian.png"
+    ],
+    "pr-18-hostage.png": [
+      "art/manga/ref-ilse.png",
+      "art/manga/ref-children.png"
+    ],
+    "pr-19-window.png": [
+      "art/manga/ref-ilse.png",
+      "art/manga/old-op-2-window.png"
+    ],
+    "pr-20-candle.png": [
+      "art/manga/old-op-3-candle.png",
+      "art/manga/ref-halden.png"
+    ],
+    "pr-21-horse.png": [
+      "art/manga/ref-children.png"
+    ],
+    "pr-22-hood.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "pr-23-ride.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/ref-children.png"
+    ],
+    "pr-24-crowned.png": [
+      "art/manga/ref-cassian.png"
+    ],
+    "pr-25-eye.png": [
+      "art/manga/ref-cassian.png",
+      "art/manga/ref-hungry-one.png"
+    ],
+    "a1-01-exile.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "a1-04-road.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/ref-hungry-one.png"
+    ],
+    "b01-2-sisters.png": [
+      "art/manga/ref-act1-foes.png"
+    ],
+    "b01-3-sink.png": [
+      "art/manga/ref-act1-foes.png"
+    ],
+    "b02-2-warrant.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "b02-3-hounds.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "b03-2-eyes.png": [
+      "art/manga/ref-act1-foes.png"
+    ],
+    "b03-3-still.png": [
+      "art/manga/ref-act1-foes.png"
+    ],
+    "a1-05-tithe.png": [
+      "art/manga/ref-halden.png"
+    ],
+    "b04-2-preacher.png": [
+      "art/manga/ref-act1-foes.png"
+    ],
+    "b04-3-lantern.png": [
+      "art/manga/b04-2-preacher.png"
+    ],
+    "a1-06-crow.png": [
+      "art/manga/old-op-5-crow.png"
+    ],
+    "b05-2-piet.png": [
+      "art/manga/ref-generals.png",
+      "art/manga/ref-halden.png"
+    ],
+    "b05-3-window.png": [
+      "art/manga/pr-19-window.png"
+    ],
+    "a2-01-sealed.png": [
+      "art/manga/ref-hungry-one.png"
+    ],
+    "a2-02-curfew.png": [
+      "art/manga/a1-05-tithe.png"
+    ],
+    "b06-2-brann.png": [
+      "art/manga/ref-generals.png"
+    ],
+    "b07-3-names.png": [
+      "art/manga/old-a3-4-ilse.png"
+    ],
+    "b09-2-rook.png": [
+      "art/manga/ref-generals.png",
+      "art/manga/pr-16-rook.png"
+    ],
+    "b09-3-hostages.png": [
+      "art/manga/ref-cassian.png"
+    ],
+    "b09-4-under.png": [
+      "art/manga/ref-generals.png",
+      "art/manga/pr-16-rook.png"
+    ],
+    "a2-03-gate.png": [
+      "art/manga/a2-01-sealed.png"
+    ],
+    "a2-04-horse.png": [
+      "art/manga/ref-children.png",
+      "art/manga/pr-21-horse.png"
+    ],
+    "a2-05-eyes.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/old-op-4-eyes.png"
+    ],
+    "a2-06-charge.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/a2-03-gate.png"
+    ],
+    "b10-2-torch.png": [
+      "art/manga/ref-generals.png"
+    ],
+    "b10-3-balcony.png": [
+      "art/manga/ref-cassian.png"
+    ],
+    "b10-4-blast.png": [
+      "art/manga/ref-halden.png",
+      "art/manga/a2-03-gate.png"
+    ]
   }
 }

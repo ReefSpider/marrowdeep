@@ -998,7 +998,8 @@
       "references": [
         "ref-halden",
         "old-op-4-eyes"
-      ]
+      ],
+      "soundEffect": "怒"
     },
     {
       "id": "a2-06-charge",
@@ -1073,7 +1074,193 @@
       "references": [
         "ref-halden",
         "a2-03-gate"
+      ],
+      "soundEffect": "轟"
+    },
+    {
+      "id": "a1-02-crow",
+      "file": "a1-02-crow.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/op-5-crow.png",
+      "ratio": "21:9",
+      "caption": "A crow found you.",
+      "tags": [
+        "story-v2",
+        "act1",
+        "crow",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "a1-03-letter",
+      "file": "a1-03-letter.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/a2-3-letter.png",
+      "ratio": "16:9",
+      "caption": "\"He comes to the house now. The children ask for you. Come home.\"",
+      "tags": [
+        "story-v2",
+        "act1",
+        "letter",
+        "ilse",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "b07-2-ledger",
+      "file": "b07-2-ledger.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/a3-2-ledger.png",
+      "ratio": "21:9",
+      "caption": "The tithe: one soul in ten.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "ledger",
+        "tithe",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "b07-4-cage",
+      "file": "b07-4-cage.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/b3-2-cage.png",
+      "ratio": "16:9",
+      "caption": "The debtors climb out, still holding out their coins.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "debtors",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "b08-2-mouths",
+      "file": "b08-2-mouths.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/b2-2-mouths.png",
+      "ratio": "16:9",
+      "caption": "\"…long live the King, long live the King…\"",
+      "tags": [
+        "story-v2",
+        "act2",
+        "choir",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "b08-3-shut",
+      "file": "b08-3-shut.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/b2-4-shut.png",
+      "ratio": "16:9",
+      "caption": "Silence is also a note.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "choir",
+        "coarse-pixel",
+        "reused"
+      ]
+    },
+    {
+      "id": "a2-07-fall",
+      "file": "a2-07-fall.png",
+      "type": "story-panel",
+      "status": "reused",
+      "source": "art/manga/a1-1-fall.png",
+      "ratio": "21:9",
+      "caption": "You fell.",
+      "tags": [
+        "story-v2",
+        "act2",
+        "halden",
+        "fall",
+        "coarse-pixel",
+        "reused"
       ]
     }
-  ]
+  ],
+  "panelOrder": [
+    "pr-01-kesh",
+    "pr-02-backs",
+    "pr-03-order",
+    "pr-04-granary",
+    "pr-05-triumph",
+    "pr-06-heir",
+    "pr-07-insult",
+    "pr-08-crypt",
+    "pr-09-altar",
+    "pr-10-price",
+    "pr-11-letters",
+    "pr-12-wine",
+    "pr-13-wake",
+    "pr-14-doorway",
+    "pr-15-trial",
+    "pr-16-rook",
+    "pr-17-mercy",
+    "pr-18-hostage",
+    "pr-19-window",
+    "pr-20-candle",
+    "pr-21-horse",
+    "pr-22-hood",
+    "pr-23-ride",
+    "pr-24-crowned",
+    "pr-25-eye",
+    "a1-01-exile",
+    "a1-02-crow",
+    "a1-03-letter",
+    "a1-04-road",
+    "b01-2-sisters",
+    "b01-3-sink",
+    "b02-2-warrant",
+    "b02-3-hounds",
+    "b03-2-eyes",
+    "b03-3-still",
+    "a1-05-tithe",
+    "b04-2-preacher",
+    "b04-3-lantern",
+    "a1-06-crow",
+    "b05-2-piet",
+    "b05-3-window",
+    "a2-01-sealed",
+    "a2-02-curfew",
+    "b06-2-brann",
+    "b07-2-ledger",
+    "b07-3-names",
+    "b07-4-cage",
+    "b08-2-mouths",
+    "b08-3-shut",
+    "b09-2-rook",
+    "b09-3-hostages",
+    "b09-4-under",
+    "a2-03-gate",
+    "a2-04-horse",
+    "a2-05-eyes",
+    "a2-06-charge",
+    "b10-2-torch",
+    "b10-3-balcony",
+    "b10-4-blast",
+    "a2-07-fall"
+  ],
+  "coverage": {
+    "listedPanels": 60,
+    "newPanels": 53,
+    "reusedPanels": 7,
+    "referenceSheets": 8,
+    "scope": "Every individually specified panel in the supplied 20-page Story Bible & Storyboard v2; detailed tables end at Act II.",
+    "notSupplied": "Act III and ending individual panel IDs, ratios and captions. The document's 94-panel summary exceeds its 60 detailed table rows."
+  }
 }
