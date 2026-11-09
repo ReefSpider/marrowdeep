@@ -89,7 +89,7 @@ function quality(it){ const r=it.aff.filter(varies); if(!r.length) return null; 
 function handWord(b){ return b.h===2?'Two-Hand':b.h===0?'Off-Hand':'One-Hand'; }
 function tipParts(it,reel){
   const c=RCOL[it.rarity], ab=it.rarity===5?' class="abyss"':''; const rows=[]; let n=0, dmgFinal='';
-  let h=`<div${ab} style="color:${c}">${it.name}</div>`; if(it.rarity>=2) h+=`<div${ab} style="color:${c}">${it.base.name}</div>`;
+  let h=`<div${ab} style="color:${c}">${escH(it.name)}</div>`; if(it.rarity>=2) h+=`<div${ab} style="color:${c}">${it.base.name}</div>`;
   const edA=it.aff.filter(a=>a.k==='ed'), edfA=it.aff.filter(a=>a.k==='edef');
   const hold=fin=>{ if(!reel||!it.aff.some(varies)) return fin; dmgFinal=fin; return `<span id="rdm">· · ·</span>`; };
   if(it.slot==='weapon'){ const b=it.base;
@@ -107,7 +107,7 @@ function tipParts(it,reel){
     h+=`<div class="m">${vs}${varies(a)?` <span class="rg">[${a.lo}–${a.hi}]</span>`:''}</div>`; }
   if(false&&it.set){ const S=SETS[it.set]; h+=`<div class="s" style="margin-top:.4em">${S.name}</div>`; for(const sp of SETP.filter(x=>x.set===it.set)){ const has=P&&Object.values(P.equip).some(e=>e&&e.name===sp.name); h+=`<div class="${has?'s':'x'}">${sp.name}</div>`; }
     for(const [k2,affs] of S.bonus) h+=`<div class="x">(${k2} items) ${affs.map(([k,v])=>FMT[k](v)).join(', ')}</div>`; }
-  if(it.fl) h+=`<div class="fl">${it.fl}</div>`;
+  if(it.fl) h+=`<div class="fl">${escH(it.fl)}</div>`;
   const q=quality(it); if(q!=null){ const vr=it.aff.filter(varies), na=vr.filter(a=>a.g===4).length;
     h+=`<div class="q"${reel?' id="rq" hidden':''}>Roll quality <b>${q}%</b>${na?` · <span class="abyss" style="color:var(--r5)">${na===vr.length&&vr.length>1?'ALL ABYSSAL':na+' abyssal'}</span>`:q===100?' · perfect':''}</div>`; }
   return {html:h,rows,dmgFinal};
@@ -161,7 +161,24 @@ function iconEl(it){ const c=document.createElement('canvas'); c.width=c.height=
 
 /* ---------- serialise for save/continue ---------- */
 const serItem=it=>it&&Object.assign({s:it.slot,b:it.base.name,r:it.rarity,n:it.name,l:it.ilvl,d:it.dq,a:it.aff,f:it.fl,t:it.set,v34:1,v44:1},it.rc?{rc:it.rc}:null,it.ins?{ins:1}:null); /* v34: every item saved from now on carries v34, so the one-time rebudget skips it */ /* v23: rc = times offered at the altar, ins = insured */
-const deItem=o=>{ if(!o) return o; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a||[],fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; if(!o.v34&&typeof rebudget==='function'&&rebudget(it)) fin(it); if(!o.v44&&typeof rebudget44==='function'&&rebudget44(it)) fin(it); } return it; };
+/* v45: items arrive from saves and from other players (gifts, drops, chests, worn gear in co-op), so deItem no longer trusts
+   them. The name loses anything that could become HTML; slot, base, rarity, item level and quality must be real; each stat must be
+   a known stat and is held under twice the largest value the game can roll for it at that item level (no real item comes near it). */
+const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cleanName=n=>String(n==null?'':n).replace(/[<>&"`\\]/g,'').slice(0,64);
+const ITEM_IN={key:'',top:{}};
+function affTop(k){ const key=PRE.length+'/'+SUF.length+'/'+UNIQUES.length+'/'+ABYSSAL.length; if(ITEM_IN.key!==key){ const t={};
+    for(const d of PRE.concat(SUF)) for(const [lo,hi] of d.v) t[d.k]=Math.max(t[d.k]||0,Math.abs(lo),Math.abs(hi));
+    for(const u of UNIQUES.concat(ABYSSAL)) for(const [k,lo,hi] of (u.aff||[])) t[k]=Math.max(t[k]||0,Math.abs(lo),Math.abs(hi));
+    ITEM_IN.key=key; ITEM_IN.top=t; }
+  return ITEM_IN.top[k]; }
+const affCap=(k,il)=>{ const t=affTop(k); return t==null?null:Math.ceil(t*flatMul(k,il)*2)+5; };
+function cleanItemIn(o){ if(!o||typeof o!=='object'||typeof o.s!=='string'||!Object.prototype.hasOwnProperty.call(BASES,o.s)) return null; const b=baseByName(o.b); if(!b||!BASES[o.s].includes(b)) return null;
+  const num=(v,lo,hi,d)=>{ v=+v; return Number.isFinite(v)?clamp(Math.round(v),lo,hi):d; };
+  return Object.assign({},o,{n:cleanName(o.n)||b.name,r:num(o.r,0,5,0),l:num(o.l,0,200,1),d:num(o.d,50,150,100),f:typeof o.f==='string'?o.f.replace(/[<>]/g,'').slice(0,240):undefined,t:typeof o.t==='string'?cleanName(o.t):undefined,rc:num(o.rc,0,99,0),
+    a:(Array.isArray(o.a)?o.a:[]).filter(a=>a&&typeof a==='object'&&typeof a.k==='string'&&Object.prototype.hasOwnProperty.call(AFX,a.k)&&Number.isFinite(+a.v)).slice(0,12).map(a=>({...a,v:+a.v,lo:a.lo==null?a.lo:+a.lo||0,hi:a.hi==null?a.hi:+a.hi||0,g:num(a.g,0,4,0),nm:a.nm==null?a.nm:cleanName(a.nm)}))}); }
+function capAffs(it){ let ch=false; for(const a of it.aff){ const c=affCap(a.k,it.ilvl); if(c==null) continue; for(const f of ['v','lo','hi']) if(a[f]!=null&&Math.abs(a[f])>c){ a[f]=Math.sign(a[f])*c; ch=true; } } return ch; }
+const deItem=o=>{ o=cleanItemIn(o); if(!o) return null; const it=fin({id:++IID,slot:o.s,base:baseByName(o.b),rarity:o.r,name:o.n,ilvl:o.l,dq:o.d,aff:o.a,fl:o.f,set:o.t}); if(it){ if(o.rc) it.rc=o.rc; if(o.ins) it.ins=1; if(!o.v34&&typeof rebudget==='function'&&rebudget(it)) fin(it); if(!o.v44&&typeof rebudget44==='function'&&rebudget44(it)) fin(it); if(capAffs(it)) fin(it); } return it; };
 
 /* ---------- grids (v21): the satchel and the stash, items take up room by size ----------
    Each grid is 16 × 10 cells per tab. A ring or amulet is 1×1, a helm or crossbow 2×2, armour 2×3, a one-handed weapon
