@@ -31,7 +31,7 @@ function offActive(){ const m=P.equip.weapon, o=P.equip.off; return !!(has('off'
    kills, level 3 ~23, level 4 ~37; the falloff in bal34.js keeps you 2–3 above the monsters on Pilgrim. */
 function xpNext(l){ return Math.round(260+50*Math.pow(l-1,1.45)); }
 function gearPower(){ let p=0; for(const k in P.equip){ const it=P.equip[k]; if(!it||(k==='off'&&!offActive())) continue; p+=[0,1,2,3,4,8][it.rarity]; p+=it.aff.filter(a=>varies(a)&&a.g===4).length*2; } return p; }
-function calcStats(){ const s={min:1+Math.floor(P.lvl/2),max:3+P.lvl,spd:1.1,omin:0,omax:0,ospd:1,def:0,life:60+(P.lvl-1)*7,as:0,ms:0,ls:0,fire:0,cold:0,shock:0,poison:0,holy:0,shadow:0,water:0,blood:0,wind:0,bone:0,crit:5,mf:0,gf:0,regen:0,thorns:0}; const sets={};
+function calcStats(){ const s={min:1+Math.floor(P.lvl/2),max:3+P.lvl,spd:1.1,omin:0,omax:0,ospd:1,def:0,life:60+(P.lvl-1)*7,as:0,ms:0,ls:0,fire:0,cold:0,shock:0,poison:0,holy:0,shadow:0,water:0,blood:0,wind:0,bone:0,crit:5,mf:0,gf:0,regen:0,thorns:0,mig:0,fin:0,fort:0}; const sets={};
   for(const k in P.equip){ const it=P.equip[k]; if(!it||(k==='off'&&!offActive())) continue; for(const a of it.aff){ if(a.k==='ed'||a.k==='edef') continue; s[a.k]+=a.v; } if(it.def) s.def+=it.def; if(it.set) sets[it.set]=(sets[it.set]||0)+1; }
   const w=P.equip.weapon; if(w){ s.min=w.min; s.max=w.max; s.spd=w.base.spd; }
   const o=P.equip.off; if(o&&offActive()&&o.base.max>0){ s.omin=o.min; s.omax=o.max; s.ospd=o.base.spd; }
@@ -65,7 +65,7 @@ function heroPose(){ const p=P; let rot=0, sx=1; const sy=p.sy; const sp=108*(1+
 function aimInfo(){ if(!aimMouse||!P) return null; const m=mouseWorld(); const dx=m.x-P.x, dy=m.y-(P.y-18); return {dx,dy,face:dx>=0?1:-1,ang:Math.atan2(dy,Math.abs(dx)||.001)}; }
 function aimFor(mv,ai){ if(!ai||mv.t==='spin'||mv.t==='plunge') return 0; const lim=mv.t==='shoot'?1.45:mv.t==='slam'?.55:1.05; return clamp(ai.ang,-lim,lim)*(mv.t==='slam'?.6:1); }
 function startMove(name,ci,hand){ const s=P.stats, mv=MV[name]; hand=hand||'main'; const ai=aimInfo(); if(ai&&mv.t!=='plunge'&&Math.abs(ai.dx)>3) P.face=ai.face;
-  const spd=hand==='off'?s.ospd:s.spd; const rate=spd*(1+s.as/100)*(P.houndT>0?1.5:1);
+  const spd=hand==='off'?s.ospd:s.spd; const rate=spd*(1+s.as/100)*(P.houndT>0?1.5:1)*(P.quickT>time?1.2:1);
   P.attack={mv,name,ci,hand,aimA:aimFor(mv,ai),t:0,dur:name==='plunge'?mv.dur:mv.dur/rate,queued:null,id:++swingId,prev:[],lunged:false,slammed:false,half:false,shot:false};
   if(ci>=0){ if(hand==='off') P.offCombo=ci; else P.combo=ci; }
   if(mv.t==='spin') AU.spin(); else if(mv.t!=='shoot') AU.swing(mv.dm>=1.5);
@@ -95,7 +95,7 @@ function canExecute(e){ return has('exe')&&!e.boss&&!e.dead&&(e.hp<e.maxhp*.2||e
 function strike(e,mv,id,hand,dir,mult){ const s=P.stats;
   if(e.hitId===id) return false; e.hitId=id; e.lastHit={cls:wcls(hand),el:handEl(hand),t:time,heavy:mv.dm>=1.5};
   let d=rollHand(hand)*mv.dm*mult*(1+(P.lvl-1)*.05)*(P.houndT>0?1.25:1);
-  const crit=R()*100<s.crit||P.clarT>0; if(crit) d*=2; d=Math.round(d)+elemHit(e,crit,hand,dir);
+  const crit=R()*100<s.crit||P.clarT>0||!!(P.attack&&P.attack.allCrit); if(crit) d*=2; d=Math.round(d)+elemHit(e,crit,hand,dir);
   if((e.type==='husk'&&e.state!=='thrust'||e.type==='knight'&&e.state!=='combo'||e.mods&&e.mods.includes('stone')&&R()<.35)&&!(e.stun>0)&&Math.sign(P.x-e.x)===e.face&&!crit&&mv.dm<1.5){ AU.clang(); sparks(e.x+e.face*6,e.y-14,6,'#fff1c8'); e.vx=-e.face*70; const gd=Math.round(d*.15)+(s.shadow||0); num(e.x,e.y-28,Math.max(1,gd),'#8a8078'); e.hp-=gd; if(e.hp<=0) killEnemy(e,dir,false); freeze=Math.max(freeze,.03); return true; }
   if(canExecute(e)){ execute(e,dir); return true; }
   if(s.fire) sparks(e.x,e.y-e.h/2,5,'#ff7a2a');
@@ -189,7 +189,7 @@ function updPlayer(dt){
   else if(p.iai){ p.vx=approach(p.vx,0,900*dt); p.vy+=900*dt; p.iai.t+=dt; p.swordA=lerp(p.swordA,2.75,Math.min(1,dt*16));
     if(!p.iai.ready&&p.iai.t>=.42){ p.iai.ready=true; AU.ting(); sparks(p.x+p.face*2,p.y-10,4,'#fff6e0'); }
     if(!(down('j','x')||mouseHeld)){ if(p.iai.ready) performIai(); else { p.iai=null; startMove(comboFor(p.equip.weapon)[0],0,'main'); } } }
-  else if(p.dash>0){ p.dash-=dt; p.vx=p.face*330; p.vy=0; p.ghostT2=(p.ghostT2||0)-dt; if(p.ghostT2<=0){ ghosts.push({x:p.x,y:p.y,face:p.face,a:p.swordA,oa:p.offA,life:.25}); p.ghostT2=.025; } }
+  else if(p.dash>0){ p.dash-=dt; p.vx=p.face*330*((p.stats&&p.stats.rollMul)||1); p.vy=0; p.ghostT2=(p.ghostT2||0)-dt; if(p.ghostT2<=0){ ghosts.push({x:p.x,y:p.y,face:p.face,a:p.swordA,oa:p.offA,life:.25}); p.ghostT2=.025; } }
   else if(atk){ if(atk.mv.t==='plunge'){ p.vx=approach(p.vx,0,600*dt); p.vy=atk.t<.08?p.vy+900*dt:480; }
     else { p.vx=approach(p.vx,dir*speed*.6,900*dt); p.vy+=900*dt; if(atk.mv.t==='spin'&&!p.onGround) p.vy=Math.min(p.vy,110); p.vy=Math.min(p.vy,540); } }
   else { if(p.hurtT<=0){ const rev=dir&&Math.sign(dir)!==Math.sign(p.vx)&&Math.abs(p.vx)>20; p.vx=approach(p.vx,dir*speed*(p.block?.35:1),(p.onGround?(rev?2800:1700):1100)*dt); }
@@ -215,14 +215,14 @@ function updPlayer(dt){
       else { const list=comboFor(p.equip.weapon); const ci=p.comboWin>0?Math.min(p.combo+1,list.length-1):0; startMove(list[ci],ci,'main'); } }
     else if(off&&took('off',.45)){ if(offKind==='shield') p.blockT=time; else { const ol=offComboFor(off); const ci=p.offWin>0?Math.min(p.offCombo+1,ol.length-1):0; startMove(ol[ci],ci,'off'); } } }
   if(off&&offKind==='shield'&&took('off',.2)) p.blockT=time;
-  if(p.grit>=25&&p.dashCd<=0&&p.dash<=0&&took('dash',.15)){ p.dash=.17; p.dashAge=0; p.dashCd=.3; p.inv=Math.max(p.inv,.22); p.grit-=25; p.attack=null; p.iai=null; p.teth=null; p.swordA=Math.atan2(Math.sin(p.swordA),Math.cos(p.swordA)); if(dir) p.face=dir; AU.dash(); dust(p.x,p.y,6);
+  if(p.grit>=25*(p.stats.rollCost||1)&&p.dashCd<=0&&p.dash<=0&&took('dash',.15)){ p.dash=.17; p.dashAge=0; p.dashCd=.3; p.inv=Math.max(p.inv,.22); p.grit-=25*(p.stats.rollCost||1); if(p.stats.shadowSet) p.shadowArm=true; p.attack=null; p.iai=null; p.teth=null; p.swordA=Math.atan2(Math.sin(p.swordA),Math.cos(p.swordA)); if(dir) p.face=dir; AU.dash(); dust(p.x,p.y,6);
     if(has('shade')) p.shade={x:p.x,y:p.y,face:p.face,t:1.4,armed:true,atk:null,ang:p.swordA}; }
   if(p.potions>0&&p.life<s.life&&p.healT<=0&&took('potion',.15)){ p.potions--; p.healT=1.1; AU.drink(); bark('potion'); updBelt(); }
   if(has('hem')&&p.cd.hem<=0&&took('s1',.2)) castHem();
   if(has('teth')&&p.cd.teth<=0&&!p.teth&&took('s2',.2)) castTether();
   if(has('hound')&&p.rage>=100&&p.houndT<=0&&took('s3',.2)) startHound();
   if(has('bell')&&p.cd.bell<=0&&took('s4',.2)) castBell();
-  if(p.healT>0){ p.healT-=dt; p.life=Math.min(s.life,p.life+s.life*.45/1.1*dt); }
+  if(p.healT>0){ p.healT-=dt; p.life=Math.min(s.life,p.life+s.life*.45/1.1*dt*(s.healMul||1)); if(s.vetSet) P.vetT=time+3; }
   p.life=Math.min(s.life,p.life+s.regen*dt*.5);
   p.grit=Math.min(100,p.grit+22*dt);
   if(p.attack) runAttack(dt);
@@ -248,17 +248,18 @@ let defMul=def=>100/(100+def*2);
 let fallHurt=s=>Math.round(s.life*.25);
 function hurtPlayer(d,src){
   if(P.dead||P.ghostT>0||mode!=='play') return;
-  if(P.dash>0){ if(has('clar')&&P.dashAge<.2&&P.clarCd<=0) triggerClarity(); return; }
+  if(P.dash>0){ if(P.stats&&P.stats.quickstep) P.quickT=time+2; if(has('clar')&&P.dashAge<.2&&P.clarCd<=0) triggerClarity(); return; }
   if(P.inv>0) return;
   const s=P.stats; let dmg=d*defMul(s.def)*(P.houndT>0?.6:1);
+  if(typeof dmgTakenHook==='function') dmg=dmgTakenHook(dmg,src); /* v41: sets, milestones, a tank nearby */
   if(P.block&&src&&Math.sign((src.x==null?P.x:src.x)-P.x)===P.face){ if(time-P.blockT<.2){ parry(src); P.inv=.3; return; } dmg*=.2; P.grit=Math.max(0,P.grit-10); AU.clang(); sparks(P.x+P.face*7,P.y-16,6,'#fff1c8'); P.vx=-P.face*90; P.inv=.25; }
   dmg=Math.max(1,Math.round(dmg));
   P.life-=dmg; P.rage=Math.min(100,P.rage+dmg*1.5);
-  if(!P.block){ if(P.houndT>0) P.inv=.35; else { P.inv=.8; P.hurtT=.22; P.vx=(P.x<(src.x==null?P.x:src.x)?-1:1)*170; P.vy=-150; P.attack=null; P.iai=null; P.teth=null; }
+  if(!P.block){ if(P.houndT>0) P.inv=.35; else if(s.noKnock||(s.standFirm&&P.attack)){ P.inv=.6; P.hurtT=.1; } else { P.inv=.8; P.hurtT=.22; P.vx=(P.x<(src.x==null?P.x:src.x)?-1:1)*170; P.vy=-150; P.attack=null; P.iai=null; P.teth=null; }
     hurtV=1; shake(5); freeze=Math.max(freeze,.06); AU.hurt(); bleed(P.x,P.y-16,10,P.x<(src.x||P.x)?-1:1,1); }
   num(P.x,P.y-32,dmg,P.block?'#8a8078':'#ff5a4a');
   if(s.thorns&&src&&src.hp>0&&!src.dead) dmgEnemy(src,s.thorns,false,P.x<src.x?1:-1,40,false);
-  if(P.life<=0) die(); else if(P.life<s.life*.3) bark('low',true);
+  if(P.life<=0){ if(s.jugg&&!(P.juggT>time)){ P.life=1; P.juggT=time+60; P.inv=1.2; toast('Juggernaut · you refuse to fall'); } else die(); } else if(P.life<s.life*.3) bark('low',true);
 }
 function die(){ if(has('last')&&!P.lastUsed){ P.lastUsed=true; P.ghostT=4; P.life=1; P.inv=4.2; AU.scream(); impactT=.12; shake(5); bark('low',true); ash(P.x,P.y-14,30); return; }
   P.life=0; P.dead=true; P.deadT=0; AU.kill(); bleed(P.x,P.y-14,30,-P.face,1.5); impactT=.12; P.attack=null; P.teth=null; P.iai=null; }

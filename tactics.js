@@ -41,7 +41,7 @@ function tacTip(k,msg){ if(tacTold[k]) return; tacTold[k]=1; const t=store.get('
 
 /* ---------- poise: light blows can't stun-lock an ordinary foe ---------- */
 (function(){ const o=dmgEnemy; dmgEnemy=function(e,d,crit,dir,kb,heavy,launch,stun){ if(!e||e.boss||e.dead) return o(e,d,crit,dir,kb,heavy,launch,stun);
-  const light=!crit&&!heavy&&!launch&&!stun, guarded=light&&e.poiseT>time; const sv=guarded?{stun:e.stun,vx:e.vx,vy:e.vy,state:e.state}:null;
+  const light=!crit&&!heavy&&!launch&&!stun, guarded=light&&e.poiseT>time&&!(P&&P.stats&&P.stats.heavyHand); const sv=guarded?{stun:e.stun,vx:e.vx,vy:e.vy,state:e.state}:null;
   const r=o(e,d,crit,dir,kb,heavy,launch,stun);
   if(guarded&&!e.dead){ e.stun=sv.stun; e.vx=sv.vx; e.vy=sv.vy; if(e.state!=='drop') e.state=sv.state; }
   else if(!e.dead&&e.stun>0) e.poiseT=time+POISE_T;
