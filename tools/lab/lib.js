@@ -1,4 +1,4 @@
-// headless harness: serves the repo from disk, three.js locally, blocks fonts
+// headless harness: serves the repo from disk (three.js and PeerJS are in lib/ since v45), blocks fonts
 const { chromium } = require('playwright-core');
 const fs = require('fs'), path = require('path');
 const ROOT = process.env.GAME || '/home/claude/marrowdeep';
