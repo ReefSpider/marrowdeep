@@ -45,38 +45,38 @@ const T_MENU={ /* 22 small nodes a sector, in the order the builder places them 
   fortitude:['life','def','threat','regen','life','def','heal','threat','life','gf','def','regen','threat','life','def','heal','regen','threat','def','gf','heal','life'] };
 /* Brands: catalogue id, the skill it gives, sector, angle */
 const T_BRANDS=[['iaid','iai','finesse',24],['shade-step','shade','finesse',72],['thousand-cuts','thou','finesse',120],
-  ['funeral-bell','bell','fortitude',162],['last-breath','last','fortitude',198],['stillness','clar','fortitude',234],
-  ['hemorrhage','hem','might',270],['the-hound','hound','might',306],['grave-slam',null,'might',342]];
+  ['funeral-bell','bell','fortitude',162],['last-breath','last','fortitude',198],['stillness','still','fortitude',234],
+  ['hemorrhage','hem','might',270],['the-hound','hound','might',306],['grave-slam','slam','might',342]];
 const T_GIFTS=[{sk:'wing',boss:'odo',n:'Ash Wings',jp:'翼',d:'Jump again in midair on a burst of grave ash.'},{sk:'claw',boss:'sisters',n:'Grave Claw',jp:'爪',d:'Cling to walls and climb them.'},{sk:'teth',boss:'preacher',n:'Red Tether',jp:'鎖',d:'Fling a chain of blood that drags you to stone and flesh. Key 2.'}];
 /* what every named node says. [text, forged in this build?] */
 const T_TEXT={
   'hemorrhage':['Art, key 1. Throw a lance of your own blood. It costs life, pierces everything, and each foe it passes through gives some back.',1],
-  'crimson-pact':['Hemorrhage splits into three lances.',1],
-  'heart-spike':['Hemorrhage becomes one heavy lance that staggers and opens Bleeding. Stagger scales with Might.',0],
+  'crimson-pact':["Hemorrhage splits into three lances. +1% lance damage per 2 Finesse.",1],
+  'heart-spike':["Hemorrhage becomes one heavy lance: ×1.9 damage, it opens Bleeding and stuns. On bosses it fills the stagger bar. The stun and the stagger grow with Might.",1],
   'the-hound':['Art, key 3. Rage builds as you bleed and make others bleed. At full rage the Hound wears you: black iron, faster blows, stolen life, no flinching. The dead spill blood orbs that feed life and grit.',1],
-  'black-iron':['Rage builds from damage you take. In Hound form you take 30% less, more with Fortitude.',0],
-  'red-maw':['Rage builds from damage you deal. Hound blows open Bleeding.',0],
-  'grave-slam':['Art. Leap and crash down: the crater knocks ordinary foes into the air.',0],
-  'ossuary-crash':['The crater leaves 3 stacks of Brittle. Its radius scales with Might.',0],
-  'gale-crash':['Foes are thrown Airborne, ready to juggle. Shorter cooldown with Finesse.',0],
+  'black-iron':["Rage also builds from the damage you take. In Hound form you take 30% less, more with Fortitude.",1],
+  'red-maw':["Every blow that draws blood builds rage. In Hound form your blows open Bleeding, more with Might.",1],
+  'grave-slam':["In the air, hold Down and Strike to crash down. Once every 4 s the landing is a Grave Slam: a wide crater that hits harder and knocks ordinary foes into the air.",1],
+  'ossuary-crash':["The crater leaves 3 stacks of Brittle. It is wider with Might.",1],
+  'gale-crash':["Foes are thrown higher and stay in the air longer, ready to juggle. The slam comes back sooner with Finesse.",1],
   'iaid':['On the ground, hold Down + Strike to sheathe and wait. Release to cut through everything ahead. The wounds open a heartbeat later.',1],
-  'thunder-draw':['The wounds open as lightning, leaving foes Shocked and arcing.',0],
-  'long-draw':['Hold longer for a wider cut, up to ×2 damage.',0],
+  'thunder-draw':["The wounds open as lightning: foes are Shocked and it arcs to those nearby. The lightning grows with Finesse.",1],
+  'long-draw':["Keep holding after the sword is ready: up to a second more makes the cut reach further and hit up to ×2.",1],
   'shade-step':['Your roll leaves a shade where you stood. It copies your next attack from there.',1],
-  'marking-shade':['The shade\'s copy Marks what it hits.',0],
-  'decoy':['The shade draws foes to it for 2 s, longer with Fortitude.',0],
+  'marking-shade':["The shade's copy Marks what it hits. Marks last longer with Finesse.",1],
+  'decoy':["For 2 s, foes near the shade stop and turn to it. Longer with Fortitude. Not bosses.",1],
   'thousand-cuts':['The last blow of every main-hand combo leaves six phantom blades in the air. They fall a moment later.',1],
-  'rain-of-needles':['Ten small blades fall, and each adds a stack of Rotting.',0],
-  'six-executioners':['Six heavy blades all fall on the nearest foe.',0],
+  'rain-of-needles':["Ten small blades fall in a row ahead of you, and each adds a stack of Rotting. The rot grows with Finesse.",1],
+  'six-executioners':["Six heavy blades all fall on the nearest foe. They hit harder with Might.",1],
   'funeral-bell':['Art, key 4. Toll a bell no one else can hear. Everything near you stands stunned, and bosses reel. Costs 40 grit.',1],
-  'toll-for-me':['Stunned foes lock on to you, and you take 20% less for 4 s.',0],
-  'drowning-bell':['The toll Soaks everything it reaches. Its radius scales with Finesse.',0],
+  'toll-for-me':["Stunned foes lock on to you, and you take 20% less for 4 s. Longer with Fortitude.",1],
+  'drowning-bell':["The toll Soaks everything it reaches. It reaches further with Finesse.",1],
   'last-breath':['Once per level, refuse death. Become a shade for a few seconds, untouchable, then crawl back with a third of your life.',1],
-  'martyr-s-breath':['When Last Breath fires, allies nearby heal 30%.',0],
-  'vengeful-shade':['As a shade you deal double and leave foes Burning.',0],
-  'stillness':['Roll through a blow at the last instant, or parry with a shield, and the world slows. Every strike in that stillness is critical. (This Brand becomes Stillness, a ward for standing your ground, in a later update.)',1],
-  'frozen-stillness':['The ward breaks into a burst that Chills everything near.',0],
-  'hallowed-stillness':['The ward breaks into a Judgement pillar.',0],
+  'martyr-s-breath':["When Last Breath fires, allies near you heal 30% of their life.",1],
+  'vengeful-shade':["As a shade you deal double and leave foes Burning. The burn grows with Might.",1],
+  'stillness':["Stand still for a second without attacking and a ward of bone forms. It takes one hit for you. When it breaks, time slows for half a second and your strikes are critical.",1],
+  'frozen-stillness':["The ward breaks into a burst that Chills everything near. Wider with Fortitude.",1],
+  'hallowed-stillness':["The ward breaks into a Judgement pillar on whatever struck it. Harder with Might.",1],
   'headsman':['The red finishing mark appears on foes at 25% life, not 20%.',1],
   'siegebreaker':['Heavy blows ignore 30% of elites\' and bosses\' defense.',0],
   'iron-grip':['Two-handers swing 8% faster. Giant\'s Grip loses half its slowdown.',0],
@@ -165,8 +165,7 @@ function buildTree(){ const N=TREE.nodes, by=TREE.by, adj=TREE.adj; N.length=0; 
   /* Brands and forks */
   for(const [cid,sk,role,deg] of T_BRANDS){ const p=small('bp-'+cid,56,deg,{[role==='might'?'life':role==='finesse'?'as':'def']:TK[role==='might'?'life':role==='finesse'?'as':'def']},{grp:role,role});
     link('heart',p); const b=named(cid,'brand',100,deg,{sk,grp:role,role}); link(p,b);
-    if(cid==='stillness'){ by[b].name='Clarity'; }
-    TreeArt.catalogue.filter(c=>c.parent===cat[cid].name).forEach((f,j)=>{ const id=named(f.id,'fork',139,deg+(j?8:-8),{grp:role,role:f.role,fork:cid,sk:f.id==='crimson-pact'?'pact':null}); link(b,id,{chain:1}); }); }
+    TreeArt.catalogue.filter(c=>c.parent===cat[cid].name).forEach((f,j)=>{ const id=named(f.id,'fork',139,deg+(j?8:-8),{grp:role,role:f.role,fork:cid,sk:f.id==='crimson-pact'?'pact':f.id}); link(b,id,{chain:1}); }); }
   /* attribute sectors */
   const notes={might:['headsman','siegebreaker','iron-grip','undertow-of-iron','unbowed','bloodletter-s-due','colossus'],finesse:['flowing-steel','deadeye','twin-fangs','second-wind','cutpurse','featherfall','paper-tiger'],fortitude:['chain-warden','shieldwall','undying','stone-skin','long-watch','pilgrim-s-draught','martyr']};
   const gates={};
