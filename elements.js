@@ -71,7 +71,7 @@ const hasSt=(e,k)=>!!(e.sts&&e.sts[k]&&e.sts[k].t>0);
 const elOn=(e,el)=>e.sts?Object.keys(e.sts).some(k=>ST_EL[k]===el&&e.sts[k].t>0):false;
 function clearEl(e,el){ if(!e.sts) return; for(const k in e.sts) if(ST_EL[k]===el) delete e.sts[k]; }
 const wAvg=()=>P?(P.stats.min+P.stats.max)/2*(1+(P.lvl-1)*.05):5;
-const resOf=(e,k)=>(e.res&&e.res[k])||0;
+const resOf=(e,k)=>Math.max(0,((e.res&&e.res[k])||0)-(typeof treePen==='function'?treePen(k):0)); /* v46: penetration nodes in the Marrow */
 const ranked=e=>e.champ||e.rare||e.unique||e.boss;
 const live=(x,y,r,not)=>enemies.filter(o=>o!==not&&!o.dead&&!o.intro&&Math.hypot(o.x-x,(o.y-o.h/2)-y)<r);
 const ctr=e=>[e.x,e.y-e.h/2];

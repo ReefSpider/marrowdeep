@@ -1,0 +1,16 @@
+{
+  "nodes": 109,
+  "glyphs": 20,
+  "frameVariants": 45,
+  "nodeDraws": 2180,
+  "groups": {
+    "Brands": 9,
+    "Forks": 18,
+    "Attributes": 21,
+    "Elements": 50,
+    "Bridges": 10,
+    "Spine": 1
+  },
+  "browserErrors": [],
+  "screenshots": 10
+}

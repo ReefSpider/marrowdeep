@@ -70,7 +70,7 @@ function abTip(id){ const s=SKILLS.find(x=>x.id===id); if(!s) return ''; const b
   return `<div style="color:${b.c};font-size:1.15em">${s.k}　${s.name} <span class="g">· key ${s.key}</span></div>`+
     `<div class="w" style="margin-top:.35em;text-align:left">${s.desc}</div>`+(i.extra?`<div class="g" style="margin-top:.3em;text-align:left">${i.extra}</div>`:'')+
     `<div class="g" style="margin-top:.35em;text-align:left">Cost: ${i.cost||'—'} · Cooldown: ${i.cd?i.cd():'—'}</div>`+
-    (on?`<div style="margin-top:.3em;color:#e8c25a">${state}</div>`:`<div style="margin-top:.3em;color:#9a8a7a">Not learned · ${b.n} brand, tier ${s.tier+1}, from level ${TIER_LVL[s.tier]} (T opens the brands)</div>`); }
+    (on?`<div style="margin-top:.3em;color:#e8c25a">${state}</div>`:`<div style="margin-top:.3em;color:#9a8a7a">${id==='teth'?'Not yet yours · a Gift from an early boss':'Not taken · a Brand in the Marrow 髄 (T opens it)'}</div>`); }
 function beltTip(){ return `<div style="font-size:1.15em">Draughts <span class="g">· key Q</span></div><div class="w" style="margin-top:.35em;text-align:left">Drink to heal. You carry ${P.potions} of ${POT_MAX}. Rising again after a death fills the belt; the Pale Merchant sells a couple on each level; foes sometimes drop one.</div>`; }
 (function(){ let shown=null;
   addEventListener('pointermove',ev=>{ if(!P||mode!=='play'||hud.hidden){ if(shown){ hideTip(); shown=null; } return; } const x=ev.clientX, y=ev.clientY; let hit=null, html='';
