@@ -231,7 +231,7 @@ html.mobile #equip{transform-origin:top left}
   const bPause = top('mtPause', '<svg width="14" height="16" viewBox="0 0 14 16"><rect x="1" y="1" width="4" height="14" fill="#e8dcc0"/><rect x="9" y="1" width="4" height="14" fill="#e8dcc0"/></svg>', 'Pause', 'Escape');
   const bBag = top('mtBag', '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M6 6 4 4h12l-2 2M5 7h10l2 11H3z" fill="none" stroke="#e8dcc0" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 11h4" stroke="#d8b24a" stroke-width="1.6"/></svg>', 'Satchel', 'i');
   const bMap = top('mtMap', '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 4l5-2 6 2 5-2v14l-5 2-6-2-5 2z M7 2v14 M13 4v14" fill="none" stroke="#e8dcc0" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="9" r="1.6" fill="#c23a2a"/></svg>', 'Map', 'm');
-  const bSp = top('mtSp', '<b>技</b><span class="c">0</span>', 'Spend skill points', 't');
+  const bSp = top('mtSp', '<b>髄</b><span class="c">0</span>', 'Spend Marrow points', 't');
 
   function layout() {
     const sh = stage.clientHeight || 393; const k = MOB.k = clamp(sh / 393, .78, 1.45) * MS.size; mt.style.setProperty('--k', k);
@@ -374,11 +374,11 @@ html.mobile #equip{transform-origin:top left}
       6: '<b>転 Roll</b> · nothing can touch you mid-roll', 8: '<b>薬 Drink</b> heals. You carry two.', 9: 'Tap the gold button to open a chest. Watch the reel.' };
     for (const i in T2) if (LESSONS[i]) LESSONS[i].t = T2[i];
   }
-  const ll = $('#lvlup span'); if (ll) ll.textContent = 'A skill point. Tap 技.';
+  const ll = $('#lvlup span'); if (ll) ll.textContent = 'A Marrow point. Tap 髄.';
   /* text written by modules at runtime: swap key words for touch words where they're shown */
   const SWAP = [[/Go to it and press F to finish it\./, 'Go to it and tap Finish.'], [/\bPress F\b|\bpress F\b/g, 'tap Finish'], [/Click · E — next/i, 'Tap for the next page'], [/\s*Esc — skip/i, ''],
-    [/Click or right-click to wear · right-click puts a weapon in your off hand once you've learned it · shift-click to drop/, 'Tap an item to see it and what you can do with it · drag to move it'],
-    [/\bA skill point\. Press T\./, 'A skill point. Tap 技.'], [/Drag to move or wear · right-click: off hand · shift-click: drop/, 'Tap an item to see it · drag to move or wear'],
+    [/Click or right-click to wear · right-click puts a weapon in your off hand · shift-click to drop/, 'Tap an item to see it and what you can do with it · drag to move it'],
+    [/\bA Marrow point\. Press T\./, 'A Marrow point. Tap 髄.'], [/Drag to move or wear · right-click: off hand · shift-click: drop/, 'Tap an item to see it · drag to move or wear'],
     [/Right-click or K to use it\./, 'The off-hand button uses it.'], [/\s*· or shift-click an item to drop it/, ''], [/\bClick\b/g, 'Tap'], [/\bclick\b/g, 'tap']];
   function swapText(root) { const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; const hits = [];
     while ((n = w.nextNode())) { const v = n.nodeValue; if (!v || v.length < 3) continue; let o = v; for (const [re, to] of SWAP) o = o.replace(re, to); if (o !== v) hits.push([n, o]); }
@@ -461,7 +461,7 @@ html.mobile #equip{transform-origin:top left}
   if (typeof openSettings === 'function') { const o = openSettings;
     openSettings = function (from) { o.apply(this, arguments); const s = $('#setScr'); if (!s) return;
       const kg = s.querySelector('.keyGrid'); if (kg) kg.innerHTML = [['Stick', 'Move · aim · down to drop through or plunge · up to climb'], ['斬 Strike', 'Hold to keep swinging'], ['跳 Jump', 'Hold to jump higher'], ['転 Roll', 'Nothing touches you mid-roll'],
-        ['副 Off hand', 'Shown when you hold something in it'], ['薬 Drink', 'A draught'], ['血 鎖 獣 鐘', 'Your arts, once learned'], ['Gold button', 'Open · take · talk · finish a kneeling boss'], ['袋 地', 'Satchel · map'], ['技', 'Skill points to spend']]
+        ['副 Off hand', 'Shown when you hold something in it'], ['薬 Drink', 'A draught'], ['血 鎖 獣 鐘', 'Your arts, once learned'], ['Gold button', 'Open · take · talk · finish a kneeling boss'], ['袋 地', 'Satchel · map'], ['髄', 'Marrow points to spend']]
         .map(([k, a]) => `<div><b style="font-family:var(--fs);font-weight:400;color:var(--ember)">${k}</b><span>${a}</span></div>`).join('');
       const tb = s.querySelector('.tabs .tab[data-t="keys"]'); if (tb) tb.textContent = 'Touch';
       const grid = s.querySelector('.setGrid'); if (!grid) return;

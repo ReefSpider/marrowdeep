@@ -60,6 +60,4 @@ EAI.zealot=function(e,dt,c){ e.walk+=dt*Math.abs(e.vx)*.13;
   if(best){ const gx=best.x-ox, gy=best.y-oy, gd=Math.hypot(gx,gy); dx=gx/gd; dy=gy/gd; }
   t.dx=dx; t.dy=dy; if(Math.abs(dx)>.05) P.face=Math.sign(dx); }; })();
 
-/* ---------- the Marrow opens when the Brand tree is full ---------- */
-(function(){ const o=calcStats; calcStats=function(){ o(); if(!P||P._remote||typeof marrowOn!=='function'||marrowOn()||!P.skills) return;
-  if(SKILLS.every(s=>P.skills.has(s.id))){ unlockMarrow(true); o(); setTimeout(()=>toast('Every brand burned in. The Marrow 髄 opens in your satchel.'),400); } }; })();
+/* (v46: "the Marrow opens when the Brand tree is full" went with the old trees; see tree50.js) */

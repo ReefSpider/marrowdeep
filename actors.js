@@ -91,7 +91,7 @@ const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 const pBox=()=>({x:P.x-P.w/2,y:P.y-P.h,w:P.w,h:P.h});
 const eBox=e=>({x:e.x-e.w/2,y:e.y-e.h,w:e.w,h:e.h});
 function rollHand(hand){ const s=P.stats; return (hand==='off'?ri(s.omin,s.omax):ri(s.min,s.max))*(1+(s.dmgP||0)/100); }
-function canExecute(e){ return has('exe')&&!e.boss&&!e.dead&&(e.hp<e.maxhp*.2||e.launchT>0||e.stun>.4); }
+function canExecute(e){ return has('exe')&&!e.boss&&!e.dead&&(e.hp<e.maxhp*((P.stats&&P.stats.exeAt)||.2)||e.launchT>0||e.stun>.4); }
 function strike(e,mv,id,hand,dir,mult){ const s=P.stats;
   if(e.hitId===id) return false; e.hitId=id; e.lastHit={cls:wcls(hand),el:handEl(hand),t:time,heavy:mv.dm>=1.5};
   let d=rollHand(hand)*mv.dm*mult*(1+(P.lvl-1)*.05)*(P.houndT>0?1.25:1);
@@ -126,7 +126,7 @@ function runAttack(dt){ const p=P, a=p.attack, mv=a.mv; a.t+=dt; const pr=a.t/a.
     if(hand==='main'&&a.ci===list.length-1&&has('thou')) thousandCuts();
     if(q==='main'){ const ml=comboFor(p.equip.weapon); if(a.ci<0&&hand==='main'){ if(p.onGround) startMove(ml[0],0,'main'); } else { const nc=hand==='main'?(last?0:a.ci+1):(p.comboWin>0?Math.min(p.combo+1,ml.length-1):0); startMove(ml[nc],nc,'main'); } }
     else if(q==='off'&&offActive()){ const ol=offComboFor(p.equip.off); if(ol[0]!=='block'){ const nc=hand==='off'?(last?0:a.ci+1):(p.offWin>0?Math.min(p.offCombo+1,ol.length-1):0); startMove(ol[nc],nc,'off'); } } } }
-function fireBolt(hand){ const s=P.stats; const d=(hand==='off'?ri(s.omin,s.omax):ri(s.min,s.max))*(1+(P.lvl-1)*.04); AU.chain(); AU.noise(.12,2000,600,2,.3,'bandpass',.2);
+function fireBolt(hand){ const s=P.stats; const d=(hand==='off'?ri(s.omin,s.omax):ri(s.min,s.max))*(1+(P.lvl-1)*.04)*(1+(s.xbowP||0)/100); AU.chain(); AU.noise(.12,2000,600,2,.3,'bandpass',.2);
   const at=P.attack, ao=at?at.aimA||0:0, wa=P.face>0?ao:Math.PI-ao, rep=hand==='off'&&P.equip.off&&P.equip.off.base.name==='Repeater';
   for(const sp of rep?[-.06,.06]:[0]) projs.push({type:'bolt',from:'p',x:P.x+Math.cos(wa)*12,y:P.y-18+Math.sin(wa)*12,vx:Math.cos(wa+sp)*540,vy:Math.sin(wa+sp)*540,g:40,hand,dmg:d*(rep?.65:1),r:3,life:.9,hits:new Set(),kb:120}); }
 function thousandCuts(){ for(let i=0;i<6;i++){ const a0=i/6*Math.PI*2; const id=++swingId; fx.push({t:-i*.05,dur:.62,a:a0,id,x:P.x,y:P.y-16,hit:false,
@@ -146,7 +146,7 @@ function castTether(){ if(P.grit<15) return; P.grit-=15; P.cd.teth=.35; AU.chain
 function updTether(dt){ const t=P.teth; if(!t) return; t.t+=dt; const ox=P.x+P.face*4, oy=P.y-18;
   if(t.state==='out'){ t.len+=820*dt; const tx=ox+t.dx*t.len, ty=oy+t.dy*t.len;
     for(const e of enemies){ if(e.dead||e.intro) continue; if(Math.abs(e.x-tx)<e.w/2+5&&ty>e.y-e.h-5&&ty<e.y+5){ AU.hit(false); bleed(e.x,e.y-e.h/2,6,P.face,1);
-      if(has('pact')&&!e.boss){ e.reelT=.35; e.stun=Math.max(e.stun||0,.9); P.teth={state:'back',len:t.len,dx:t.dx,dy:t.dy,t:0}; return; }
+      if(has('chain-warden')&&!e.boss){ /* v46: was Crimson Pact; now the Chain Warden notable */ e.reelT=.35; e.stun=Math.max(e.stun||0,.9); P.teth={state:'back',len:t.len,dx:t.dx,dy:t.dy,t:0}; return; }
       t.state='pull'; t.tgt=e; t.t=0; if(!e.boss) e.stun=Math.max(e.stun||0,.7); return; } }
     if(solidPx(tx,ty)){ t.state='pull'; t.px=tx; t.py=ty; t.t=0; sparks(tx,ty,6,'#ff6a50'); AU.clang(); return; }
     if(t.len>190){ t.state='back'; } }
@@ -224,7 +224,7 @@ function updPlayer(dt){
   if(has('bell')&&p.cd.bell<=0&&took('s4',.2)) castBell();
   if(p.healT>0){ p.healT-=dt; p.life=Math.min(s.life,p.life+s.life*.45/1.1*dt*(s.healMul||1)); if(s.vetSet) P.vetT=time+3; }
   p.life=Math.min(s.life,p.life+s.regen*dt*.5);
-  p.grit=Math.min(100,p.grit+22*dt);
+  p.grit=Math.min(100,p.grit+22*(1+(s.gritP||0)/100)*dt); /* v46: grit nodes in the Marrow */
   if(p.attack) runAttack(dt);
   else if(!p.iai){ const st=heroState(); const m=p.equip.weapon; const tgtA=!m?(st==='dash'?2.6:st==='run'?1.45+Math.sin(p.runPh)*.55:st==='jump'||st==='fall'?.6:1.35+Math.sin(time*2.2)*.04):st==='dash'?2.9:st==='wall'?-2.9:st==='run'?-2.7+Math.sin(p.runPh*2)*.06:st==='jump'||st==='fall'?-2.15:-2.45+Math.sin(time*2.2)*.04;
     let ta=tgtA; const ai=m?aimInfo():null; if(ai&&ai.face===p.face&&st!=='dash'&&st!=='wall') ta=clamp(ai.ang,-1.35,1.25);
