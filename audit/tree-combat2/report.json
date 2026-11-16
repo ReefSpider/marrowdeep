@@ -1,0 +1,19 @@
+{
+  "studies": 10,
+  "thrallPoses": 5,
+  "defenses": 2,
+  "combos": 3,
+  "draws": 2490,
+  "maxPixelCalls": 472,
+  "platePixels": [
+    0,
+    31,
+    62,
+    93
+  ],
+  "deterministic": true,
+  "integerOpaquePixels": true,
+  "noRNG": true,
+  "noGameOrSaveMutation": true,
+  "browserErrors": []
+}

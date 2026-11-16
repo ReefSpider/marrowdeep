@@ -1,0 +1,10 @@
+{
+  "studies": 17,
+  "draws": 5087,
+  "maxPixelCalls": 445,
+  "deterministic": true,
+  "integerOpaquePixels": true,
+  "noRNG": true,
+  "noGameOrSaveMutation": true,
+  "browserErrors": []
+}
