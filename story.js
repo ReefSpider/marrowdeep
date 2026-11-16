@@ -102,12 +102,13 @@ const STORY={
    drift: [dx,dy] how far the picture slides across its frame (fraction of the frame) · dur: seconds to settle
    red: 'pulse' | 'beat' | 'flicker' · lights: [[x,y,radius,strength]] candle halos, as fractions of the still
    parts: particles, [kind,{options}] — dust, ash ({up:1} rises), embers ({from:[[x,y]]}), souls, streak, drip, tear, birds
-   tremble: shake in the art's own blocks. Panels not listed still drift slowly. */
+   tremble: shake in the art's own blocks. Panels not listed still drift slowly.
+   details: pixel-safe source-space micro animation — flame point, blink box, water box. */
 const MOTION={
   'op-1-wall':{drift:[.03,0],parts:[['embers',{from:[[.53,.2],[.62,.1],[.82,.13]],n:12}],['ash',{n:10,speed:.6}]]},
-  'op-2-window':{drift:[-.025,0],lights:[[.65,.58,.1,.7]],parts:[['dust',{n:8}]]},
-  'op-3-candle':{drift:[0,.02],lights:[[.49,.25,.12,.75]]},
-  'op-4-eyes':{drift:[0,-.03],red:'pulse',dur:12},
+  'op-2-window':{drift:[-.025,0],lights:[[.65,.58,.1,.7]],parts:[['dust',{n:8}]],details:[['flame',{point:[.65,.52]}]]},
+  'op-3-candle':{drift:[0,.02],lights:[[.49,.25,.12,.75]],details:[['flame',{point:[.515,.135]}]]},
+  'op-4-eyes':{drift:[0,-.03],red:'pulse',dur:12,details:[['blink',{box:[.365,.54,.434,.564],period:6.4}],['blink',{box:[.586,.544,.629,.56],period:6.4}]]},
   'op-5-crow':{drift:[.03,0],parts:[['dust',{n:8}]]},
   'op-6-count':{drift:[0,.035],red:'pulse',parts:[['ash',{up:1,n:16}]]},
   'a1-1-fall':{drift:[0,-.04],dur:8,parts:[['streak',{n:22}],['ash',{up:1,n:10,speed:2.5}]]},
@@ -115,7 +116,7 @@ const MOTION={
   'a1-3-stub':{drift:[.025,0],parts:[['dust',{n:10}]]},
   'a1-5-bones':{drift:[-.03,0],parts:[['dust',{n:12}]]},
   'a1-6-up':{drift:[0,.04],parts:[['ash',{n:14,speed:.5}]]},
-  'a2-2-bell':{drift:[0,.025],parts:[['drip',{n:5,xs:[.22,.35,.5,.66,.8],floor:.82}]]},
+  'a2-2-bell':{drift:[0,.025],parts:[['drip',{n:5,xs:[.22,.35,.5,.66,.8],floor:.82}]],details:[['water',{box:[0,.79,1,.99],speed:1.7,amp:1.3}]]},
   'a2-3-letter':{drift:[-.025,0],red:'pulse',parts:[['dust',{n:8}]]},
   'a3-2-ledger':{drift:[.03,0],lights:[[.12,.5,.09,.7]],parts:[['dust',{n:10}]]},
   'a3-3-father':{drift:[.04,0],dur:20},
@@ -123,7 +124,7 @@ const MOTION={
   'a4-2-letter':{drift:[-.03,0],red:'pulse',lights:[[.86,.47,.12,.75]],parts:[['ash',{n:10,speed:.5}]]},
   'a4-3-stub':{drift:[0,.025],red:'beat',parts:[['ash',{n:10,speed:.5}]]},
   'a5-2-sky':{drift:[0,.03],red:'pulse',parts:[['ash',{up:1,n:26}],['embers',{n:10}]]},
-  'a5-3-window':{drift:[.025,0],lights:[[.66,.74,.08,.6]]},
+  'a5-3-window':{drift:[.025,0],lights:[[.66,.74,.08,.6]],details:[['flame',{point:[.659,.676],phase:3}]]},
   'a6-2-count':{drift:[0,.03],parts:[['ash',{up:1,n:18}]]},
   'b1-2-agathe':{drift:[0,.02],parts:[['dust',{n:10}]]},
   'b1-3-cradle':{drift:[.02,0],lights:[[.82,.3,.06,.5]],parts:[['dust',{n:10}]]},
@@ -139,10 +140,10 @@ const MOTION={
   'b5-2-face':{drift:[0,.025],red:'beat'},
   'b5-3-crown':{drift:[.03,0],red:'pulse',parts:[['ash',{n:12,speed:.6}]]},
   'e-1-dawn':{drift:[.035,0],dur:20,parts:[['birds',{n:4,y:.08,h:.25}]]},
-  'e-2-door':{drift:[0,.025],lights:[[.43,.46,.1,.7]]},
-  'e-3-light':{drift:[0,.02],lights:[[.55,.2,.12,.8],[.48,.33,.09,.7]]},
+  'e-2-door':{drift:[0,.025],lights:[[.43,.46,.1,.7]],details:[['flame',{point:[.428,.292]}]]},
+  'e-3-light':{drift:[0,.02],lights:[[.55,.2,.12,.8],[.48,.33,.09,.7]],details:[['flame',{point:[.553,.13]}]]},
   'e-4-embrace':{drift:[0,.025],lights:[[.32,.42,.08,.65]],parts:[['dust',{n:8}]]},
-  'e-5-window':{drift:[0,.02],lights:[[.52,.52,.1,.75],[.625,.5,.1,.75]],parts:[['dust',{n:6}]]}
+  'e-5-window':{drift:[0,.02],lights:[[.52,.52,.1,.75],[.625,.5,.1,.75]],parts:[['dust',{n:6}]],details:[['flame',{point:[.532,.541]}],['flame',{point:[.636,.476],phase:2}]]}
 };
 
 /* ---------- where the pages play ---------- */
