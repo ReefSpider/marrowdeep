@@ -52,8 +52,9 @@ function tacTip(k,msg){ if(tacTold[k]) return; tacTold[k]=1; const t=store.get('
 (function(){ const o=castTether; castTether=function(){ o(); if(P.teth) P.cd.teth=CD.teth; }; })();
 
 /* ---------- the Funeral Bell: a stun, not a weapon ---------- */
-castBell=function(){ if(P.grit<40) return; P.grit-=40; P.cd.bell=CD.bell; AU.bell(); shake(5); const bx=P.x, by=P.y-20; let n=0;
-  for(const e of enemies){ if(e.dead||e.intro) continue; const d=Math.hypot(e.x-bx,e.y-e.h/2-by); if(d>=140) continue;
+castBell=function(){ if(P.grit<40) return; P.grit-=40; P.cd.bell=CD.bell; AU.bell(); shake(5); const bx=P.x, by=P.y-20; let n=0; if(typeof bellCast==='function') bellCast(bx,by); /* v47: forks (brands51.js) */
+  for(const e of enemies){ if(e.dead||e.intro) continue; const d=Math.hypot(e.x-bx,e.y-e.h/2-by); if(d>=(typeof bellR==='function'?bellR():140)) continue;
+    if(typeof bellHit==='function') bellHit(e);
     if(e.boss){ if(typeof bossStagAdd==='function') bossStagAdd(e,(e.stagMax||e.maxhp*.07)*.22,false,false); continue; }
     if(e.type==='anchor'||e.type==='relicx') continue;
     e.stun=Math.max(e.stun||0,2.6); e.state=e.fly?'rec':'chase'; e.vx=Math.sign(e.x-bx)*60; if(e.fly) e.vy=0; e.bellT=2.6; n++; }
