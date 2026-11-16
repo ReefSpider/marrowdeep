@@ -156,6 +156,11 @@ function mgMotionBuild(holder,cvs,mo,kind,p){ const Wc=cvs.width, Hc=cvs.height;
   if(mo.red){ const rc=document.createElement('canvas'); rc.width=Wc; rc.height=Hc; const rg=rc.getContext('2d'), ri=rg.createImageData(Wc,Hc); let any=0;
     for(let i=0;i<Wc*Hc;i++){ const j=i*4; if(d[j]>140&&d[j+1]<70&&d[j+2]<70){ ri.data[j]=d[j]; ri.data[j+1]=d[j+1]; ri.data[j+2]=d[j+2]; ri.data[j+3]=255; d[j]=96; d[j+1]=8; d[j+2]=12; any=1; } }
     if(any){ g.putImageData(img,0,0); rg.putImageData(ri,0,0); mv.appendChild(rc); n.red=rc; } }
+  /* Animate selected details on a transparent overlay; leave the source PNG unchanged. */
+  if(mo.details&&mo.details.length&&kind==='flat'){
+    const ac=document.createElement('canvas'); ac.width=Wc; ac.height=Hc; mv.appendChild(ac);
+    n.detail=ac; n.dg=ac.getContext('2d'); n.dg.imageSmoothingEnabled=false; n.base=cvs;
+  }
   if(still) for(const L of mo.lights||[]){ const [x,y]=n.at(L[0],L[1]); n.lights.push({x,y,r:n.len(L[2]||.06),s:L[3]||.55,ph:n.rg()*9}); }
   for(const spec of mo.parts||[]){ const [type,o]=Array.isArray(spec)?spec:[spec,{}]; const T=MG_PT[type]; if(!T) continue; const cnt=Math.round((o&&o.n)||T.n);
     for(let i=0;i<cnt;i++){ const q={type,o:o||{},T,i,cnt}; T.spawn(q,n,true); n.parts.push(q); } }
@@ -198,6 +203,45 @@ function mgFxDraw(n,t,dt){ const g=n.fg, W=n.W, H=n.H, bs=n.bs; g.clearRect(0,0,
     else if(q.type==='souls'&&q.sz>1){ mgDot(n,x,y,bs,bs,MG_PAPER); mgDot(n,x-bs,y,bs,bs,MG_PAPER); mgDot(n,x+bs,y,bs,bs,MG_PAPER); mgDot(n,x,y-bs,bs,bs,MG_PAPER); mgDot(n,x,y+bs,bs,bs,MG_PAPER); }
     else if(q.type==='drip'||q.type==='tear'){ mgDot(n,x,y,bs,bs*2,null); }
     else mgDot(n,x,y,bs,bs,col||(q.type==='souls'?MG_PAPER:null)); } }
+/* 12-fps hand-directed micro-animation for the original pixel-art stills.
+   Coordinates are fractions of the full PNG and map through the game's crop.
+   The original is never blurred, re-dithered or overwritten. */
+function mgDetailDraw(n,t){
+  const g=n.dg, bs=n.bs; g.clearRect(0,0,n.W,n.H);
+  for(const [kind,o] of n.mo.details){
+    if(kind==='water'){
+      const a=n.at(o.box[0],o.box[1]), b=n.at(o.box[2],o.box[3]);
+      const x0=clamp(Math.round(a[0]),0,n.W), x1=clamp(Math.round(b[0]),0,n.W);
+      const y0=clamp(Math.round(a[1]),0,n.H), y1=clamp(Math.round(b[1]),0,n.H);
+      if(x1<=x0||y1<=y0) continue;
+      const band=Math.max(1,bs*2); g.save(); g.beginPath(); g.rect(x0,y0,x1-x0,y1-y0); g.clip();
+      g.fillStyle=MG_INK; g.fillRect(x0,y0,x1-x0,y1-y0);
+      for(let y=y0;y<y1;y+=band){
+        const h=Math.min(band,y1-y);
+        const shift=Math.round(Math.sin(t*(o.speed||2)+(y-y0)/band*.6)*(o.amp||1))*bs;
+        g.drawImage(n.base,x0,y,x1-x0,h,x0+shift,y,x1-x0,h);
+      } g.restore();
+    }else if(kind==='blink'){
+      const phase=(t+(o.phase||0))%(o.period||6);
+      const shut=phase<.09?phase/.09:phase<.18?1:phase<.3?1-(phase-.18)/.12:0;
+      if(shut<=0) continue;
+      const a=n.at(o.box[0],o.box[1]), b=n.at(o.box[2],o.box[3]);
+      const x=Math.round(a[0]), w=Math.round(b[0]-a[0]);
+      const cy=(a[1]+b[1])/2, h=Math.max(1,Math.round((b[1]-a[1])*shut));
+      if(w>0){ g.fillStyle=MG_INK; g.fillRect(x,Math.round(cy-h/2),w,h); }
+    }else if(kind==='flame'){
+      /* Sparse jagged flame-tip movement: all geometry remains on pixel blocks. */
+      const p=n.at(o.point[0],o.point[1]), k=Math.max(1,bs);
+      const step=Math.floor(t*9+(o.phase||0));
+      const x=Math.round(p[0]/k)*k, y=Math.round(p[1]/k)*k;
+      const sway=[-1,0,1,0][((step%4)+4)%4], rise=step%5===0?1:0;
+      g.fillStyle=MG_INK; g.fillRect(x-2*k,y-4*k,5*k,4*k);
+      g.fillStyle=MG_PAPER; g.fillRect(x+sway*k,y-(3+rise)*k,k,k*(1+rise));
+      g.fillRect(x,y-k,k,k*2);
+      if(step%7===0) g.fillRect(x+sway*k*2,y-5*k,k,k);
+    }
+  }
+}
 /* red: 'pulse' breathes, 'beat' is a heartbeat, 'flicker' is firelight */
 function mgRedLevel(kind,t,R){ if(kind==='beat'){ const c=t%1.25; return Math.max(Math.exp(-Math.pow((c-.05)/.07,2)),.7*Math.exp(-Math.pow((c-.32)/.08,2))); }
   if(kind==='flicker') return clamp(.6+.25*Math.sin(t*8.3)+.15*Math.sin(t*19)+(R()-.5)*.3,0,1); return .5+.5*Math.sin(t*1.6-1.57); }
@@ -208,7 +252,9 @@ function mgTick(now){ if(!MG.on){ MG.raf=0; return; } MG.raf=requestAnimationFra
     if(mo.tremble&&(t*12|0)%3===0){ const cp=hw*(1+Math.abs(mo.drift[0]))/n.W*n.bs; tx+=((t*31|0)%3-1)*cp*mo.tremble; ty+=((t*17|0)%3-1)*cp*mo.tremble; }
     n.mv.style.transform=`translate(${Math.round(tx*dpr)/dpr}px,${Math.round(ty*dpr)/dpr}px)`;
     if(n.red){ const v=mgRedLevel(mo.red,t,n.rg); n.red.style.opacity=(.35+.65*v).toFixed(3); n.red.style.filter=`brightness(${(1+.3*v).toFixed(3)})`; }
-    if(n.fx){ const fr=(t*12)|0; if(fr!==n.last){ const dt=n.last<0?0:(fr-n.last)/12; n.last=fr; mgFxDraw(n,t,dt); } } } }
+    if(n.fx||n.detail){ const fr=(t*12)|0; if(fr!==n.last){ const dt=n.last<0?0:(fr-n.last)/12; n.last=fr;
+      if(n.detail) mgDetailDraw(n,t);
+      if(n.fx) mgFxDraw(n,t,dt); } } } }
 const hashStr=s=>{ let h=2166136261; for(const ch of String(s)){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; };
 
 /* ---------- playing a scene ---------- */
