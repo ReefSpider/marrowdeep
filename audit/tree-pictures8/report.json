@@ -1,0 +1,10 @@
+{
+  "pictures": 27,
+  "draws": 540,
+  "maxPixelCalls": 249,
+  "deterministic": true,
+  "integerOpaquePixels": true,
+  "noRNG": true,
+  "noGameOrSaveMutation": true,
+  "browserErrors": []
+}

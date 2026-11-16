@@ -1,0 +1,34 @@
+{
+  "effects": 8,
+  "heroPoses": 2,
+  "draws": 2000,
+  "maxPixels": 2359,
+  "maxPixelCalls": 757,
+  "waveBounds": {
+    "early": {
+      "left": 100,
+      "right": 135,
+      "top": 131
+    },
+    "late": {
+      "left": 139,
+      "right": 203,
+      "top": 130
+    },
+    "dry": {
+      "left": 104,
+      "right": 164,
+      "top": 130
+    },
+    "wet": {
+      "left": 100,
+      "right": 166,
+      "top": 121
+    }
+  },
+  "deterministic": true,
+  "integerPixels": true,
+  "contextRestored": true,
+  "gameStateUnchanged": true,
+  "browserErrors": []
+}
