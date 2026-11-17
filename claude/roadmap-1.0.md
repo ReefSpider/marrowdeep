@@ -2,7 +2,7 @@
 
 Scope decision (BT, 2026-11-05): **1.0 is everything as it is** — all 11 tiers, co-op, the Rope-House, altar, Ways, slots. Nothing is cut; everything gets polished.
 
-Last updated: v51 (17 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
+Last updated: v52 (17 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
 
 ## Done since v17
 - **Playtest loop running:** friends' reports drove v34–v44 (scaling, levelling, loot variety, chest kinds, falls, late-game difficulty, Act II, boss guard/openings).
@@ -18,11 +18,12 @@ Last updated: v51 (17 Nov 2026). Version notes for each release are in `claude/v
 - **The cold open** (v49).
 - **Set pieces** (v50): the first three bosses rebuilt on their own ground; a director and a far plane in the first three regions; foe reactions to damage types, regional leanings, element shrines, officers; a slow-motion beat on heavy blows. The audit behind it is `claude/audit-v50-steam.md`.
 - **Act II's bosses and the stake** (v51): Brann, the Tithe-Collector, the Choir, Rook and Gideon each on a stage with moving parts that can be turned on them; a push-your-luck stake on every boss chest (solo).
+- **Grander bosses and a logic sweep** (v52): nine hero-sized bosses drawn 1.35–1.6× larger; Rook moved from the Royal Houses to the Palace Bridge; officers only among soldiers, set pieces only under open sky, Brann back in period.
 
 ## Next, in order
 
 ### 1. Playtest round on v45 (BT)
-- Everyone reloads (co-op needs `marrowdeep-51`), presses **Clear** in the playtest report, plays, and sends it.
+- Everyone reloads (co-op needs `marrowdeep-52`), presses **Clear** in the playtest report, plays, and sends it.
 - Questions: do v44's boss openings make fights feel read rather than rushed? Do the builds feel different (tank holding the room deep, killers equal)? Anything that suddenly feels unfair after the Might change?
 
 ### 2. Things Claude can build next

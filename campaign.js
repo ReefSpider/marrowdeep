@@ -43,9 +43,9 @@ const RETIRED={};
     Object.assign(byId.choir,{act:A2,name:'The Cathedral of the Crown',jp:'王冠の大聖堂',pal:'chapel'}),
     {id:'royal',kind:'dungeon',look:'royal',name:'The Royal Houses',jp:'王家の館',act:A2,pal:'royal',cols:6,rows:3,up:.4,env:'bone',amb:'ball',
       enemies:{noble:2,puppet:1.8,servant:1.6,handknight:.9,guard:1},packs:[{t:'puppet',n:[3,4]},{t:'noble',n:[2,3]}],packP:.45,bg:['eyes','procession']},
-    {id:'rook',kind:'boss',boss:'rook',open:1,look:'royal',arena:'yard',name:'The Iron Barracks',jp:'鉄の兵舎',act:A2,pal:'barracks',surface:1,bg:['wound']},
     {id:'bridge',kind:'dungeon',open:1,look:'bridge',name:'The Palace Bridge',jp:'王宮の橋',act:A2,pal:'bridge',cols:7,rows:1,up:0,env:'war',amb:'wind',
       enemies:{guard:2.4,handknight:1,archer:1.6,taker:1,bellman:.6},packs:[{t:'guard',n:[3,5]}],packP:.55,bg:['wound','wound','bells']},
+    {id:'rook',kind:'boss',boss:'rook',open:1,look:'bridge',arena:'span',name:'The Long Span',jp:'長い橋',act:A2,pal:'bridge',surface:1,bg:['wound']}, /* v52: he met you at the end of the Royal Houses, on a horse, indoors. A lancer belongs on the bridge. */
     {id:'gideon',kind:'boss',boss:'gideon',open:1,look:'bridge',arena:'bridge',name:'The Gate of Pikes',jp:'槍の門',act:A2,pal:'bridge',surface:1,bg:['wound']}
   ];
   LEVELS.length=0; LEVELS.push(wall,...NEW,...old,byId.count); }
