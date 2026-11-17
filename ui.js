@@ -382,11 +382,12 @@ function update(dt){
 function bossIntroReady(b){ return P.x>9*T; }
 function passive(dt){ updParts(dt); updBG(dt); updPlats(dt); for(const e of enemies) e.anim+=dt; for(const g of ghosts) g.life-=dt; ghosts=ghosts.filter(g=>g.life>0); }
 let last=performance.now();
+let hitSlowT=0; /* v50: a short slow-motion beat for heavy blows, ranked kills and broken bosses (react56.js) */
 function frame(now){
   requestAnimationFrame(frame);
   const rdt=clamp((now-last)/1000,0,.05); last=now; time+=rdt;
-  if(P&&P.clarT>0) P.clarT-=rdt; bossSlow-=rdt; if(dropSlow>0) dropSlow-=rdt;
-  timeScale=P&&P.dead&&!COOP?.3:bossSlow>0?.3:(P&&P.clarT>0)?.35:dropSlow>0?.75:1;
+  if(P&&P.clarT>0) P.clarT-=rdt; bossSlow-=rdt; hitSlowT-=rdt; if(dropSlow>0) dropSlow-=rdt;
+  timeScale=P&&P.dead&&!COOP?.3:bossSlow>0?.3:hitSlowT>0?.4:(P&&P.clarT>0)?.35:dropSlow>0?.75:1;
   camZ=lerp(camZ,camZT,Math.min(1,rdt*3)); if(Math.abs(camZ-camZT)<.002) camZ=camZT;
   if(P&&L){ const f=cut&&cut.s&&cut.s.cam?cut.s.cam:{x:P.x,y:P.y-16}; camPX=lerp(camPX,clamp(f.x-camR.x,0,W),Math.min(1,rdt*4)); camPY=lerp(camPY,clamp(f.y-camR.y,0,H),Math.min(1,rdt*4)); }
   if(mode==='play'){ if(freeze>0){ freeze=Math.min(freeze,lastKillT>time-.05?0:.025); freeze-=rdt; } if(freeze<=0){ let left=rdt*timeScale; while(left>1e-5){ const st=Math.min(left,1/60); update(st); left-=st; } } }

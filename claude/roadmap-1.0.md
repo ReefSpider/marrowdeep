@@ -2,7 +2,7 @@
 
 Scope decision (BT, 2026-11-05): **1.0 is everything as it is** — all 11 tiers, co-op, the Rope-House, altar, Ways, slots. Nothing is cut; everything gets polished.
 
-Last updated: v45 (10 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
+Last updated: v50 (17 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
 
 ## Done since v17
 - **Playtest loop running:** friends' reports drove v34–v44 (scaling, levelling, loot variety, chest kinds, falls, late-game difficulty, Act II, boss guard/openings).
@@ -13,13 +13,21 @@ Last updated: v45 (10 Nov 2026). Version notes for each release are in `claude/v
 - **Tooling:** DPS meter, telemetry and the balance lab (v32); seeded lab runs (v45).
 - **Hosting:** three.js and PeerJS self-hosted (v45); story panels as WebP (77 → 5 MB, v45).
 
+## Done since v45
+- **The Marrow tree, stages 1–3** (v46–v48): 273 of 300 nodes.
+- **The cold open** (v49).
+- **Set pieces** (v50): the first three bosses rebuilt on their own ground; a director and a far plane in the first three regions; foe reactions to damage types, regional leanings, element shrines, officers; a slow-motion beat on heavy blows. The audit behind it is `claude/audit-v50-steam.md`.
+
 ## Next, in order
 
 ### 1. Playtest round on v45 (BT)
-- Everyone reloads (co-op needs `marrowdeep-45`), presses **Clear** in the playtest report, plays, and sends it.
+- Everyone reloads (co-op needs `marrowdeep-50`), presses **Clear** in the playtest report, plays, and sends it.
 - Questions: do v44's boss openings make fights feel read rather than rushed? Do the builds feel different (tank holding the room deep, killers equal)? Anything that suddenly feels unfair after the Might change?
 
 ### 2. Things Claude can build next
+- **Set pieces, the rest (from the v50 audit):** Merrow, Piet and Act II's five bosses on their own ground; directors and far planes for the other seven regions; plan section 5's Gift routes and boss tree answers.
+- **Fonts into the repo** (they load from Google Fonts; a desktop build has to start offline).
+- **A desktop build with Steamworks** (Electron or Tauri; achievements, cloud saves).
 - **Controller support:** gamepad play, plus menus navigable by controller and keyboard.
 - **Settings & accessibility:** key rebinding (the Controls tab lists keys but can't change them), screen shake and flash toggles, colour-blind rarity markers (shape or letter as well as colour), text size.
 - **Shipping basics, the rest:** in-game changelog, credits screen, loading screen, automatic save backup slot, known-issues list (GitHub Issues).
