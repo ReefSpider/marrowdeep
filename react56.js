@@ -28,7 +28,9 @@
       short slow-motion beat instead (hitSlowT in ui.js; never in co-op, never with reduced motion).
    RX holds the numbers. */
 const RX={cd:3.5,weak:1.3,res:.3,infuse:40,ban:.55,banR:110,horn:1.9,every:9};
-const REGION_EL={meadow:['fire','poison'],fen:['shock','water'],ashes:['water','fire'],pass:['fire','cold'],fort:['holy','shadow'],villages:['fire','blood'],slums:['holy','poison'],oldcity:['shock','holy'],royal:['shadow','blood'],bridge:['wind','shock']};
+/* v52: only soldiers carry a banner or a horn (villagers, beggars, nobles and servants were getting them) */
+const RX_ARMY=new Set(['footman','pikeman','guard','handknight','archer','buried','zealot','knight','taker','engineer','rider','penitent','husk']);
+const REGION_EL={meadow:['fire','poison'],fen:['shock','water'],ashes:['water','fire'],pass:['fire','cold'],fort:['holy','shadow'],villages:['holy','blood'],slums:['fire','poison'],oldcity:['shock','holy'],royal:['shadow','blood'],bridge:['wind','shock']};
 const rxSeen=(()=>{ try{ return store.get('marrowdeep.rx')||{}; }catch(e){ return {}; } })();
 function rxPop(e,jp,name,col){ try{ const d=document.createElement('div'); d.className='cpop t1'; d.innerHTML=`<b>${jp}</b>${name}`; d.style.setProperty('--tc',col||'#ffd27a'); cpLayer.appendChild(d); cpops.push({el:d,x:e.x,y:e.y-e.h-8,t:0}); }catch(err){} }
 function rxTip(k,t){ if(rxSeen[k]) return; rxSeen[k]=1; try{ store.set('marrowdeep.rx',rxSeen); }catch(e){} toast(t,1); }
@@ -79,7 +81,7 @@ let rxLastSlow=0;
 /* ---------- regions lean; officers in the packs; shrines ---------- */
 (function(){ const o=mkEnemy; mkEnemy=function(s){ const e=o(s); const le=L&&L.def&&REGION_EL[L.def.look]; if(e&&le&&!e.boss){ e.weak=le[0]; e.res=Object.assign({},e.res); e.res[le[1]]=Math.min(.75,(e.res[le[1]]||0)+RX.res); } return e; }; })();
 (function(){ const o=loadLevel; loadLevel=function(idx,opt){ const r=o(idx,opt); if(!L) return r; const d=L.def, le=REGION_EL[d.look]; L.shrines=[];
-  if(d.kind==='dungeon'){ /* officers */ const ok=e=>!e.dead&&!e.boss&&!e.fly&&e.h>=20&&!NO_RANK.has(e.type)&&!e.champ&&!e.rare&&!e.unique&&!e.ceil&&e.state!=='hang'&&e.type!=='scarecrow'&&e.type!=='debtor'; let n=0;
+  if(d.kind==='dungeon'){ /* officers */ const ok=e=>RX_ARMY.has(e.type)&&!e.dead&&!e.boss&&!e.fly&&e.h>=20&&!NO_RANK.has(e.type)&&!e.champ&&!e.rare&&!e.unique&&!e.ceil&&e.state!=='hang'&&e.type!=='scarecrow'&&e.type!=='debtor'; let n=0;
     enemies.forEach((e,i)=>{ if(!ok(e)||hsh(i*31+idx,77)>4.5/RX.every) return; const near=enemies.filter(m=>m!==e&&!m.dead&&!m.officer&&Math.abs(m.x-e.x)<160&&Math.abs(m.y-e.y)<50).length; if(near<2) return; n++;
       if(n%2){ e.officer='banner'; e.hp=e.maxhp=e.hp*1.4; e.name='Banner-bearer'; } else { e.officer='horn'; e.name='Horn-blower'; } e.xp=Math.round(e.xp*2); });
     /* a shrine */ if(le&&L.rooms&&L.rooms.length>2){ const fin=L.rooms[L.rooms.length-1], spots=[]; const g=(x,y)=>L.g[y]&&L.g[y][x]===1&&[1,2,3].every(k=>L.g[y-k]&&L.g[y-k][x]===0);

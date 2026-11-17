@@ -12,7 +12,7 @@
    Shared chests: everyone watches the reel, then has 3 seconds to roll for the item or pass. The winner is drawn with
    odds weighted by "fate debt": winning raises your debt (more for rarer items, a little even when nobody rolled against
    you), losing a contested roll pays some back, so the loot spreads out. */
-const NET_V='marrowdeep-51'; /* v51: Act II's boss arenas are a different size and carry their own props (bosses57.js) */
+const NET_V='marrowdeep-52'; /* v52: Rook moved to after the Palace Bridge (level order changed); bosses are larger (logic59.js) */
 const SEAT_C=['#e8c25a','#7ab8ff','#86d66a','#ff7ab8'];
 const QS=new URLSearchParams(location.search);
 const NET={conn:false,host:false,running:false,me:0,code:'',seats:[],tr:null,links:{},heroes:{},epoch:0,n:1,

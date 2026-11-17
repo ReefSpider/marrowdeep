@@ -5,7 +5,7 @@
    unless you walked into it. A hero who held right and jumped through the Quiet Fields lost about one life bar in
    23 seconds and never had to stop.
    Now each of the first three regions has
-     - a far plane that is busy all the time: the hunt riding the ridge with torches and siege fire crossing the sky
+     - a far plane that is busy all the time: the hunt riding the ridge with torches
        (fields), something tall wading through the mist (fen), the towers of Kesh coming down one at a time (ashes);
      - and set pieces that come out of that far plane into the level, called by a director every 35–50 s of play
        while you are outdoors and not already in a sealed fight. Each is announced, and each asks for something:
@@ -22,6 +22,8 @@ const STG_EV={meadow:['hunt','torches'],fen:['risen','hand'],ashes:['tower','com
 let SD=null;
 (function(){ const o=loadLevel; loadLevel=function(idx,opt){ const r=o(idx,opt); SD=null; const d=L&&L.def; if(d&&d.kind==='dungeon'&&STG_EV[d.look]){ SD={look:d.look,t:rnd(STG.first[0],STG.first[1]),last:'',n:0,clock:rnd(0,50),sky:rnd(4,9),sk:[],fall:-1,fallT:0,towers:[...Array(6)].map((_,i)=>({x:60+i*150+hsh(i,idx)*60,h:46+hsh(i*3,idx)*54,w:14+hsh(i*7,idx)*10,k:1})),wader:rnd(0,400),arm:0}; } return r; }; })();
 const stFloor=(x,y)=>{ const f=findFloor(x,(y==null?P.y:y)-46); return Math.abs(f-(y==null?P.y:y))<=64?f:null; };
+const stSky=()=>{ const tx=Math.floor(P.x/T); for(let ty=Math.floor((P.y-P.h)/T)-1;ty>=0;ty--) if(tileAt(tx,ty)===1) return false; return true; }; /* v52: riders, torches, the hand and falling towers only come where there is sky over you */
+const STG_SKY={hunt:1,torches:1,hand:1,tower:1};
 const stQuiet=()=>!L.arenas||!L.arenas.some(a=>a.state===1);
 function stCap(t,jp,ms){ caption(t,jp); setTimeout(()=>caption(''),ms||2600); }
 function stSpawn(t,x,y,fn){ if(!spHost()) return null; const e=mkEnemyAt(t,x,y); e.intro=false; e.state='chase'; e.atkCd=rnd(.4,.9); e.staged=1; if(fn) fn(e); enemies.push(e); return e; }
@@ -48,11 +50,11 @@ const stRubble=(sx,sy,f)=>{ ctx.save(); ctx.translate(sx,sy-8); ctx.rotate(f.lan
 (function(){ const o=update; update=function(dt){ o(dt); const S=SD; if(!S||mode!=='play'||!L) return; S.clock+=dt; S.wader+=dt*5; if(S.arm>0) S.arm-=dt; if(S.ridge>0) S.ridge-=dt;
   for(const t of S.towers) if(t.k<1&&t.k>0){ t.k=Math.max(0,t.k-dt*.3); if(t.k<=0){ AU.boom(.25); shake(2); } }
   S.fallT-=dt; if(S.look==='ashes'&&S.fallT<=0){ S.fallT=rnd(26,40); const live=S.towers.filter(t=>t.k>=1); if(live.length>2){ pick(live).k=.999; AU.tone('sine',48,30,2,.2,.6); } }
-  S.sky-=dt; if(S.look==='meadow'&&S.sky<=0){ S.sky=rnd(5,10); const d=R()<.5?1:-1; S.sk.push({t:0,dur:rnd(2.6,3.6),x0:d>0?-30:W+30,x1:d>0?rnd(W*.5,W+40):rnd(-40,W*.5),h:rnd(90,150),y0:rnd(120,160)}); AU.noise(.9,700,200,1,.07,'lowpass',.7); }
+  S.sky-=dt; if(false&&S.look==='meadow'&&S.sky<=0){ /* v52: no siege fire over the Quiet Fields. There is no siege there; the region's whole idea is that nothing happens overhead. */ S.sky=rnd(5,10); const d=R()<.5?1:-1; S.sk.push({t:0,dur:rnd(2.6,3.6),x0:d>0?-30:W+30,x1:d>0?rnd(W*.5,W+40):rnd(-40,W*.5),h:rnd(90,150),y0:rnd(120,160)}); AU.noise(.9,700,200,1,.07,'lowpass',.7); }
   for(const k of S.sk) k.t+=dt; S.sk=S.sk.filter(k=>k.t<k.dur+.7);
   if(STG.off||P.dead) return; S.t-=dt; if(S.t>0) return;
   if(!stQuiet()||!P.onGround||enemies.filter(e=>!e.dead&&Math.abs(e.x-P.x)<220&&Math.abs(e.y-P.y)<90).length>STG.busy||(L.finalArena&&P.x>L.finalArena.x0-3*T&&P.y>L.finalArena.y0&&P.y<L.finalArena.y1)){ S.t=3; return; }
-  const list=STG_EV[S.look]; let ev=list[S.n%list.length]; if(ev===S.last) ev=list[(S.n+1)%list.length];
+  const list=STG_EV[S.look]; let ev=list[S.n%list.length]; if(ev===S.last) ev=list[(S.n+1)%list.length]; if(STG_SKY[ev]&&!stSky()){ const alt=list.find(k=>!STG_SKY[k]); if(!alt){ S.t=3; return; } ev=alt; }
   if(STG_RUN[ev](S)){ S.last=ev; S.n++; S.t=rnd(STG.every[0],STG.every[1]); S.ran=(S.ran||0)+1; if(typeof MUS!=='undefined'&&MUS.sting) try{ MUS.sting(); }catch(e){} } else S.t=4; }; })();
 
 /* ---------- the far plane ---------- */

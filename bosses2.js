@@ -65,7 +65,7 @@ function netThrow(e){ const x0=e.x+e.face*10, y0=e.y-24, tx=P.x+P.vx*.3, t=.7; c
     draw(f){ if(f.done) return; const sx=f.x-camR.x, sy=f.y-camR.y; ctx.strokeStyle='#8a7a5a'; ctx.lineWidth=1; for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(sx-10,sy+i*4); ctx.lineTo(sx+10,sy+i*4); ctx.stroke(); ctx.beginPath(); ctx.moveTo(sx+i*4,sy-10); ctx.lineTo(sx+i*4,sy+10); ctx.stroke(); } }}); }
 function shell(x,delay,dmg,r){ const F=FLOOR(); r=r||28; teleRect(x-r,F-6,r*2,6,delay); setTimeout(()=>{ if(mode!=='play'||!L) return; boom(x,F-2,r+6,dmg); },delay*1000); }
 function mineAt(x,dmg){ const F=FLOOR(); fx.push({t:0,dur:9,haz:1,upd(f){ if(f.blown) return; if((!P.dead&&Math.abs(P.x-x)<14&&Math.abs(P.y-F)<10&&f.t>.6)||f.t>8.5){ f.blown=1; f.t=f.dur; boom(x,F-2,34,dmg); } },
-  draw(f){ const sx=Math.round(x-camR.x), sy=Math.round(F-camR.y); rect(ctx,sx-4,sy-3,8,3,'#2a2420'); rect(ctx,sx-3,sy-4,6,1,'#5a5054'); if(Math.sin(f.t*(f.t>6?24:8))>0){ ectx.fillStyle='#ff3a2a'; ectx.fillRect(sx,sy-5,1,1); addLight(x,F-5,20,.6,1,.2,.1); } }}); }
+  draw(f){ const sx=Math.round(x-camR.x), sy=Math.round(F-camR.y); rect(ctx,sx-4,sy-3,8,3,'#2a2420'); rect(ctx,sx-3,sy-4,6,1,'#5a5054'); rect(ctx,sx,sy-6,1,2,'#6a5a3a'); { const fl=Math.abs(Math.sin(f.t*(f.t>6?26:11))); ectx.fillStyle=`rgba(255,${150+Math.round(fl*80)},70,${(.5+fl*.5).toFixed(2)})`; ectx.fillRect(sx,sy-7-(fl>.6?1:0),1,1); addLight(x,F-5,16+fl*8,.5,1,.6,.25); } }}); }
 
 /* ---------- patterns ---------- */
 (function(){ const o=startPat2; startPat2=function(e,n,p){ const F=FLOOR();
@@ -86,9 +86,9 @@ function mineAt(x,dmg){ const F=FLOOR(); fx.push({t:0,dur:9,haz:1,upd(f){ if(f.b
   else if(n==='roll'){ p.dir=Math.sign(P.x-e.x)||1; }
   else if(n==='combo'){ p.name='duel'; AU.noise(.3,600,2000,2,.2,'bandpass',.3); }
   else if(n==='bash'){ p.name='charge'; teleRect(Math.min(e.x,e.x+e.face*420),F-30,420,30,.7); AU.growl(); }
-  else if(n==='barrage'){ p.xs=[]; const k=e.phase>1?6:4; for(let i=0;i<k;i++) p.xs.push(clamp(i===0?P.x:P.x+rnd(-140,140),2*T,(L.w-2)*T)); p.xs.forEach((x,i)=>shell(x,1+i*.18,e.dmg,26)); AU.boom(.3); caption('"Mark. Fire."','撃て'); setTimeout(()=>caption(''),1300); }
+  else if(n==='barrage'){ p.xs=[]; const k=e.phase>1?6:4; for(let i=0;i<k;i++) p.xs.push(clamp(i===0?P.x:P.x+rnd(-140,140),2*T,(L.w-2)*T)); p.xs.forEach((x,i)=>shell(x,1+i*.18,e.dmg,26)); AU.boom(.3); caption('"Wind her. Loose."','放て'); setTimeout(()=>caption(''),1300); }
   else if(n==='creep'){ p.dir=Math.sign(P.x-e.x)||1; const x0=p.dir>0?3*T:(L.w-3)*T; const n_=12; for(let i=0;i<n_;i++) shell(x0+p.dir*i*36,.9+i*.22,e.dmg,20); }
-  else if(n==='mines'){ for(let i=0;i<(e.phase>1?4:3);i++) mineAt(clamp(P.x+rnd(-160,160),3*T,(L.w-3)*T),e.dmg*1.1); AU.lock&&AU.lock(); toast('Mines. Watch the red lights.'); }
+  else if(n==='mines'){ for(let i=0;i<(e.phase>1?4:3);i++) mineAt(clamp(P.x+rnd(-160,160),3*T,(L.w-3)*T),e.dmg*1.1); AU.lock&&AU.lock(); toast('Fire-pots under the mud. Watch for the fuses.'); }
   else if(n==='sappers'){ if(enemies.filter(o=>!o.dead&&o.type==='engineer').length>=2){ p.skip=1; return; } }
   else if(n==='trample'){ p.name='charge'; teleRect(Math.min(e.x,e.x+e.face*500),F-34,500,34,.6); AU.roar(); }
   else if(n==='flame'){ p.dir=Math.sign(P.x-e.x)||1; AU.cast(); }
