@@ -47,7 +47,8 @@ Object.assign(PHASE3_SUB,{odo:'He blows the horn. The field is burning in from b
 EDEF.fenhand={w:44,h:22,hp:99999,dmg:0,spd:0,xp:0,name:'The Many-Fingered Hand'};
 EDEF.chapelbell={w:28,h:28,hp:99999,dmg:0,spd:0,xp:0,name:'Saint Edda\'s Bell'};
 NO_RANK.add('fenhand'); NO_RANK.add('chapelbell');
-const spProp=e=>e&&(e.type==='fenhand'||e.type==='chapelbell');
+const SP_PROPS=new Set(['fenhand','chapelbell']); const SP_X={back:{},mid:{},world:{},front:{},tick:{},p2:{},p3:{},prop:{}}; /* v51: later bosses hang their stages here (bosses57.js) */
+const spProp=e=>!!e&&SP_PROPS.has(e.type);
 
 /* ---------- fire that burns both sides, and wheat that carries it ---------- */
 function spFire(x,y,dmg,life){ life=life||SP.fireLife; foeFire(x,y,dmg,life);
@@ -123,15 +124,16 @@ function spUnseat(e){ e.pat=null; e.rear=0; e.shyT=time+SP.unseat; e.cd=SP.unsea
   if(e&&e.type==='chapelbell'){ spToll(e,heavy); return; }
   return o(e,d,crit,dir,kb,heavy,launch,stun); }; })();
 (function(){ const o=updEnemy; updEnemy=function(e,dt){ if(!spProp(e)) return o(e,dt); e.flash-=dt; e.anim+=dt; e.vx=e.vy=0; e.stun=0; e.sts=null;
+  if(SP_X.prop[e.type]) SP_X.prop[e.type](e,dt);
   if(e.type==='fenhand'){ e.life-=dt; if(e.life<=0&&!e.dead){ e.dead=true; e.deadT=9; for(let i=0;i<12;i++) part({x:e.x+rnd(-18,18),y:e.y-rnd(0,18),vx:rnd(-30,30),vy:rnd(-80,-20),g:300,life:.6,col:'#2a3a2a'}); } }
   }; })();
 (function(){ const o=killEnemy; killEnemy=function(e,dir,crit){ if(spProp(e)){ e.hp=e.maxhp; return; } return o(e,dir,crit); }; })();
-(function(){ const o=bossPhase3; bossPhase3=function(e){ o(e); const S=L.sp; if(!S) return; const F=FLOOR();
+(function(){ const o=bossPhase3; bossPhase3=function(e){ o(e); const S=L.sp; if(!S) return; const F=FLOOR(); if(SP_X.p3[S.kind]) SP_X.p3[S.kind](S,e,F);
   if(S.kind==='odo'){ const c=clamp(e.x,(SP.closeHalf+2)*T,(L.w-SP.closeHalf-2)*T); S.close={l:T,r:(L.w-1)*T,tl:c-SP.closeHalf*T,tr:c+SP.closeHalf*T,tk:0}; S.barn=.001; spHorn(1.2); for(const z of L.straw||[]) if(z.a==null){ z.a=z.b=(z.x0+z.x1)/2; } spTell('close','The field is burning in from both ends. Stay inside the fire.'); }
   if(S.kind==='preacher'){ S.burn=1; S.beam=1.2; if(S.glass){ S.glass=0; S.shat=time; U.uWhite.value=.5; AU.boom(1); AU.noise(.8,6000,1500,2,.4,'highpass',.5); shake(12); for(let i=0;i<40;i++) part({x:camR.x+W/2+rnd(-30,30),y:F-rnd(90,190),vx:rnd(-160,160),vy:rnd(-60,120),g:500,life:rnd(.6,1.4),em:true,col:pick(['#c03a2a','#3a6ac0','#d8b24a','#e8e0d0'])}); } }
   }; })();
 /* the preacher burns the bell rope at half; the sisters' giants */
-(function(){ const o=bossPhase; bossPhase=function(e){ o(e); const S=L.sp; if(S&&S.kind==='preacher'&&S.bell&&S.bell.hang&&!S.fallT){ S.fallT=1.7; teleRect(S.bell.x-34,0,68,FLOOR(),1.7); caption('He puts the lantern to the bell rope.','鐘が落ちる'); setTimeout(()=>caption(''),1800); } }; })();
+(function(){ const o=bossPhase; bossPhase=function(e){ o(e); const S=L.sp; if(S&&SP_X.p2[S.kind]) SP_X.p2[S.kind](S,e,FLOOR()); if(S&&S.kind==='preacher'&&S.bell&&S.bell.hang&&!S.fallT){ S.fallT=1.7; teleRect(S.bell.x-34,0,68,FLOOR(),1.7); caption('He puts the lantern to the bell rope.','鐘が落ちる'); setTimeout(()=>caption(''),1800); } }; })();
 
 /* ---------- the bell ---------- */
 function spToll(b,heavy){ const S=L.sp; if(!S||S.kind!=='preacher') return; b.flash=.12; if(S.cd>0){ AU.clang(); return; } S.cd=SP.bellCd; S.swing=1.6; AU.bell(); AU.toll&&AU.toll(); if(typeof SMP!=='undefined') SMP.play('bell_dissonant',{v:.7,wet:.5}); shake(7); impactT=.08;
@@ -152,6 +154,7 @@ EDRAW.fenhand=function(c,e){ const k=clamp(e.life>.4?1:e.life/.4,0,1); c.fillSty
     const c=S.close; if(c&&!e.dead){ c.l=Math.min(c.tl,c.l+SP.closeSp*dt); c.r=Math.max(c.tr,c.r-SP.closeSp*dt); c.tk-=dt; if(c.tk<=0){ c.tk=.5; if(!P.dead&&(P.x<c.l+6||P.x>c.r-6)) hurtPlayer(e.dmg*.5,{x:P.x<c.l+6?c.l-20:c.r+20,hp:0,dead:true}); for(const m of enemies) if(!m.dead&&!m.boss&&(m.x<c.l||m.x>c.r)) setBurn(m,e.dmg*.4); }
       e.x=clamp(e.x,c.l+14,c.r-14); } if(e.dead) S.close=null; }
   else if(S.kind==='sisters'&&live){ spSisters(S,e,dt,F); }
+  else if(SP_X.tick[S.kind]) SP_X.tick[S.kind](S,e,dt,F,live);
   else if(S.kind==='preacher'){ S.cd-=dt; S.swing=Math.max(0,S.swing-dt); const b=S.bell; if(typeof RG!=='undefined'){ RG.storm=0; RG.stormT=20; }
     if(S.fallT>0&&b.hang){ S.fallT-=dt; if(R()<.5) part({x:b.x+rnd(-1,1),y:b.y-40-rnd(0,40),vx:rnd(-10,10),vy:rnd(-30,0),g:-20,life:.5,em:true,col:'#ff9a3c'});
       if(S.fallT<=0){ b.hang=0; b.vyF=0; } }
@@ -193,7 +196,7 @@ function spHandSlam(x,F,dmg,leave){ const lv=L; teleRect(x-30,F-5,60,5,1.3);
 
 /* ---------- drawing: behind everything (the far plane) ---------- */
 const spPx=(x,par)=>Math.round(x-camR.x*par);
-function spBack(){ const S=L&&L.sp; if(!S) return; const F=FLOOR()-camR.y;
+function spBack(){ const S=L&&L.sp; if(!S) return; const F=FLOOR()-camR.y; if(SP_X.back[S.kind]) return SP_X.back[S.kind](S,F);
   if(S.kind==='odo'){ /* the hunt on the ridge: a column of riders with torches, and the farm going up */
     const hy=F-49, e=enemies.find(b=>b.boss), ph=e?e.phase:1; const span=W+520, base=((S.hunt*13)%span);
     for(let i=0;i<16;i++){ const x=Math.round(((base+i*31)%span)-260-camR.x*.12*0+Math.sin(i*7)*4), y=hy+Math.round(Math.sin(i*3.1)*2), g=Math.sin(time*11+i)>0?1:0; if(x<-12||x>W+12) continue;
@@ -237,7 +240,7 @@ function spChapel(S,F){ const off=(camR.x+W/2-L.w*T/2)*.3, cx=Math.round(W/2-off
   /* the rope the bell hangs from */ const b=S.bell; if(b&&b.hang){ const bx=Math.round(b.x-camR.x); rect(ctx,bx,0,1,Math.max(0,Math.round(b.y-28-camR.y)),S.fallT>0?'#ff9a3c':'#6a5a3a'); } }
 
 /* ---------- drawing: in the world, behind the fighters ---------- */
-function spWorld(){ const S=L&&L.sp; if(!S) return; const F=FLOOR(), sy=F-camR.y;
+function spWorld(){ const S=L&&L.sp; if(!S) return; const F=FLOOR(), sy=F-camR.y; if(SP_X.world[S.kind]) return SP_X.world[S.kind](S,F,sy);
   if(S.kind==='odo'){ /* gallows posts under the beams, the hanged, and the wheat */
     for(const [x,y,n] of L.gal||[]){ const px=Math.round((x+n-1)*T+6-camR.x), py=y*T-camR.y; if(px<-80||px>W+80) continue; rect(ctx,px,py,4,sy-py,'#1c1412'); rect(ctx,px,py,1,sy-py,'#3a2a22'); ctx.strokeStyle='#1c1412'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(px+2,py+22); ctx.lineTo(px-16,py+2); ctx.stroke();
       for(let k=0;k<2;k++){ const hx=Math.round(x*T+10+k*26-camR.x), sw=Math.round(Math.sin(time*1.3+x+k)*1.5); rect(ctx,hx,py+4,1,10,'#6a5a3a'); rect(ctx,hx-3+sw,py+14,7,14,'#141012'); for(let i=0;i<3;i++) rect(ctx,hx-2+sw+i*2,py+14,1,14,'#4a4448'); rect(ctx,hx-1+sw,py+18,3,3,'#cfc6b2'); } }
@@ -253,10 +256,12 @@ function spWorld(){ const S=L&&L.sp; if(!S) return; const F=FLOOR(), sy=F-camR.y
         /* shade under the lofts and behind the bell */ ctx.fillStyle='rgba(0,0,0,.35)'; for(const x0 of [4,41]) ctx.fillRect(x0*T-camR.x,11*T+4-camR.y,7*T,F-11*T-4); } } } }
 
 /* ---------- drawing: in front (water over the floor) ---------- */
-function spFront(){ const S=L&&L.sp; if(!S) return; if(S.kind==='sisters'&&S.flood.k>0){ const F=FLOOR()-camR.y, k=S.flood.k, h=Math.round(11*k); ctx.fillStyle='rgba(24,52,50,.58)'; ctx.fillRect(0,F-h,W,h+2);
+function spFront(){ const S=L&&L.sp; if(!S) return; if(SP_X.front[S.kind]) return SP_X.front[S.kind](S); if(S.kind==='sisters'&&S.flood.k>0){ const F=FLOOR()-camR.y, k=S.flood.k, h=Math.round(11*k); ctx.fillStyle='rgba(24,52,50,.58)'; ctx.fillRect(0,F-h,W,h+2);
     for(let x=0;x<W;x+=2){ const yy=F-h+Math.round(Math.sin(time*3+(x+camR.x)*.14)*1); ectx.fillStyle=`rgba(170,215,205,${(.16+.1*Math.sin(time*2+x*.3)).toFixed(2)})`; ectx.fillRect(x,yy,2,1); } }
   if(S.kind==='preacher'&&L.dark>0&&!L.cand) L.dark=Math.max(0,L.dark-.004); }
 (function(){ const o=drawBGEvents; drawBGEvents=function(){ o(); try{ spBack(); }catch(err){ if(!spTold.err){ spTold.err=1; console.error(err); } } }; })();
+/* mid: painted over the region's own middle layer, for stages that are somewhere else entirely (a vault, a yard) */
+(function(){ const o=drawWeather; drawWeather=function(){ const S=L&&L.sp; if(S&&SP_X.mid[S.kind]){ try{ SP_X.mid[S.kind](S,FLOOR()-camR.y); }catch(err){ if(!spTold.err4){ spTold.err4=1; console.error(err); } } } return o(); }; })();
 (function(){ const o=drawHazards; drawHazards=function(){ try{ spWorld(); }catch(err){ if(!spTold.err2){ spTold.err2=1; console.error(err); } } o(); }; })();
 (function(){ const o=drawBossOverlays; drawBossOverlays=function(){ o(); try{ spFront(); }catch(err){ if(!spTold.err3){ spTold.err3=1; console.error(err); } } }; })();
 
