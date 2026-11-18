@@ -2,7 +2,7 @@
 
 Scope decision (BT, 2026-11-05): **1.0 is everything as it is** — all 11 tiers, co-op, the Rope-House, altar, Ways, slots. Nothing is cut; everything gets polished.
 
-Last updated: v53 (18 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
+Last updated: v54 (18 Nov 2026). Version notes for each release are in `claude/vNN-notes.md`.
 
 ## Done since v17
 - **Playtest loop running:** friends' reports drove v34–v44 (scaling, levelling, loot variety, chest kinds, falls, late-game difficulty, Act II, boss guard/openings).
@@ -20,6 +20,7 @@ Last updated: v53 (18 Nov 2026). Version notes for each release are in `claude/v
 - **Act II's bosses and the stake** (v51): Brann, the Tithe-Collector, the Choir, Rook and Gideon each on a stage with moving parts that can be turned on them; a push-your-luck stake on every boss chest (solo).
 - **Grander bosses and a logic sweep** (v52): nine hero-sized bosses drawn 1.35–1.6× larger; Rook moved from the Royal Houses to the Palace Bridge; officers only among soldiers, set pieces only under open sky, Brann back in period.
 - **The end of Act I** (v53): Merrow (countermand his orders, the avalanche) and Piet (ladders, the three-cut chain, the ram) on their own ground.
+- **The Crowspire** (v54): the endgame. An endless tower from the Rope-House at any level; 10× tougher every 10 floors; one Crow's Hoard per climb whose odds grow with the floor (a grey coffer at 1, 50/50 abyssal at 1000), lost if you fall.
 
 ## Next, in order
 
